@@ -1,0 +1,19 @@
+# secrets — NEVER tracked
+.env
+
+# dependencies — reinstallable with npm install
+node_modules/
+
+# hardhat build output — regenerable with npx hardhat compile
+cache/
+artifacts/
+typechain-types/
+
+# coverage
+coverage/
+coverage.json
+
+# os / editor noise
+.DS_Store
+Thumbs.db
+*.log

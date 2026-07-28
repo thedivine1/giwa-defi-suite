@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GIWA DeFi Suite — DojangScore · WonVault · GIWASwap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e0c;
+            --panel: #0f1512;
+            --panel2: #131b16;
+            --panel3: #17211b;
+            --line: #223029;
+            --line2: #2d4036;
+            --text: #eaf2ec;
+            --muted: #8aa396;
+            --faint: #5d7568;
+            --jade: #6fe3b0;
+            --jade-dim: #2f6f54;
+            --jade-deep: #0e2a20;
+            --gold: #e7c277;
+            --rose: #e0918f;
+            --disp: 'Syne', sans-serif;
+            --body: 'IBM Plex Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--body);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            font-size: 15px;
+            line-height: 1.5
+        }
+
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            pointer-events: none;
+            background: radial-gradient(120% 80% at 12% 0%, #11201a 0%, transparent 55%), radial-gradient(100% 70% at 100% 100%, #14110a 0%, transparent 50%), var(--bg)
+        }
+
+        .bg.grid {
+            z-index: -1;
+            opacity: .5;
+            background-image: radial-gradient(var(--line) 1px, transparent 1.4px);
+            background-size: 30px 30px;
+            animation: pan 38s linear infinite
+        }
+
+        .bg.scan {
+            z-index: -1;
+            background: linear-gradient(to bottom, transparent 0%, rgba(111, 227, 176, .05) 50%, transparent 100%);
+            height: 34vh;
+            width: 100%;
+            position: fixed;
+            left: 0;
+            animation: scan 7.5s linear infinite;
+            opacity: .6
+        }
+
+        @keyframes pan {
+            from {
+                background-position: 0 0
+            }
+
+            to {
+                background-position: 30px 60px
+            }
+        }
+
+        @keyframes scan {
+            0% {
+                top: -34vh
+            }
+
+            100% {
+                top: 100vh
+            }
+        }
+
+        .dot {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--jade);
+            opacity: .35;
+            z-index: -1;
+            box-shadow: 0 0 8px var(--jade);
+            animation: float 14s ease-in-out infinite
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-26px)
+            }
+        }
+
+        .shell {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 42px 26px 70px;
+            display: grid;
+            grid-template-columns: 330px 1fr;
+            gap: 38px;
+            align-items: start
+        }
+
+        @media(max-width:880px) {
+            .shell {
+                grid-template-columns: 1fr;
+                gap: 26px;
+                padding: 26px 16px 60px
+            }
+        }
+
+        .rail {
+            position: sticky;
+            top: 30px;
+            animation: rise .7s cubic-bezier(.2, .7, .2, 1) both
+        }
+
+        .kicker {
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .28em;
+            color: var(--jade);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 18px
+        }
+
+        .kicker .pip {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--jade);
+            box-shadow: 0 0 0 0 rgba(111, 227, 176, .6);
+            animation: pulse 2.4s infinite
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(111, 227, 176, .5)
+            }
+
+            70% {
+                box-shadow: 0 0 0 9px rgba(111, 227, 176, 0)
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(111, 227, 176, 0)
+            }
+        }
+
+        .wordmark {
+            font-family: var(--disp);
+            font-weight: 800;
+            line-height: .9;
+            letter-spacing: -.02em;
+            font-size: clamp(2.6rem, 6vw, 4.4rem);
+            text-transform: uppercase
+        }
+
+        .wordmark em {
+            font-style: normal;
+            color: var(--jade);
+            display: block
+        }
+
+        .manifesto {
+            margin-top: 18px;
+            font-size: 1.02rem;
+            color: var(--muted);
+            max-width: 30ch;
+            line-height: 1.45
+        }
+
+        .manifesto b {
+            color: var(--text);
+            font-weight: 600
+        }
+
+        .status {
+            margin-top: 26px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            border-radius: 6px;
+            padding: 14px;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%)
+        }
+
+        .status .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px
+        }
+
+        .status .lab {
+            font-family: var(--mono);
+            font-size: .6rem;
+            letter-spacing: .2em;
+            color: var(--faint);
+            text-transform: uppercase
+        }
+
+        .net {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--muted)
+        }
+
+        .net .d {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--faint)
+        }
+
+        .net.live .d {
+            background: var(--jade);
+            box-shadow: 0 0 7px var(--jade)
+        }
+
+        #connectBtn {
+            margin-top: 12px;
+            width: 100%;
+            font-family: var(--mono);
+            font-size: .78rem;
+            letter-spacing: .04em;
+            border: 1px solid var(--jade-dim);
+            background: var(--jade-deep);
+            color: var(--jade);
+            padding: 11px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: .18s;
+            text-transform: uppercase
+        }
+
+        #connectBtn:hover {
+            background: var(--jade);
+            color: var(--bg);
+            border-color: var(--jade);
+            transform: translateY(-1px)
+        }
+
+        #connectBtn.on {
+            background: transparent;
+            border-color: var(--line2);
+            color: var(--text);
+            cursor: default;
+            transform: none
+        }
+
+        .dataline {
+            margin-top: 10px;
+            font-family: var(--mono);
+            font-size: .66rem;
+            color: var(--faint);
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px dashed var(--line);
+            padding-top: 9px
+        }
+
+        .dataline b {
+            color: var(--muted);
+            font-weight: 500
+        }
+
+        .registry {
+            margin-top: 18px
+        }
+
+        .registry h4 {
+            font-family: var(--mono);
+            font-size: .58rem;
+            letter-spacing: .24em;
+            color: var(--faint);
+            text-transform: uppercase;
+            margin-bottom: 9px
+        }
+
+        .registry a {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: var(--mono);
+            font-size: .66rem;
+            color: var(--muted);
+            text-decoration: none;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--line);
+            transition: .15s
+        }
+
+        .registry a:hover {
+            color: var(--jade);
+            padding-left: 4px
+        }
+
+        .registry a span {
+            color: var(--faint)
+        }
+
+        .deck {
+            animation: rise .7s .12s cubic-bezier(.2, .7, .2, 1) both
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(16px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 22px
+        }
+
+        .tab {
+            font-family: var(--disp);
+            font-weight: 600;
+            font-size: .92rem;
+            letter-spacing: .02em;
+            background: none;
+            border: none;
+            color: var(--faint);
+            padding: 12px 18px 14px;
+            cursor: pointer;
+            position: relative;
+            transition: color .2s;
+            text-transform: uppercase
+        }
+
+        .tab:hover {
+            color: var(--muted)
+        }
+
+        .tab.active {
+            color: var(--text)
+        }
+
+        .tab::after {
+            content: "";
+            position: absolute;
+            left: 14px;
+            right: 14px;
+            bottom: -1px;
+            height: 2px;
+            background: var(--jade);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform .3s cubic-bezier(.2, .7, .2, 1)
+        }
+
+        .tab.active::after {
+            transform: scaleX(1)
+        }
+
+        .panel {
+            display: none;
+            animation: fade .35s ease both
+        }
+
+        .panel.show {
+            display: block
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .card {
+            background: linear-gradient(180deg, var(--panel2), var(--panel));
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 26px
+        }
+
+        .card+.card {
+            margin-top: 16px
+        }
+
+        .card h2 {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: .01em;
+            margin-bottom: 4px
+        }
+
+        .card .sub {
+            font-family: var(--mono);
+            font-size: .66rem;
+            color: var(--faint);
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            margin-bottom: 20px
+        }
+
+        .readout {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: end;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 22px;
+            margin-bottom: 22px
+        }
+
+        @media(max-width:560px) {
+            .readout {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .scorewrap .lab {
+            font-family: var(--mono);
+            font-size: .6rem;
+            letter-spacing: .24em;
+            color: var(--faint);
+            text-transform: uppercase
+        }
+
+        #sVal {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: clamp(3.6rem, 13vw, 7rem);
+            line-height: .85;
+            color: var(--text);
+            letter-spacing: -.03em;
+            display: block;
+            margin-top: 2px;
+            text-shadow: 0 0 30px rgba(111, 227, 176, .12)
+        }
+
+        .scorewrap .of {
+            font-family: var(--mono);
+            font-size: .8rem;
+            color: var(--faint)
+        }
+
+        .chips {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 150px
+        }
+
+        @media(max-width:560px) {
+            .chips {
+                flex-direction: row
+            }
+        }
+
+        .chip {
+            border: 1px solid var(--line2);
+            border-radius: 6px;
+            padding: 11px 14px;
+            background: var(--panel)
+        }
+
+        .chip .k {
+            font-family: var(--mono);
+            font-size: .56rem;
+            letter-spacing: .2em;
+            color: var(--faint);
+            text-transform: uppercase
+        }
+
+        .chip .v {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-top: 2px
+        }
+
+        .chip.tier .v {
+            color: var(--gold)
+        }
+
+        .chip.fee .v {
+            color: var(--jade)
+        }
+
+        .attest {
+            height: 2px;
+            background: var(--line);
+            border-radius: 2px;
+            margin-top: 18px;
+            overflow: hidden;
+            position: relative
+        }
+
+        .attest::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            width: 30%;
+            background: linear-gradient(90deg, transparent, var(--jade), transparent);
+            transform: translateX(-120%);
+            animation: sweep 3.2s ease-in-out infinite
+        }
+
+        @keyframes sweep {
+            0% {
+                transform: translateX(-120%)
+            }
+
+            60%,
+            100% {
+                transform: translateX(420%)
+            }
+        }
+
+        .field {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px
+        }
+
+        .field input,
+        .field select {
+            flex: 1;
+            background: var(--panel);
+            border: 1px solid var(--line2);
+            border-radius: 6px;
+            color: var(--text);
+            padding: 12px 14px;
+            font-family: var(--mono);
+            font-size: .85rem;
+            transition: .18s;
+            outline: none
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--jade);
+            box-shadow: 0 0 0 3px var(--jade-deep)
+        }
+
+        .field input::placeholder {
+            color: var(--faint)
+        }
+
+        .btn {
+            font-family: var(--mono);
+            font-size: .78rem;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            background: var(--jade);
+            color: var(--bg);
+            border: none;
+            border-radius: 6px;
+            padding: 0 20px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: .16s;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .btn:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px)
+        }
+
+        .btn:active {
+            transform: translateY(0)
+        }
+
+        .btn.ghost {
+            background: transparent;
+            border: 1px solid var(--line2);
+            color: var(--muted)
+        }
+
+        .btn.ghost:hover {
+            border-color: var(--jade);
+            color: var(--jade);
+            transform: translateY(-1px)
+        }
+
+        .btn.full {
+            width: 100%;
+            justify-content: center;
+            padding: 12px
+        }
+
+        .btn.busy {
+            opacity: .7;
+            cursor: wait;
+            pointer-events: none
+        }
+
+        .btn.busy::after {
+            content: "";
+            width: 12px;
+            height: 12px;
+            border: 2px solid currentColor;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin .7s linear infinite
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .console {
+            margin-top: 6px;
+            border: 1px dashed var(--line2);
+            border-radius: 6px;
+            padding: 14px;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .console .prompt {
+            font-family: var(--mono);
+            font-size: .74rem;
+            color: var(--jade)
+        }
+
+        .console input {
+            flex: 1;
+            min-width: 90px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--line2);
+            border-radius: 0;
+            color: var(--text);
+            padding: 6px 2px;
+            font-family: var(--mono);
+            font-size: .85rem;
+            outline: none
+        }
+
+        .console input:focus {
+            border-bottom-color: var(--jade);
+            box-shadow: none
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px
+        }
+
+        .stats3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px
+        }
+
+        @media(max-width:560px) {
+            .stats3 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .stat {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 14px
+        }
+
+        .stat .k {
+            font-family: var(--mono);
+            font-size: .58rem;
+            letter-spacing: .18em;
+            color: var(--faint);
+            text-transform: uppercase
+        }
+
+        .stat .v {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-top: 4px;
+            color: var(--text)
+        }
+
+        .stat .v small {
+            font-size: .7rem;
+            color: var(--faint);
+            font-weight: 400
+        }
+
+        .stat .v.pos {
+            color: var(--jade)
+        }
+
+        .stat .v.neg {
+            color: var(--rose)
+        }
+
+        .msg {
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--muted);
+            min-height: 1.1em;
+            margin-top: 10px
+        }
+
+        .msg.err {
+            color: var(--rose)
+        }
+
+        .row2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+
+        @media(max-width:560px) {
+            .row2 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .apyhero {
+            border: 1px solid var(--line2);
+            border-radius: 8px;
+            padding: 22px 24px;
+            margin-bottom: 18px;
+            background: radial-gradient(120% 140% at 0% 0%, var(--jade-deep), transparent 70%), var(--panel);
+            position: relative;
+            overflow: hidden
+        }
+
+        .apyhero .lab {
+            font-family: var(--mono);
+            font-size: .6rem;
+            letter-spacing: .24em;
+            color: var(--muted);
+            text-transform: uppercase
+        }
+
+        .apyhero .num {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: clamp(2.8rem, 9vw, 4.6rem);
+            line-height: .9;
+            color: var(--jade);
+            letter-spacing: -.03em;
+            display: inline-block;
+            text-shadow: 0 0 34px rgba(111, 227, 176, .25)
+        }
+
+        .apyhero .pct {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: var(--jade-dim);
+            vertical-align: top;
+            margin-left: 2px
+        }
+
+        .apyhero .cap {
+            display: block;
+            margin-top: 8px;
+            font-family: var(--mono);
+            font-size: .64rem;
+            color: var(--faint);
+            letter-spacing: .06em
+        }
+
+        .apyhero .you {
+            position: absolute;
+            top: 18px;
+            right: 20px;
+            text-align: right;
+            font-family: var(--mono);
+            font-size: .66rem;
+            color: var(--muted)
+        }
+
+        .apyhero .you b {
+            color: var(--gold)
+        }
+
+        .tiertable {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 8px
+        }
+
+        .trow {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr;
+            align-items: center;
+            padding: 11px 16px;
+            border-top: 1px solid var(--line);
+            font-family: var(--mono);
+            font-size: .8rem;
+            color: var(--muted);
+            transition: .18s;
+            position: relative
+        }
+
+        .trow:first-child {
+            border-top: none
+        }
+
+        .trow:hover {
+            background: var(--panel3);
+            padding-left: 20px
+        }
+
+        .trow .tn {
+            font-family: var(--disp);
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: .02em
+        }
+
+        .trow .tf {
+            text-align: right
+        }
+
+        .trow .td {
+            text-align: right;
+            color: var(--jade)
+        }
+
+        .trow.me {
+            background: linear-gradient(90deg, rgba(111, 227, 176, .10), transparent);
+            color: var(--text)
+        }
+
+        .trow.me::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--jade);
+            box-shadow: 0 0 10px var(--jade)
+        }
+
+        .trow.me .tn::after {
+            content: " · you";
+            color: var(--jade);
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .1em
+        }
+
+        .cap2 {
+            font-family: var(--mono);
+            font-size: .64rem;
+            color: var(--faint);
+            letter-spacing: .04em;
+            margin-bottom: 18px;
+            line-height: 1.6
+        }
+
+        .engine {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 10px
+        }
+
+        @media(max-width:680px) {
+            .engine {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        .eng {
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 10px 12px
+        }
+
+        .eng .k {
+            font-family: var(--mono);
+            font-size: .54rem;
+            letter-spacing: .18em;
+            color: var(--faint);
+            text-transform: uppercase
+        }
+
+        .eng .v {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 1.02rem;
+            margin-top: 3px;
+            color: var(--text)
+        }
+
+        .eng .v .delta {
+            font-size: .6rem;
+            font-weight: 500;
+            margin-left: 6px;
+            letter-spacing: 0
+        }
+
+        .delta.pos {
+            color: var(--jade)
+        }
+
+        .delta.neg {
+            color: var(--rose)
+        }
+
+        .eng .v.livepill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: .74rem;
+            color: var(--jade)
+        }
+
+        .eng .v.livepill .d {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--jade);
+            box-shadow: 0 0 7px var(--jade);
+            animation: pulse 2.4s infinite
+        }
+
+        .accrual {
+            height: 3px;
+            background: var(--line);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 18px
+        }
+
+        .accrual .fill {
+            height: 100%;
+            width: 30%;
+            background: linear-gradient(90deg, transparent, var(--jade), transparent);
+            animation: sweep 4s ease-in-out infinite
+        }
+
+        .flash {
+            animation: flashG .9s ease
+        }
+
+        @keyframes flashG {
+            0% {
+                color: var(--jade);
+                text-shadow: 0 0 16px rgba(111, 227, 176, .7)
+            }
+
+            100% {
+                text-shadow: none
+            }
+        }
+
+        .foot {
+            margin-top: 30px;
+            font-family: var(--mono);
+            font-size: .62rem;
+            color: var(--faint);
+            letter-spacing: .1em;
+            text-align: center;
+            line-height: 1.9
+        }
+
+        .foot a {
+            color: var(--muted);
+            text-decoration: none
+        }
+
+        .foot a:hover {
+            color: var(--jade)
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg"></div>
+    <div class="bg grid"></div>
+    <div class="bg scan"></div>
+    <div class="dot" style="top:18%;left:8%;animation-delay:0s"></div>
+    <div class="dot" style="top:62%;left:91%;animation-delay:3s"></div>
+    <div class="dot" style="top:80%;left:24%;animation-delay:6s"></div>
+    <div class="dot" style="top:30%;left:70%;animation-delay:9s"></div>
+
+    <div class="shell">
+        <aside class="rail">
+            <div class="kicker"><span class="pip"></span>GASOK 2026 · GIWA SEPOLIA · 91342</div>
+            <h1 class="wordmark">GIWA<em>DeFi Suite</em></h1>
+            <p class="manifesto">GIWA built the trust layer. We built the first three reasons to <b>trust someone</b>.
+            </p>
+            <div class="status">
+                <div class="row"><span class="lab">Wallet</span><span class="net" id="net"><span class="d"></span><span
+                            id="netName">disconnected</span></span></div>
+                <button id="connectBtn" onclick="connect()">Connect Wallet</button>
+                <div class="dataline"><span>block</span><b id="blk">—</b></div>
+                <div class="dataline"><span>address</span><b id="addr">—</b></div>
+            </div>
+            <div class="registry">
+                <h4>On-chain registry</h4>
+                <div id="reg"></div>
+            </div>
+        </aside>
+
+        <main class="deck">
+            <nav class="tabs">
+                <button class="tab active" onclick="tab('score',this)">Score</button>
+                <button class="tab" onclick="tab('vault',this)">Vault</button>
+                <button class="tab" onclick="tab('swap',this)">Swap</button>
+            </nav>
+
+            <section class="panel show" id="p-score">
+                <div class="card">
+                    <h2>DojangScore</h2>
+                    <div class="sub">composite trust · 4 attestation types · 0–1000</div>
+                    <div class="readout">
+                        <div class="scorewrap"><span class="lab">Trust score</span><span id="sVal">0</span><span
+                                class="of">/ 1000</span></div>
+                        <div class="chips">
+                            <div class="chip tier">
+                                <div class="k">Tier</div>
+                                <div class="v" id="sTier">—</div>
+                            </div>
+                            <div class="chip fee">
+                                <div class="k">Swap fee</div>
+                                <div class="v" id="sFee">—</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="attest"></div>
+                    <div style="height:18px"></div>
+                    <div class="field"><input id="scoreAddr" placeholder="0x wallet address…" /><button class="btn"
+                            id="btnCheck" onclick="checkScore()">Check</button></div>
+                    <div class="console"><span class="prompt">$ attest --score</span><input id="manualVal" type="number"
+                            min="0" max="1000" placeholder="0–1000" /><button class="btn ghost" id="btnSet"
+                            onclick="setManual()">Write</button></div>
+                </div>
+            </section>
+
+            <section class="panel" id="p-vault">
+                <div class="card">
+                    <h2>WonVault</h2>
+                    <div class="sub">ERC-4626 · KRW yield · trust sets your entry fee</div>
+
+                    <div class="stats3">
+                        <div class="stat">
+                            <div class="k">TKRW balance</div>
+                            <div class="v" id="vBal">—</div>
+                        </div>
+                        <div class="stat">
+                            <div class="k">Your position</div>
+                            <div class="v" id="vPos">—</div>
+                        </div>
+                        <div class="stat">
+                            <div class="k">Unrealized P&amp;L</div>
+                            <div class="v" id="vPnl">—</div>
+                        </div>
+                    </div>
+
+                    <div class="apyhero">
+                        <div class="you">your tier<br><b id="vTierName">—</b> · entry <span id="vTierFee">—</span></div>
+                        <span class="lab">Strategy target APY</span><br>
+                        <span class="num" id="vApy">0.00</span><span class="pct">%</span>
+                        <span class="cap">testnet-simulated source · real ERC-4626 share-price accrual engine</span>
+                    </div>
+
+                    <div class="tiertable">
+                        <div class="trow" data-t="0"><span class="tn">Standard</span><span class="tf">entry
+                                2.00%</span><span class="td">98.00% at work</span></div>
+                        <div class="trow" data-t="1"><span class="tn">Silver</span><span class="tf">entry
+                                1.50%</span><span class="td">98.50% at work</span></div>
+                        <div class="trow" data-t="2"><span class="tn">Gold</span><span class="tf">entry
+                                1.00%</span><span class="td">99.00% at work</span></div>
+                        <div class="trow" data-t="3"><span class="tn">Platinum</span><span class="tf">entry
+                                0.50%</span><span class="td">99.50% at work</span></div>
+                    </div>
+                    <div class="cap2">Lower entry fee = more of every deposit earning from day one. Verify through
+                        Dojang to climb tiers.</div>
+
+                    <div class="engine">
+                        <div class="eng">
+                            <div class="k">Share price</div>
+                            <div class="v" id="vPrice">—</div>
+                        </div>
+                        <div class="eng">
+                            <div class="k">Vault TVL</div>
+                            <div class="v" id="vTvl">0.00</div>
+                        </div>
+                        <div class="eng">
+                            <div class="k">Vault state</div>
+                            <div class="v" id="vState">—</div>
+                        </div>
+                        <div class="eng">
+                            <div class="k">Strategy</div>
+                            <div class="v livepill"><span class="d"></span>running · sim</div>
+                        </div>
+                    </div>
+                    <div class="accrual">
+                        <div class="fill"></div>
+                    </div>
+
+                    <div class="field"><input id="depAmt" placeholder="amount to deposit" /><button class="btn"
+                            id="btnDep" onclick="deposit()">Deposit</button></div>
+                    <div class="row2">
+                        <button class="btn ghost" id="btnWd" onclick="withdraw()">Withdraw all</button>
+                        <button class="btn ghost" id="btnSim" onclick="simulateYield()">▶ Run strategy tick</button>
+                    </div>
+                    <div class="msg" id="vMsg"></div>
+                </div>
+            </section>
+
+            <section class="panel" id="p-swap">
+                <div class="card">
+                    <h2>GIWASwap</h2>
+                    <div class="sub">constant-product AMM · verified wallets pay less</div>
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="k">TKRW</div>
+                            <div class="v" id="swB0">—</div>
+                        </div>
+                        <div class="stat">
+                            <div class="k">TUSD</div>
+                            <div class="v" id="swB1">—</div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <select id="swDir">
+                            <option value="0">TKRW → TUSD</option>
+                            <option value="1">TUSD → TKRW</option>
+                        </select>
+                        <input id="swAmt" placeholder="amount" />
+                        <button class="btn" id="btnSwap" onclick="doSwap()">Swap</button>
+                    </div>
+                    <button class="btn ghost full" id="btnFaucet" onclick="faucet()">Mint 10,000 test tokens</button>
+                    <div class="msg" id="swMsg"></div>
+                </div>
+            </section>
+
+            <div class="foot">
+                DojangScore · WonVault · GIWASwap — deployed on GIWA Sepolia (OP Stack, chain 91342)<br>
+                Reads <a target="_blank"
+                    href="https://sepolia-explorer.giwa.io/address/0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9">DojangScroll</a>
+                &amp; <a target="_blank"
+                    href="https://sepolia-explorer.giwa.io/address/0x4200000000000000000000000000000000000021">EAS</a>
+                attestations · attester: Upbit Korea
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+    <script>
+        const C = {
+            chainId: 91342, rpc: "https://sepolia-rpc.giwa.io", explorer: "https://sepolia-explorer.giwa.io",
+            TKRW: "0x11DF7b38DA5F496F2B02bb6E51eAcDFEfcAB4f40",
+            TUSD: "0x84D986ac1B5913253a417a1AB68F94CD77e59a80",
+            DojangScore: "0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f",
+            WonVault: "0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5",
+            GIWASwapFactory: "0x7c7825AEF6b8b590dcF48d8C5059F3594B84a99F",
+            Pool: "0x8813361aA6FFdC1B5926FA95d756b7390C680059"
+        };
+        const STRATEGY_APY = 6.00;
+        // THE FIX: with _decimalsOffset()=18 the inflation guard makes shares 1e18x more granular
+        // than assets, so a "1.0-ish" share is 1e36 wei (assetDecimals 18 + offset 18), not 1e18.
+        const SHARE_UNIT = ethers.parseUnits("1", 36);
+        const TIERMETA = [{ n: "Standard", f: "2.00%" }, { n: "Silver", f: "1.50%" }, { n: "Gold", f: "1.00%" }, { n: "Platinum", f: "0.50%" }];
+        let provider, signer, user, timer, lastPrice = 0, lastState = "", apyShown = false;
+        const ABI_S = ["function score(address) view returns (uint256)", "function tierOf(address) view returns (uint8)", "function tierName(address) view returns (string)", "function setManualScore(address,uint256)"];
+        const ABI_E = ["function balanceOf(address) view returns (uint256)", "function approve(address,uint256) returns (bool)", "function decimals() view returns (uint8)", "function faucet()", "function transfer(address,uint256) returns (bool)", "function mint(address,uint256)"];
+        const ABI_V = ["function deposit(uint256,address) returns (uint256)", "function redeem(uint256,address,address) returns (uint256)", "function balanceOf(address) view returns (uint256)", "function feeTierOf(address) view returns (uint256,string)", "function convertToAssets(uint256) view returns (uint256)", "function totalAssets() view returns (uint256)", "function totalSupply() view returns (uint256)"];
+        const ABI_P = ["function getReserves() view returns (uint256,uint256)", "function swap(address,uint256,uint256,address) returns (uint256)", "function feeBpsFor(address) view returns (uint256)"];
+
+        (function () {
+            const rows = [["DojangScore", C.DojangScore], ["WonVault", C.WonVault], ["Swap Pool", C.Pool], ["Factory", C.GIWASwapFactory]];
+            document.getElementById("reg").innerHTML = rows.map(([n, a]) =>
+                `<a target="_blank" href="${C.explorer}/address/${a}">${n} <span>${a.slice(0, 6)}…${a.slice(-4)}</span></a>`).join("");
+        })();
+
+        function busy(id, on, label) { const b = document.getElementById(id); if (!b) return; if (on) { if (!b.dataset.orig) b.dataset.orig = b.textContent; b.textContent = label; b.classList.add('busy'); } else { b.textContent = b.dataset.orig || b.textContent; b.classList.remove('busy'); } }
+        function msg(id, t, err) { const e = document.getElementById(id); if (!e) return; e.textContent = t; e.classList.toggle('err', !!err); }
+        function countUp(el, to) { try { const d = 700, t0 = performance.now(); (function f(t) { const k = Math.min(1, (t - t0) / d); el.textContent = Math.round((1 - Math.pow(1 - k, 3)) * to); if (k < 1) requestAnimationFrame(f); })(t0); } catch (e) { el.textContent = to; } }
+        function countUpF(el, to, dec) { try { const d = 800, t0 = performance.now(); (function f(t) { const k = Math.min(1, (t - t0) / d); const e = 1 - Math.pow(1 - k, 3); el.textContent = (e * to).toFixed(dec); if (k < 1) requestAnimationFrame(f); })(t0); } catch (e) { el.textContent = to.toFixed(dec); } }
+        function flash(id) { const e = document.getElementById(id); if (!e) return; e.classList.remove('flash'); void e.offsetWidth; e.classList.add('flash'); }
+        function fmtPrice(p) { if (!isFinite(p) || p <= 0) return "—"; if (p > 1000 || p < 0.001) return "—"; return p.toFixed(6); }
+        function basisKey() { return "giwa_vbasis_" + (C.WonVault || "x") + "_" + (user || "x"); }
+        function getBasis() { return parseFloat(localStorage.getItem(basisKey()) || "0"); }
+        function setBasis(v) { if (v <= 0) localStorage.removeItem(basisKey()); else localStorage.setItem(basisKey(), String(v)); }
+
+        async function fresh() { provider = new ethers.BrowserProvider(window.ethereum); signer = await provider.getSigner(); user = await signer.getAddress(); }
+
+        async function connect() {
+            if (!window.ethereum) { alert("Install Rabby or MetaMask!"); return }
+            try {
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+                const hex = await window.ethereum.request({ method: "eth_chainId" });
+                if (parseInt(hex, 16) !== 91342) {
+                    try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x164ce" }] }); }
+                    catch (e) { if (e && e.code === 4902) { await window.ethereum.request({ method: "wallet_addEthereumChain", params: [{ chainId: "0x164ce", chainName: "GIWA Sepolia", rpcUrls: [C.rpc], blockExplorerUrls: [C.explorer], nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 } }] }); } else { alert("Switch your wallet to GIWA Sepolia, then connect again."); return; } }
+                }
+                await fresh();
+                document.getElementById("connectBtn").textContent = user.slice(0, 6) + "…" + user.slice(-4);
+                document.getElementById("connectBtn").classList.add("on");
+                document.getElementById("net").classList.add("live");
+                document.getElementById("netName").textContent = "GIWA Sepolia";
+                document.getElementById("addr").textContent = user.slice(0, 6) + "…" + user.slice(-4);
+                document.getElementById("scoreAddr").value = user;
+                refresh(); readVault(); tick(); if (!timer) timer = setInterval(tick, 4000);
+            } catch (e) { console.error(e); alert("Connect error: " + (e.shortMessage || e.message)); }
+        }
+        async function tick() {
+            try { const p = new ethers.BrowserProvider(window.ethereum); document.getElementById("blk").textContent = "#" + await p.getBlockNumber(); } catch (e) { }
+            if (document.getElementById("p-vault").classList.contains("show")) readVault();
+        }
+
+        function tab(n, el) {
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            if (el) el.classList.add("active");
+            ["score", "vault", "swap"].forEach(t => document.getElementById("p-" + t).classList.toggle("show", t === n));
+            if (n === "vault") readVault();
+            if (n === "swap") refresh();
+        }
+
+        async function checkScore() {
+            const a = document.getElementById("scoreAddr").value.trim(); if (!a) return;
+            busy("btnCheck", true, "Reading");
+            try {
+                const p = new ethers.BrowserProvider(window.ethereum);
+                const c = new ethers.Contract(C.DojangScore, ABI_S, p);
+                const [s, t, n] = await Promise.all([c.score(a), c.tierOf(a), c.tierName(a)]);
+                const fees = { 0: "0.30%", 1: "0.20%", 2: "0.15%", 3: "0.10%" };
+                countUp(document.getElementById("sVal"), Number(s));
+                document.getElementById("sTier").textContent = n;
+                document.getElementById("sFee").textContent = fees[t.toString()] || "0.30%";
+            } catch (e) { alert("Lookup failed — connect to GIWA Sepolia first."); }
+            finally { busy("btnCheck", false); }
+        }
+
+        async function setManual() {
+            const v = parseInt(document.getElementById("manualVal").value);
+            const a = document.getElementById("scoreAddr").value.trim();
+            if (isNaN(v) || !a) return;
+            busy("btnSet", true, "Signing");
+            try {
+                await fresh();
+                const c = new ethers.Contract(C.DojangScore, ABI_S, signer);
+                await (await c.setManualScore(a, v)).wait();
+                alert("Attestation written: " + v + ". Hit Check to read it back.");
+            } catch (e) { alert("Error: " + (e.shortMessage || e.message)); }
+            finally { busy("btnSet", false); }
+        }
+
+        async function refresh() {
+            if (!user) return;
+            try {
+                const p = new ethers.BrowserProvider(window.ethereum);
+                const t0 = new ethers.Contract(C.TKRW, ABI_E, p), t1 = new ethers.Contract(C.TUSD, ABI_E, p);
+                const [b0, b1] = await Promise.all([t0.balanceOf(user), t1.balanceOf(user)]);
+                document.getElementById("swB0").textContent = parseFloat(ethers.formatEther(b0)).toFixed(2);
+                document.getElementById("swB1").textContent = parseFloat(ethers.formatUnits(b1, 6)).toFixed(2);
+                document.getElementById("vBal").textContent = parseFloat(ethers.formatEther(b0)).toFixed(2);
+            } catch (e) { console.warn(e); }
+        }
+
+        async function readVault() {
+            if (!user) return;
+            refresh();
+            try {
+                const p = new ethers.BrowserProvider(window.ethereum);
+                const v = new ethers.Contract(C.WonVault, ABI_V, p);
+                const sc = new ethers.Contract(C.DojangScore, ABI_S, p);
+                const [shares, assets, supply, feeInfo, tier] = await Promise.all([
+                    v.balanceOf(user), v.totalAssets(), v.totalSupply(), v.feeTierOf(user), sc.tierOf(user)
+                ]);
+                const bps = feeInfo[0];
+                const oneShare = await v.convertToAssets(SHARE_UNIT);          // <- right unit now
+                const price = parseFloat(ethers.formatEther(oneShare));
+                const valueNow = parseFloat(ethers.formatEther(await v.convertToAssets(shares)));
+                if (getBasis() <= 0 && valueNow > 0) setBasis(valueNow);          // <- self-heal missing basis
+                const basis = getBasis();
+                const pnl = valueNow - basis;
+                const healthy = isFinite(price) && price > 0.5 && price < 5;
+                const delta = isFinite(price) ? (price - 1) * 100 : 0;
+
+                const fp = fmtPrice(price);
+                const pePrice = document.getElementById("vPrice");
+                if (fp === "—") pePrice.textContent = "—";
+                else pePrice.innerHTML = fp + ' <span class="delta ' + (delta >= 0 ? 'pos' : 'neg') + '">' + (delta >= 0 ? '+' : '') + delta.toFixed(2) + '%</span>';
+                if (lastPrice && price > lastPrice + 1e-9) flash("vPrice");
+                lastPrice = price;
+
+                document.getElementById("vTvl").textContent = parseFloat(ethers.formatEther(assets)).toFixed(2);
+                document.getElementById("vPos").innerHTML = valueNow.toFixed(2) + ' <small>TKRW</small>';
+                const pe = document.getElementById("vPnl");
+                if (basis <= 0) { pe.textContent = "—"; pe.className = "v"; }
+                else { pe.textContent = (pnl >= 0 ? "+" : "") + pnl.toFixed(2); pe.className = "v " + (pnl >= 0 ? "pos" : "neg"); }
+                document.getElementById("vTierName").textContent = TIERMETA[tier].n;
+                document.getElementById("vTierFee").textContent = TIERMETA[tier].f;
+                document.querySelectorAll(".trow").forEach(r => r.classList.toggle("me", Number(r.dataset.t) === tier));
+                const st = document.getElementById("vState");
+                const ns = supply === 0n ? "empty" : (healthy ? "healthy" : "degraded");
+                if (ns !== lastState) { if (ns === "healthy" && lastState && lastState !== "healthy") { flash("vState"); flash("vPrice"); } lastState = ns; }
+                st.textContent = ns;
+                st.style.color = ns === "healthy" ? "var(--jade)" : ns === "empty" ? "var(--muted)" : "var(--rose)";
+                if (!apyShown) { countUpF(document.getElementById("vApy"), STRATEGY_APY, 2); apyShown = true; }
+                else { document.getElementById("vApy").textContent = STRATEGY_APY.toFixed(2); }
+            } catch (e) { console.warn("vault", e); }
+        }
+
+        async function deposit() {
+            const amt = document.getElementById("depAmt").value; if (!amt) return;
+            const amount = ethers.parseEther(amt); busy("btnDep", true, "Signing"); msg("vMsg", "Approving…");
+            try {
+                await fresh();
+                const p = new ethers.BrowserProvider(window.ethereum);
+                const bps = await (new ethers.Contract(C.WonVault, ABI_V, p)).feeTierOf(user).then(r => r[0]);
+                const tk = new ethers.Contract(C.TKRW, ABI_E, signer), v = new ethers.Contract(C.WonVault, ABI_V, signer);
+                await (await tk.approve(C.WonVault, amount)).wait(); msg("vMsg", "Depositing…");
+                await (await v.deposit(amount, user)).wait();
+                const feeWei = amount * BigInt(bps) / 10000n;
+                const netWei = amount - feeWei;
+                setBasis(getBasis() + parseFloat(ethers.formatEther(netWei)));
+                msg("vMsg", "✓ Deposited. Entry " + (Number(bps) / 100).toFixed(2) + "% = " + parseFloat(ethers.formatEther(feeWei)).toFixed(2) + " TKRW → treasury · " + parseFloat(ethers.formatEther(netWei)).toFixed(2) + " TKRW invested.");
+                readVault();
+            } catch (e) { msg("vMsg", "✗ " + (e.shortMessage || e.message), true); } finally { busy("btnDep", false); }
+        }
+        async function withdraw() {
+            busy("btnWd", true, "Signing"); msg("vMsg", "Withdrawing…");
+            try {
+                await fresh(); const v = new ethers.Contract(C.WonVault, ABI_V, signer); const sh = await v.balanceOf(user);
+                if (sh === 0n) { alert("No shares to withdraw"); msg("vMsg", ""); return; }
+                await (await v.redeem(sh, user, user)).wait(); setBasis(0); msg("vMsg", "✓ Withdrawn all"); readVault();
+            } catch (e) { msg("vMsg", "✗ " + (e.shortMessage || e.message), true); } finally { busy("btnWd", false); }
+        }
+        async function simulateYield() {
+            busy("btnSim", true, "Accruing"); msg("vMsg", "Injecting strategy yield into vault…");
+            try {
+                await fresh();
+                const p = new ethers.BrowserProvider(window.ethereum);
+                const vR = new ethers.Contract(C.WonVault, ABI_V, p);
+                const [supply, assets] = await Promise.all([vR.totalSupply(), vR.totalAssets()]);
+                if (supply === 0n) { alert("Deposit into the vault first — yield accrues to share-holders."); msg("vMsg", ""); return; }
+                let y = assets * 25n / 10000n; if (y === 0n) y = ethers.parseEther("1");
+                const tk = new ethers.Contract(C.TKRW, ABI_E, signer);
+                await (await tk.mint(C.WonVault, y)).wait();
+                msg("vMsg", "✓ Strategy tick: +" + parseFloat(ethers.formatEther(y)).toFixed(2) + " TKRW accrued. Share price rose — every depositor earns.");
+                readVault();
+            } catch (e) { msg("vMsg", "✗ " + (e.shortMessage || e.message), true); } finally { busy("btnSim", false); }
+        }
+
+        async function faucet() {
+            busy("btnFaucet", true, "Minting"); msg("swMsg", "Minting test tokens…");
+            try {
+                await fresh();
+                const t0 = new ethers.Contract(C.TKRW, ABI_E, signer), t1 = new ethers.Contract(C.TUSD, ABI_E, signer);
+                await (await t0.faucet()).wait(); await (await t1.faucet()).wait();
+                msg("swMsg", "✓ +10,000 TKRW  +10,000 TUSD"); refresh();
+            } catch (e) { msg("swMsg", "✗ " + (e.shortMessage || e.message), true); } finally { busy("btnFaucet", false); }
+        }
+        async function doSwap() {
+            const dir = document.getElementById("swDir").value, amtStr = document.getElementById("swAmt").value; if (!amtStr) return;
+            const is0 = dir === "0", tokenIn = is0 ? C.TKRW : C.TUSD, dec = is0 ? 18 : 6, amount = ethers.parseUnits(amtStr, dec);
+            busy("btnSwap", true, "Signing"); msg("swMsg", "Approving…");
+            try {
+                await fresh();
+                const tk = new ethers.Contract(tokenIn, ABI_E, signer), pool = new ethers.Contract(C.Pool, ABI_P, signer);
+                await (await tk.approve(C.Pool, amount)).wait(); msg("swMsg", "Swapping…");
+                await (await pool.swap(tokenIn, amount, 0, user)).wait(); msg("swMsg", "✓ Swap complete"); refresh();
+            } catch (e) { msg("swMsg", "✗ " + (e.shortMessage || e.message), true); } finally { busy("btnSwap", false); }
+        }
+    </script>
+</body>
+
+</html>
