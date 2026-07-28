@@ -1,10 +1,19 @@
-node_modules/
+# secrets — NEVER tracked
 .env
+
+# dependencies — reinstall with: npm install
+node_modules/
+
+# hardhat build output — regenerate with: npx hardhat compile
 cache/
 artifacts/
+typechain-types/
+
+# coverage
 coverage/
 coverage.json
-typechain-types/
+
+# os / editor noise
 .DS_Store
 Thumbs.db
 *.log
