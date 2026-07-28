@@ -19,7 +19,7 @@ An application for **GASOK 2026** — the first application layer on GIWA's **Do
 | Contract | Address | Explorer |
 |---|---|---|
 | DojangScore | `0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f` | [view](https://sepolia-explorer.giwa.io/address/0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f) |
-| WonVault | `0xEE4E_PASTE_FULL_ADDRESS_FROM_deployed-addresses.json_69F5` | [view](https://sepolia-explorer.giwa.io/address/0xEE4E69F5) |
+| WonVault | `0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5` | [view](https://sepolia-explorer.giwa.io/address/0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5) |
 | GIWASwap Pool | `0x8813361aA6FFdC1B5926FA95d756b7390C680059` | [view](https://sepolia-explorer.giwa.io/address/0x8813361aA6FFdC1B5926FA95d756b7390C680059) |
 | GIWASwap Factory | `0x7c7825AEF6b8b590dcF48d8C5059F3594B84a99F` | [view](https://sepolia-explorer.giwa.io/address/0x7c7825AEF6b8b590dcF48d8C5059F3594B84a99F) |
 | TKRW / TUSD (test assets) | `0x11DF…4f40` / `0x84D9…9a80` | — |
