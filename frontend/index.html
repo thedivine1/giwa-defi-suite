@@ -1036,6 +1036,29 @@
             color: var(--jade)
         }
     </style>
+    <style>
+        #disconnectBtn {
+            margin-top: 8px;
+            width: 100%;
+            font-family: var(--mono);
+            font-size: .72rem;
+            letter-spacing: .06em;
+            border: 1px solid var(--line2);
+            background: transparent;
+            color: var(--muted);
+            padding: 9px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: .18s;
+            text-transform: uppercase
+        }
+
+        #disconnectBtn:hover {
+            border-color: var(--rose);
+            color: var(--rose);
+            background: rgba(224, 145, 143, .08)
+        }
+    </style>
 </head>
 
 <body>
@@ -1057,6 +1080,7 @@
                 <div class="row"><span class="lab">Wallet</span><span class="net" id="net"><span class="d"></span><span
                             id="netName">disconnected</span></span></div>
                 <button id="connectBtn" onclick="connect()">Connect Wallet</button>
+                <button id="disconnectBtn" onclick="disconnect()" style="display:none">Disconnect</button>
                 <div class="dataline"><span>block</span><b id="blk">—</b></div>
                 <div class="dataline"><span>address</span><b id="addr">—</b></div>
             </div>
@@ -1263,6 +1287,7 @@
                 await fresh();
                 document.getElementById("connectBtn").textContent = user.slice(0, 6) + "…" + user.slice(-4);
                 document.getElementById("connectBtn").classList.add("on");
+                document.getElementById("disconnectBtn").style.display = "block";
                 document.getElementById("net").classList.add("live");
                 document.getElementById("netName").textContent = "GIWA Sepolia";
                 document.getElementById("addr").textContent = user.slice(0, 6) + "…" + user.slice(-4);
@@ -1270,6 +1295,34 @@
                 refresh(); readVault(); tick(); if (!timer) timer = setInterval(tick, 4000);
             } catch (e) { console.error(e); alert("Connect error: " + (e.shortMessage || e.message)); }
         }
+
+        function disconnect() {
+            if (timer) { clearInterval(timer); timer = null; }
+            provider = null; signer = null; user = null;
+            const cb = document.getElementById("connectBtn");
+            cb.textContent = "Connect Wallet"; cb.classList.remove("on");
+            document.getElementById("disconnectBtn").style.display = "none";
+            document.getElementById("net").classList.remove("live");
+            document.getElementById("netName").textContent = "disconnected";
+            document.getElementById("addr").textContent = "—";
+            document.getElementById("blk").textContent = "—";
+            document.getElementById("sVal").textContent = "0";
+            document.getElementById("sTier").textContent = "—";
+            document.getElementById("sFee").textContent = "—";
+            document.getElementById("vBal").textContent = "—";
+            document.getElementById("vPos").innerHTML = "—";
+            const pe = document.getElementById("vPnl"); pe.textContent = "—"; pe.className = "v";
+            document.getElementById("vPrice").textContent = "—";
+            document.getElementById("vTvl").textContent = "0.00";
+            document.getElementById("vState").textContent = "—";
+            document.getElementById("vState").style.color = "";
+            document.getElementById("vApy").textContent = "0.00";
+            document.getElementById("swB0").textContent = "—";
+            document.getElementById("swB1").textContent = "—";
+            msg("vMsg", ""); msg("swMsg", "");
+            lastPrice = 0; lastState = ""; apyShown = false;
+        }
+
         async function tick() {
             try { const p = new ethers.BrowserProvider(window.ethereum); document.getElementById("blk").textContent = "#" + await p.getBlockNumber(); } catch (e) { }
             if (document.getElementById("p-vault").classList.contains("show")) readVault();
