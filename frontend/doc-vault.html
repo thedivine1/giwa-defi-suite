@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WonVault — Technical Specification</title>
+    <meta name="description" content="WonVault ERC-4626 KRW yield vault technical one-pager: entry fees, share-price accrual, inflation protection, and security model on GIWA Sepolia." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink:       #0c0f0e;
+            --ink2:      #101413;
+            --panel:     #141a17;
+            --panel2:    #18201c;
+            --panel3:    #1d2722;
+            --line:      #27332c;
+            --line2:     #33433a;
+            --bone:      #ece7da;
+            --muted:     #93a39a;
+            --faint:     #647569;
+            --jade:      #5fe0a8;
+            --jade-dim:  #2c6b51;
+            --jade-deep: #0e2a20;
+            --gold:      #e3b96a;
+            --slate:     #86b6cb;
+            --rose:      #e0918f;
+            --disp: 'Syne', sans-serif;
+            --body: 'IBM Plex Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { background: var(--ink); color: var(--bone); font-family: var(--body); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+        ::selection { background: var(--jade); color: var(--ink); }
+
+        /* Layout */
+        .wrap { position: relative; z-index: 2; max-width: 920px; margin: 0 auto; padding: 0 30px; }
+        @media(max-width:680px) { .wrap { padding: 0 18px; } }
+
+        /* Background grid */
+        .gridbg { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(120% 80% at 8% -5%, #13241c 0%, transparent 55%), radial-gradient(90% 70% at 100% 110%, #1a160c 0%, transparent 50%), var(--ink); }
+        .gridbg::after { content: ""; position: absolute; inset: 0; background-image: radial-gradient(var(--line) 1px, transparent 1.4px); background-size: 34px 34px; animation: pan 50s linear infinite; opacity: .4; }
+        @keyframes pan { to { background-position: 34px 68px; } }
+        .scan { position: fixed; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; opacity: .4; background: linear-gradient(to bottom, transparent, rgba(95,224,168,.04), transparent); animation: scan 9s linear infinite; }
+        @keyframes scan { 0% { top: -30vh; } 100% { top: 100vh; } }
+
+        /* ── Opening readout ───────────────────────────────────── */
+        .vault-hero { text-align: center; padding: 90px 0 50px; }
+        .price-display { display: inline-flex; align-items: baseline; gap: 18px; }
+        .price-val { font-family: var(--mono); font-weight: 700; font-size: clamp(4rem, 16vw, 9rem); color: var(--jade); line-height: 1; letter-spacing: -.04em; text-shadow: 0 0 50px rgba(95,224,168,.18); transition: color .3s; }
+        .price-delta { font-family: var(--mono); font-size: 1.2rem; padding: 6px 14px; border-radius: 30px; background: var(--jade-deep); color: var(--jade); border: 1px solid var(--jade-dim); white-space: nowrap; transition: .3s; }
+        .price-delta.neg { background: rgba(224,145,143,.08); color: var(--rose); border-color: #6b2c2c; }
+        .price-label { font-family: var(--mono); font-size: .78rem; letter-spacing: .18em; color: var(--faint); text-transform: uppercase; margin-top: 16px; }
+
+        /* ── Shared components ─────────────────────────────────── */
+        .chap { padding: 52px 0 20px; position: relative; }
+        .chap-eyebrow { font-family: var(--mono); font-size: .64rem; letter-spacing: .28em; color: var(--gold); text-transform: uppercase; }
+        .chap h2 { font-family: var(--disp); font-weight: 700; font-size: clamp(1.7rem, 5vw, 2.6rem); letter-spacing: -.02em; line-height: 1.1; margin: 8px 0 0; }
+        .chap h2 em { font-style: normal; color: var(--jade); }
+        .chap .deck { color: var(--muted); max-width: 68ch; margin-top: 14px; font-size: 1.05rem; line-height: 1.6; }
+
+        .card { background: linear-gradient(180deg, var(--panel2), var(--panel)); border: 1px solid var(--line); border-radius: 10px; padding: 24px; position: relative; overflow: hidden; margin-top: 24px; }
+        .card .tag { font-family: var(--mono); font-size: .58rem; letter-spacing: .2em; color: var(--faint); text-transform: uppercase; display: block; margin-bottom: 10px; }
+        .card h3 { font-family: var(--disp); font-weight: 700; font-size: 1.18rem; margin-bottom: 14px; letter-spacing: .01em; }
+        .card p { color: var(--muted); font-size: .97rem; line-height: 1.65; }
+        .card p + p { margin-top: 12px; }
+        .card p b { color: var(--bone); font-weight: 600; }
+        .card p code, li code { font-family: var(--mono); font-size: .84em; color: var(--jade); background: var(--jade-deep); padding: 2px 6px; border-radius: 4px; }
+
+        .feat { list-style: none; margin-top: 16px; }
+        .feat li { position: relative; padding: 9px 0 9px 26px; border-top: 1px solid var(--line); font-size: .96rem; color: var(--muted); line-height: 1.55; }
+        .feat li:first-child { border-top: none; }
+        .feat li::before { content: ""; position: absolute; left: 0; top: 17px; width: 12px; height: 2px; background: var(--jade); }
+        .feat li b { color: var(--bone); font-weight: 600; }
+
+        .tscroll { overflow-x: auto; margin-top: 24px; border: 1px solid var(--line); border-radius: 10px; }
+        .tscroll table { width: 100%; border-collapse: collapse; min-width: 540px; text-align: left; }
+        .tscroll th { font-family: var(--mono); font-size: .58rem; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); background: var(--panel); padding: 11px 15px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+        .tscroll td { padding: 13px 15px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: .88rem; color: var(--muted); vertical-align: top; }
+        .tscroll tr:last-child td { border-bottom: none; }
+        .tscroll th:last-child, .tscroll td:last-child { border-right: none; }
+        .tscroll td b { color: var(--bone); }
+        .tscroll td.hi { color: var(--jade); font-family: var(--mono); }
+        .tscroll td.num { font-family: var(--mono); }
+
+        .formula-card { font-family: var(--mono); font-size: .92rem; color: var(--jade); background: var(--jade-deep); border: 1px solid var(--jade-dim); border-radius: 8px; padding: 18px 22px; margin-top: 18px; line-height: 1.8; }
+        .formula-card span.c { color: var(--faint); }
+        .formula-card span.h { color: var(--bone); }
+        .formula-card span.g { color: var(--gold); }
+
+        .note { background: rgba(95,224,168,.05); border-left: 3px solid var(--jade-dim); padding: 16px 20px; font-size: .92rem; color: var(--muted); margin-top: 20px; border-radius: 0 6px 6px 0; line-height: 1.6; }
+        .note b { color: var(--bone); font-weight: 600; }
+        .note.warn { background: rgba(224,145,143,.06); border-left-color: var(--rose); }
+        .note.warn b { color: var(--rose); }
+        .note.gold { background: rgba(227,185,106,.06); border-left-color: #7a5d28; }
+        .note.gold b { color: var(--gold); }
+
+        .pull { margin: 36px 0; padding: 26px 0 26px 28px; border-left: 3px solid var(--jade); font-family: var(--disp); font-weight: 600; font-size: clamp(1.3rem, 4vw, 2rem); line-height: 1.3; color: var(--bone); letter-spacing: -.01em; }
+
+        /* ── Calc: fee calculator ──────────────────────────────── */
+        .calc-inputs { display: flex; gap: 14px; flex-wrap: wrap; margin: 24px 0 0; }
+        .calc-field { display: flex; flex-direction: column; gap: 6px; }
+        .calc-field label { font-family: var(--mono); font-size: .6rem; letter-spacing: .2em; text-transform: uppercase; color: var(--faint); }
+        .calc-field input { background: var(--panel); border: 1px solid var(--line2); border-radius: 6px; color: var(--bone); padding: 10px 14px; font-family: var(--mono); font-size: .95rem; width: 160px; outline: none; transition: .18s; }
+        .calc-field input:focus { border-color: var(--jade); box-shadow: 0 0 0 3px var(--jade-deep); }
+
+        .tier-chip { display: inline-block; font-family: var(--mono); font-size: .62rem; padding: 2px 8px; border-radius: 12px; vertical-align: middle; margin-right: 4px; }
+        .tier-chip.p { background: var(--jade-deep); color: var(--jade); }
+        .tier-chip.g { background: rgba(227,185,106,.1); color: var(--gold); }
+        .tier-chip.s { background: rgba(134,182,203,.1); color: var(--slate); }
+        .tier-chip.u { background: var(--panel2); color: var(--muted); }
+
+        .delta-note { margin-top: 14px; padding: 12px 16px; border-radius: 6px; background: rgba(95,224,168,.07); border: 1px solid var(--jade-deep); font-family: var(--mono); font-size: .82rem; color: var(--jade); }
+
+        /* ── Accrual simulator ─────────────────────────────────── */
+        .sim-wrap { margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media(max-width:680px) { .sim-wrap { grid-template-columns: 1fr; } }
+        .sim-panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+        .sim-panel .k { font-family: var(--mono); font-size: .58rem; letter-spacing: .18em; text-transform: uppercase; color: var(--faint); display: block; margin-bottom: 6px; }
+        .sim-panel .v { font-family: var(--mono); font-weight: 700; font-size: 1.55rem; color: var(--bone); transition: .3s; }
+        .sim-panel .v.pos { color: var(--jade); }
+        .sim-panel .v.neg { color: var(--rose); }
+
+        .slider-wrap { margin: 24px 0 0; }
+        .slider-wrap label { font-family: var(--mono); font-size: .7rem; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .slider-wrap label b { color: var(--jade); }
+        input[type=range] { -webkit-appearance: none; width: 100%; height: 4px; border-radius: 2px; background: var(--line2); outline: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--jade); cursor: pointer; box-shadow: 0 0 8px rgba(95,224,168,.5); }
+
+        .apy-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 20px; }
+        .apy-num { font-family: var(--mono); font-weight: 700; font-size: 2.2rem; color: var(--jade); }
+        .apy-row .k { font-family: var(--mono); font-size: .6rem; letter-spacing: .18em; color: var(--faint); text-transform: uppercase; }
+        .apy-row input[type=number] { width: 72px; background: var(--panel); border: 1px solid var(--line2); border-radius: 4px; color: var(--bone); font-family: var(--mono); font-size: .9rem; padding: 6px 8px; outline: none; text-align: center; }
+        .apy-row input:focus { border-color: var(--jade); }
+
+        /* Flash animation */
+        @keyframes flash-jade { 0% { color: var(--jade); text-shadow: 0 0 20px rgba(95,224,168,.8); } 100% { text-shadow: none; } }
+        .flash { animation: flash-jade .9s ease; }
+
+        /* ── Security section ─────────────────────────────────── */
+        .sec-item { border-left: 3px solid var(--line2); padding: 16px 20px; margin-top: 16px; border-radius: 0 8px 8px 0; background: var(--panel2); transition: border-left-color .2s; }
+        .sec-item:hover { border-left-color: var(--jade-dim); }
+        .sec-item h4 { font-family: var(--disp); font-weight: 600; font-size: 1.05rem; color: var(--bone); margin-bottom: 8px; }
+        .sec-item p { color: var(--muted); font-size: .93rem; line-height: 1.6; }
+        .sec-item p b { color: var(--bone); font-weight: 600; }
+        .sec-item p code { font-family: var(--mono); font-size: .84em; color: var(--jade); background: var(--jade-deep); padding: 2px 5px; border-radius: 3px; }
+        .sec-item.crit { border-left-color: var(--rose); }
+        .sec-item.crit:hover { border-left-color: var(--rose); }
+        .sec-item.crit h4 { color: var(--rose); }
+
+        /* Footer */
+        .foot { margin-top: 80px; padding: 40px 0; border-top: 1px solid var(--line); font-family: var(--mono); font-size: .72rem; color: var(--faint); text-align: center; line-height: 2; }
+        .foot a { color: var(--muted); text-decoration: none; margin: 0 10px; transition: .2s; display: inline-block; }
+        .foot a:hover { color: var(--jade); text-decoration: underline; }
+
+        /* ── Print ────────────────────────────────────────────── */
+        @media print {
+            .gridbg, .scan { display: none; }
+            body { background: #fff; color: #111; font-size: 11pt; }
+            .wrap { max-width: 100%; padding: 0; }
+            .price-val { color: #111; text-shadow: none; font-size: 5rem; }
+            .price-delta { background: #eee; color: #111; border-color: #ccc; }
+            .price-label { color: #555; }
+            .card, .sim-panel, .tscroll { border: 1px solid #ccc; background: none; box-shadow: none; }
+            .formula-card { background: #f5f5f5; border: 1px solid #ccc; color: #111; }
+            .note, .sec-item { background: #f9f9f9; border-left-color: #555; }
+            .pull { border-left-color: #555; color: #111; }
+            .feat li::before { background: #111; }
+            .chap-eyebrow { color: #555; }
+            .card h3, .chap h2, .sec-item h4 { color: #111; }
+            .card p, .chap .deck, .feat li, .note { color: #444; }
+            a { color: #111 !important; }
+            .sim-wrap { grid-template-columns: 1fr 1fr; }
+            input[type=range] { display: none; }
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+<div class="gridbg"></div>
+<div class="scan"></div>
+
+<div class="wrap">
+
+    <!-- ── OPENER: Live share-price readout ─────────────────────── -->
+    <div class="vault-hero">
+        <div class="price-display">
+            <div class="price-val" id="heroPrice">1.000000</div>
+            <div class="price-delta" id="heroDelta">+0.00%</div>
+        </div>
+        <div class="price-label">WonVault · TKRW share price · GIWA Sepolia 91342</div>
+    </div>
+
+    <!-- ── §1 WHY ERC-4626 ──────────────────────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 1</div>
+        <h2>Why <em>ERC-4626</em></h2>
+        <div class="deck">The Ethereum tokenized-vault standard. Any wallet, aggregator, or yield router integrates with zero custom code.</div>
+    </div>
+
+    <div class="card">
+        <span class="tag">Interface guarantees</span>
+        <p>ERC-4626 defines a complete bidirectional interface: <code>deposit</code>, <code>withdraw</code>, <code>mint</code>, <code>redeem</code> plus the accounting helpers <code>convertToAssets</code>, <code>convertToShares</code>, <code>totalAssets</code>, <code>totalSupply</code>. Any party that speaks ERC-4626 reads WonVault correctly without a custom adapter.</p>
+        <p>Our implementation extends OpenZeppelin v5's <code>ERC4626</code>, meaning the share-minting, asset-transfer, and accounting invariants ship from a thoroughly-audited library base — not hand-rolled math. The share-price mechanism <em>is</em> the yield mechanism: see §3.</p>
+        <p><b>Decimal offset override:</b> we set <code>_decimalsOffset() = 18</code>, which inflates the virtual share supply by 1 × 10¹⁸ and adds a corresponding virtual asset unit. This neutralizes the first-depositor inflation attack (the exact bug that produced our 1.09 × 10²¹ share price on an earlier testnet build). The full security argument is in §5.</p>
+    </div>
+
+    <!-- ── §2 ENTRY FEE SCHEDULE + CALCULATOR ──────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 2</div>
+        <h2>Entry-fee schedule &amp; <em>calculator</em></h2>
+        <div class="deck">Fee tier is read live from <code>DojangScore.feeTierOf(user)</code> at deposit time. Higher trust = lower friction.</div>
+    </div>
+
+    <div class="tscroll">
+        <table>
+            <tr>
+                <th>Tier</th>
+                <th>Basis points</th>
+                <th>Entry fee %</th>
+                <th>Source condition</th>
+            </tr>
+            <tr>
+                <td><span class="tier-chip p">Platinum</span><b>Platinum</b></td>
+                <td class="hi">50 bps</td>
+                <td class="num">0.50 %</td>
+                <td>DojangScore ≥ 800</td>
+            </tr>
+            <tr>
+                <td><span class="tier-chip g">Gold</span><b>Gold</b></td>
+                <td class="hi" style="color:var(--gold)">100 bps</td>
+                <td class="num">1.00 %</td>
+                <td>Score 500 – 799</td>
+            </tr>
+            <tr>
+                <td><span class="tier-chip s">Silver</span><b>Silver</b></td>
+                <td class="hi" style="color:var(--slate)">150 bps</td>
+                <td class="num">1.50 %</td>
+                <td>Score 200 – 499</td>
+            </tr>
+            <tr>
+                <td><span class="tier-chip u">Standard</span><b>Standard</b></td>
+                <td style="color:var(--muted)">200 bps</td>
+                <td class="num">2.00 %</td>
+                <td>Score &lt; 200</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="formula-card">
+        <span class="c">// on-chain deposit math (Solidity)</span><br>
+        fee  = <span class="h">floor</span>(assets × bps / 10000);<br>
+        net  = assets − fee;<br>
+        <span class="c">// OZ library: transferFrom(msg.sender, vault, net) then mint shares</span><br>
+        shares = super.deposit(net, receiver);<br>
+        <span class="c">// fee routes to treasury (separate transferFrom)</span>
+    </div>
+
+    <div class="card">
+        <span class="tag">Interactive fee calculator</span>
+        <div class="calc-inputs">
+            <div class="calc-field">
+                <label>Deposit amount (TKRW)</label>
+                <input type="number" id="feeAmt" value="1000" min="0" step="any" oninput="calcFees()">
+            </div>
+            <div class="calc-field">
+                <label>Current share price</label>
+                <input type="number" id="feePrice" value="1.000000" min="0.000001" step="0.000001" oninput="calcFees()">
+            </div>
+        </div>
+
+        <div class="tscroll" style="margin-top:20px;">
+            <table>
+                <tr>
+                    <th>Tier</th>
+                    <th>Fee (TKRW)</th>
+                    <th>Net deposited</th>
+                    <th>Shares minted</th>
+                </tr>
+                <tr>
+                    <td><span class="tier-chip p">Platinum</span>Platinum</td>
+                    <td class="num" id="f-p-fee">5.00</td>
+                    <td class="num" id="f-p-net">995.00</td>
+                    <td class="num hi" id="f-p-sh">995.000</td>
+                </tr>
+                <tr>
+                    <td><span class="tier-chip g">Gold</span>Gold</td>
+                    <td class="num" id="f-g-fee">10.00</td>
+                    <td class="num" id="f-g-net">990.00</td>
+                    <td class="num" style="color:var(--gold)" id="f-g-sh">990.000</td>
+                </tr>
+                <tr>
+                    <td><span class="tier-chip s">Silver</span>Silver</td>
+                    <td class="num" id="f-s-fee">15.00</td>
+                    <td class="num" id="f-s-net">985.00</td>
+                    <td class="num" style="color:var(--slate)" id="f-s-sh">985.000</td>
+                </tr>
+                <tr>
+                    <td><span class="tier-chip u">Standard</span>Standard</td>
+                    <td class="num" id="f-u-fee">20.00</td>
+                    <td class="num" id="f-u-net">980.00</td>
+                    <td class="num" style="color:var(--muted)" id="f-u-sh">980.000</td>
+                </tr>
+            </table>
+        </div>
+        <div class="delta-note" id="deltaNote">
+            On a 1000 TKRW deposit — Platinum keeps <b>15.00 TKRW</b> more at work than Standard.
+        </div>
+    </div>
+
+    <!-- ── §3 ACCRUAL SIMULATOR ─────────────────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 3</div>
+        <h2>Strategy accrual — <em>the engine</em></h2>
+        <div class="deck">No new shares are minted when yield arrives. Assets grow; shares stay fixed; every share redeems for more.</div>
+    </div>
+
+    <div class="formula-card">
+        <span class="c">// conceptual share price</span><br>
+        sharePrice = totalAssets / totalSupply<br><br>
+        <span class="c">// with _decimalsOffset()=18 (virtual units included)</span><br>
+        sharePrice = (assets + 1) / (shares + 10<sup>18</sup>)<br><br>
+        <span class="c">// yield = assets growing, shares constant → price rises</span>
+    </div>
+
+    <div class="card">
+        <span class="tag">Interactive accrual simulator</span>
+
+        <div class="slider-wrap">
+            <label>
+                Yield injected this harvest (% of current assets)
+                <b id="pctLbl">2.50%</b>
+            </label>
+            <input type="range" id="yieldSlider" min="0" max="10" step="0.01" value="2.5" oninput="calcAccrual()">
+        </div>
+
+        <div class="sim-wrap">
+            <div class="sim-panel">
+                <span class="k">New share price</span>
+                <div class="v" id="simPrice">1.025000</div>
+            </div>
+            <div class="sim-panel">
+                <span class="k">Position value (Platinum shares)</span>
+                <div class="v pos" id="simPos">1020.13</div>
+            </div>
+            <div class="sim-panel">
+                <span class="k">P&amp;L vs. entry</span>
+                <div class="v pos" id="simPnl">+20.13 TKRW</div>
+            </div>
+            <div class="sim-panel">
+                <span class="k">Harvest return (single period)</span>
+                <div class="v" id="simR">2.50%</div>
+            </div>
+        </div>
+
+        <div class="apy-row">
+            <div>
+                <div class="k">Annualized APY</div>
+                <div class="apy-num" id="simApy">—</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+                <span class="k" style="color:var(--faint)">Harvests / year</span>
+                <input type="number" id="harvestsPerYear" value="365" min="1" max="10000" oninput="calcAccrual()">
+            </div>
+        </div>
+
+        <div class="note" style="margin-top:20px;">
+            <b>Honest framing:</b> The 6.00% APY shown in the live app is the <em>target spec</em> realized by the real mainnet strategy's harvest cadence. The testnet "▶ Run strategy tick" button deliberately injects ~2.5% per click so the accrual engine is visually legible on camera during a judge demo. These are two different things; neither is fabricated.
+        </div>
+    </div>
+
+    <!-- ── §4 V2 FEE ROADMAP ────────────────────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 4 · roadmap</div>
+        <h2>Fee stack beyond entry</h2>
+        <div class="deck">V2 adds management and performance fees. Labeled roadmap; not in the deployed testnet contract.</div>
+    </div>
+
+    <div class="card">
+        <span class="tag">V2 — not yet deployed</span>
+        <p><b>Management fee:</b> 1.00%/yr accrued continuously into the share price via a virtual assets increase per block — no discrete event, no depositor action required.</p>
+        <p><b>Performance fee:</b> 15% of realized yield taken at each harvest and minted as shares to treasury (dilutive-by-design, per Yearn/Morpho standard).</p>
+    </div>
+
+    <div class="formula-card">
+        perfFee_shares = <span class="h">floor</span>(realizedYield_assets × 1500 / 10000)<br>
+        <span class="c">// minted to treasury → dilutes existing holders by design</span><br>
+        <span class="c">// this is the performance carry; entry+management fees are split</span><br>
+        <span class="g">operatorSplit</span>: perfFee → operator carry<br>
+        <span class="g">ecosystemSplit</span>: entry + management → 50 / 50 operator + GIWA treasury
+    </div>
+
+    <div class="note gold">
+        <b>Operator / protocol split policy:</b> Performance fee is operator carry. Entry and management fees are shared with the GIWA ecosystem (proposed 50/50) so the protocol has a recurring revenue stake proportional to TVL activity — not a one-time listing fee.
+    </div>
+
+    <!-- ── §5 SECURITY ─────────────────────────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 5 · most important</div>
+        <h2>Security &amp; <em>trust model</em></h2>
+        <div class="deck">Read this section before auditing, forking, or deploying to mainnet.</div>
+    </div>
+
+    <div class="sec-item crit">
+        <h4>⚠ Simulation yield — testnet only</h4>
+        <p>On testnet, the "yield source" is MockERC20's open <code>mint(vault, amount)</code>. <b>This is a simulation so judges can watch the accrual engine in a live demo.</b> On mainnet, this open mint MUST be removed entirely. Value may enter the vault only through a role-gated <code>harvest()</code> called by a whitelisted strategy contract that has actually earned external yield (e.g. from a Dunamu-backed KRW yield source). No exceptions. The testnet build is not a mainnet reference.</p>
+    </div>
+
+    <div class="sec-item crit">
+        <h4>Inflation / first-depositor / donation attack</h4>
+        <p>Without the decimal offset, an attacker can deposit 1 wei to an empty vault, then donate a large amount directly to the vault's asset balance. This inflates <code>totalAssets / totalSupply</code> — so the next depositor's shares round to zero (the pathology that produced our 1.09 × 10²¹ share price in an earlier testnet build — we caught and patched it before any real money was at risk).</p>
+        <p><b>Fix: </b><code>_decimalsOffset() = 18</code> makes the virtual supply 10¹⁸ × larger. An attacker must donate 10¹⁸ × the "attack capital" to move the price by 1 wei of shares — making the attack economically infeasible. This is the same defense used by Morpho, Euler v2, and OZ's own documentation.</p>
+    </div>
+
+    <div class="formula-card">
+        <span class="c">// protected invariant with offset</span><br>
+        virtualSupply  = totalSupply + 10<sup>18</sup><br>
+        virtualAssets  = totalAssets + 1<br>
+        sharePrice     = virtualAssets / virtualSupply<br><br>
+        <span class="c">// attacker needs ≥ 10^18 TKRW donation to inflate by 1 wei</span><br>
+        <span class="c">// ∴ attack cost >> any rational yield extraction</span>
+    </div>
+
+    <div class="sec-item">
+        <h4>Oracle discipline</h4>
+        <p>Any price the strategy trusts for rebalancing or yield calculation <b>must be a TWAP, Chainlink feed, or Pyth pull oracle</b>. Spot DEX quotes are manipulable within a single block — using them as an input to a harvest function is a known vector for flash-loan-driven bad debt. This is a mainnet checklist item, not a testnet constraint.</p>
+    </div>
+
+    <div class="sec-item">
+        <h4>Roles &amp; emergency brake</h4>
+        <p>Access is managed via OpenZeppelin <code>AccessControl</code> with four roles: <b>governor</b> (governance), <b>curator</b> (parameter tuning), <b>keeper</b> (harvest calls), <b>guardian</b> (emergency). The guardian can pause or quarantine a strategy without a governance delay — providing a fast response path to a detected exploit. Owner and treasury keys are held in a Safe multisig.</p>
+    </div>
+
+    <div class="sec-item">
+        <h4>The dashboard as a control surface</h4>
+        <p>The live app clamps the displayed share price to a sanity band (0.5 – 5.0) and shows <b>—</b> / "degraded" when the price falls outside it. This is the same check that surfaced the 1e21 price before any user saw it. The UI is defense-in-depth: if the contract state is wrong, the dashboard renders wrong, not silently normal. This is not decoration.</p>
+    </div>
+
+    <!-- ── §6 TRUST ASSUMPTIONS ──────────────────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 6</div>
+        <h2>Trust assumptions summary</h2>
+    </div>
+
+    <ul class="feat">
+        <li><b>DojangScore (fee tier):</b> A wrong DojangScore sets the wrong entry fee tier — a user might pay 2.00% instead of 0.50%, or vice versa. This is a pricing error, <em>not</em> a principal-safety error. The depositor's net TKRW and share entitlement are correct; only the fee amount changes.</li>
+        <li><b>Upbit Korea attester:</b> Transitively trusted through DojangScore. A compromised attester key inflates or deflates trust scores, mis-pricing fees. Mitigated by 90-day attestation expiry; multi-attester quorum on roadmap.</li>
+        <li><b>Asset counterparty (TKRW):</b> Testnet TKRW is a mock with open <code>faucet()</code> — no economic value. On mainnet the asset is intended to be the Dunamu/Naver KRW-backed stablecoin, which carries its own issuer counterparty risk and regulatory exposure. A KRW stablecoin depeg directly reduces every depositor's real-world value regardless of share-price correctness.</li>
+        <li><b>ERC-4626 + OpenZeppelin v5:</b> Assumed correct per the library's audit history. Any undiscovered critical vulnerability in OZ v5 is a direct risk to vault principal. Mitigation: a WonVault-specific audit pre-mainnet.</li>
+    </ul>
+
+    <!-- ── PULL QUOTE ─────────────────────────────────────────────── -->
+    <div class="pull">
+        Freeze every new deposit today; holders still earn — because the yield is external. That test is the whole vault.
+    </div>
+
+    <!-- ── FOOTER ─────────────────────────────────────────────────── -->
+    <div class="foot">
+        <a href="doc-score.html">DojangScore Docs</a>
+        <a href="doc-swap.html">GIWASwap Docs</a>
+        <a href="index.html">Live App</a>
+        <a href="https://sepolia-explorer.giwa.io/address/0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5" target="_blank" rel="noopener">0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5 (Explorer)</a>
+    </div>
+
+</div><!-- /wrap -->
+
+<script>
+    /* ── Fee calculator ──────────────────────────────────────────── */
+    const tiers = [
+        { id: "p", bps:  50 },
+        { id: "g", bps: 100 },
+        { id: "s", bps: 150 },
+        { id: "u", bps: 200 }
+    ];
+
+    function calcFees() {
+        const amt   = parseFloat(document.getElementById("feeAmt").value)   || 0;
+        const price = parseFloat(document.getElementById("feePrice").value) || 1;
+        if (amt <= 0 || price <= 0) return;
+
+        tiers.forEach(t => {
+            const fee  = Math.floor(amt * t.bps) / 10000;   // floor(assets*bps/10000)
+            const net  = amt - fee;
+            const sh   = net / price;
+            document.getElementById(`f-${t.id}-fee`).textContent = fee.toFixed(2);
+            document.getElementById(`f-${t.id}-net`).textContent = net.toFixed(2);
+            document.getElementById(`f-${t.id}-sh`).textContent  = sh.toFixed(3);
+        });
+
+        // Platinum vs Standard delta
+        const feePlatinum = Math.floor(amt * 50)  / 10000;
+        const feeStandard = Math.floor(amt * 200) / 10000;
+        const delta = feeStandard - feePlatinum;
+        document.getElementById("deltaNote").innerHTML =
+            `On a ${amt.toLocaleString()} TKRW deposit — Platinum keeps <b>${delta.toFixed(2)} TKRW</b> more at work than Standard.`;
+
+        // Drive the hero share-price readout from the price input
+        const basePriceEl = document.getElementById("heroPrice");
+        const baseDeltaEl = document.getElementById("heroDelta");
+        const base = 1.0;
+        const diff = ((price - base) / base) * 100;
+        basePriceEl.textContent = price.toFixed(6);
+        baseDeltaEl.textContent = (diff >= 0 ? "+" : "") + diff.toFixed(2) + "%";
+        baseDeltaEl.className   = "price-delta" + (diff < 0 ? " neg" : "");
+    }
+
+    /* ── Accrual simulator ───────────────────────────────────────── */
+    let lastPrice = 1.0;
+
+    function calcAccrual() {
+        const pct = parseFloat(document.getElementById("yieldSlider").value) || 0;
+        document.getElementById("pctLbl").textContent = pct.toFixed(2) + "%";
+
+        // Use Platinum scenario: net deposited = 995, shares = 995/startPrice
+        const feeAmt    = parseFloat(document.getElementById("feeAmt").value)   || 1000;
+        const startPrice = parseFloat(document.getElementById("feePrice").value) || 1;
+        const entryNet   = feeAmt - Math.floor(feeAmt * 50) / 10000; // Platinum
+        const shares     = entryNet / startPrice;
+
+        const r        = pct / 100;
+        const newAssets = entryNet * (1 + r);
+        const newPrice  = newAssets / shares;          // newAssets/shares (demonstration, single-depositor)
+        const posValue  = shares * newPrice;
+        const pnl       = posValue - entryNet;
+
+        const harvests  = parseInt(document.getElementById("harvestsPerYear").value) || 365;
+        const apy       = (Math.pow(1 + r, harvests) - 1) * 100;
+
+        // Update DOM
+        const simPriceEl = document.getElementById("simPrice");
+        simPriceEl.textContent = newPrice.toFixed(6);
+
+        // Flash on change
+        if (Math.abs(newPrice - lastPrice) > 1e-9) {
+            simPriceEl.classList.remove("flash");
+            void simPriceEl.offsetWidth;
+            simPriceEl.classList.add("flash");
+            lastPrice = newPrice;
+
+            // also drive hero readout
+            const heroEl    = document.getElementById("heroPrice");
+            const heroDelta = document.getElementById("heroDelta");
+            heroEl.textContent    = newPrice.toFixed(6);
+            const diffPct = ((newPrice - 1) / 1) * 100;
+            heroDelta.textContent = (diffPct >= 0 ? "+" : "") + diffPct.toFixed(2) + "%";
+            heroDelta.className   = "price-delta" + (diffPct < 0 ? " neg" : "");
+            heroEl.classList.remove("flash");
+            void heroEl.offsetWidth;
+            heroEl.classList.add("flash");
+        }
+
+        document.getElementById("simPos").textContent = posValue.toFixed(2) + " TKRW";
+        document.getElementById("simPos").className   = "v " + (pnl >= 0 ? "pos" : "neg");
+
+        document.getElementById("simPnl").textContent = (pnl >= 0 ? "+" : "") + pnl.toFixed(2) + " TKRW";
+        document.getElementById("simPnl").className   = "v " + (pnl >= 0 ? "pos" : "neg");
+
+        document.getElementById("simR").textContent   = (r * 100).toFixed(2) + "%";
+        document.getElementById("simApy").textContent = isFinite(apy) ? apy.toFixed(2) + "%" : "—";
+    }
+
+    // Init on load
+    window.addEventListener("DOMContentLoaded", () => {
+        calcFees();
+        calcAccrual();
+    });
+</script>
+</body>
+</html>
