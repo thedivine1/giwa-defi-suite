@@ -16,4 +16,11 @@ module.exports = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
   },
+  etherscan: {
+    apiKey: { giwa: "verify" },
+    customChains: [{
+      network: "giwa", chainId: 91342,
+      urls: { apiURL: "https://sepolia-explorer.giwa.io/api", browserURL: "https://sepolia-explorer.giwa.io" }
+    }]
+  }
 };

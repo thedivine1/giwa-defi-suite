@@ -315,26 +315,79 @@
             margin-bottom: 9px
         }
 
-        .registry a {
+        .reg-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            padding: 8px 6px;
+            border-bottom: 1px solid var(--line);
+            transition: .15s;
+            gap: 12px;
+        }
+
+        .reg-row:hover {
+            background: var(--panel2);
+        }
+
+        .reg-lab {
             font-family: var(--mono);
             font-size: .66rem;
             color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .reg-link-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: right;
+            justify-content: flex-end;
+        }
+
+        .reg-link-wrap a {
+            font-family: var(--mono);
+            font-size: .66rem;
+            color: var(--faint);
             text-decoration: none;
-            padding: 6px 0;
-            border-bottom: 1px solid var(--line);
-            transition: .15s
+            transition: .15s transform, .15s color;
+            word-break: break-all;
+            display: inline-block;
         }
 
-        .registry a:hover {
+        .reg-link-wrap a:hover {
             color: var(--jade);
-            padding-left: 4px
+            text-decoration: underline;
+            transform: translateX(2px);
         }
 
-        .registry a span {
-            color: var(--faint)
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: .15s;
+            font-family: var(--mono);
+            min-width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .copy-btn svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .copy-btn:hover {
+            color: var(--jade);
+        }
+
+        .copy-btn.flash-jade {
+            color: var(--bg);
+            background: var(--jade);
         }
 
         .deck {
@@ -1028,12 +1081,19 @@
         }
 
         .foot a {
+            font-family: var(--mono);
+            font-size: .62rem;
             color: var(--muted);
-            text-decoration: none
+            text-decoration: none;
+            word-break: break-all;
+            display: inline-block;
+            transition: .15s transform, .15s color;
         }
 
         .foot a:hover {
-            color: var(--jade)
+            color: var(--jade);
+            text-decoration: underline;
+            transform: translateX(2px);
         }
     </style>
     <style>
@@ -1226,10 +1286,10 @@
 
             <div class="foot">
                 DojangScore · WonVault · GIWASwap — deployed on GIWA Sepolia (OP Stack, chain 91342)<br>
-                Reads <a target="_blank"
-                    href="https://sepolia-explorer.giwa.io/address/0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9">DojangScroll</a>
-                &amp; <a target="_blank"
-                    href="https://sepolia-explorer.giwa.io/address/0x4200000000000000000000000000000000000021">EAS</a>
+                Reads <a target="_blank" rel="noopener" title="view on explorer"
+                    href="https://sepolia-explorer.giwa.io/address/0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9">0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9</a>
+                &amp; <a target="_blank" rel="noopener" title="view on explorer"
+                    href="https://sepolia-explorer.giwa.io/address/0x4200000000000000000000000000000000000021">0x4200000000000000000000000000000000000021</a>
                 attestations · attester: Upbit Korea
             </div>
         </main>
@@ -1258,10 +1318,40 @@
         const ABI_P = ["function getReserves() view returns (uint256,uint256)", "function swap(address,uint256,uint256,address) returns (uint256)", "function feeBpsFor(address) view returns (uint256)"];
 
         (function () {
-            const rows = [["DojangScore", C.DojangScore], ["WonVault", C.WonVault], ["Swap Pool", C.Pool], ["Factory", C.GIWASwapFactory]];
+            const rows = [
+                ["DojangScore", C.DojangScore],
+                ["WonVault", C.WonVault],
+                ["Swap Factory", C.GIWASwapFactory],
+                ["Swap Pool", C.Pool],
+                ["TKRW", C.TKRW],
+                ["TUSD", C.TUSD]
+            ];
             document.getElementById("reg").innerHTML = rows.map(([n, a]) =>
-                `<a target="_blank" href="${C.explorer}/address/${a}">${n} <span>${a.slice(0, 6)}…${a.slice(-4)}</span></a>`).join("");
+                `<div class="reg-row">
+                    <span class="reg-lab">${n}</span>
+                    <div class="reg-link-wrap">
+                        <a target="_blank" rel="noopener" href="${C.explorer}/address/${a}" title="view on explorer">${a}</a>
+                        <button class="copy-btn" onclick="copyAddr(this, '${a}')" title="copy address">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                        </button>
+                    </div>
+                </div>`).join("");
         })();
+
+        window.copyAddr = async function(btn, text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                const oldHTML = btn.innerHTML;
+                btn.classList.add('flash-jade');
+                btn.innerHTML = `<span style="font-size:0.6rem;">copied</span>`;
+                setTimeout(() => {
+                    btn.classList.remove('flash-jade');
+                    btn.innerHTML = oldHTML;
+                }, 900);
+            } catch (e) {
+                console.error('Failed to copy', e);
+            }
+        };
 
         function busy(id, on, label) { const b = document.getElementById(id); if (!b) return; if (on) { if (!b.dataset.orig) b.dataset.orig = b.textContent; b.textContent = label; b.classList.add('busy'); } else { b.textContent = b.dataset.orig || b.textContent; b.classList.remove('busy'); } }
         function msg(id, t, err) { const e = document.getElementById(id); if (!e) return; e.textContent = t; e.classList.toggle('err', !!err); }
