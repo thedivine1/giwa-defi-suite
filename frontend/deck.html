@@ -1453,6 +1453,12 @@
                     class="lab">DojangScroll (upstream, not
                     rebuilt)</span><span>0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9</span></a>
             <a><span class="lab dead">WonVault v0 (abandoned — footgun)</span><span class="dead">0x6e37…BB2C</span></a>
+            <div style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--line2);display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+                <span style="font-family:var(--mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);margin-right:4px;">Technical docs</span>
+                <a href="doc-score.html" style="display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.68rem;color:var(--muted);text-decoration:none;padding:4px 10px;border:1px solid var(--line2);border-radius:20px;transition:.2s;" onmouseover="this.style.color='#0c0f0e';this.style.background='#5fe0a8';this.style.borderColor='#5fe0a8'" onmouseout="this.style.color='';this.style.background='';this.style.borderColor=''">DojangScore spec</a>
+                <a href="doc-vault.html" style="display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.68rem;color:var(--muted);text-decoration:none;padding:4px 10px;border:1px solid var(--line2);border-radius:20px;transition:.2s;" onmouseover="this.style.color='#0c0f0e';this.style.background='#5fe0a8';this.style.borderColor='#5fe0a8'" onmouseout="this.style.color='';this.style.background='';this.style.borderColor=''">WonVault spec</a>
+                <a href="doc-swap.html" style="display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.68rem;color:var(--muted);text-decoration:none;padding:4px 10px;border:1px solid var(--line2);border-radius:20px;transition:.2s;" onmouseover="this.style.color='#0c0f0e';this.style.background='#5fe0a8';this.style.borderColor='#5fe0a8'" onmouseout="this.style.color='';this.style.background='';this.style.borderColor=''">GIWASwap spec</a>
+            </div>
             <div class="note"><b>Security note for the judges.</b> Our first vault build hit OpenZeppelin's ERC-4626
                 inflation footgun — a deposit minted zero shares and the share price spiked to 1.09e+21. We did not find
                 it in a unit test; we found it because we built a live share-price readout that exposes accounting truth

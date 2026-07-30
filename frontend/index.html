@@ -1118,6 +1118,50 @@
             color: var(--rose);
             background: rgba(224, 145, 143, .08)
         }
+
+        .docs-rail {
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--line)
+        }
+
+        .docs-rail h4 {
+            font-family: var(--mono);
+            font-size: .58rem;
+            letter-spacing: .24em;
+            color: var(--faint);
+            text-transform: uppercase;
+            margin-bottom: 8px
+        }
+
+        .docs-rail a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--muted);
+            text-decoration: none;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--line);
+            transition: .15s
+        }
+
+        .docs-rail a:last-child {
+            border-bottom: none
+        }
+
+        .docs-rail a::before {
+            content: '\203A';
+            color: var(--jade);
+            font-size: .9rem;
+            line-height: 1
+        }
+
+        .docs-rail a:hover {
+            color: var(--jade);
+            transform: translateX(2px)
+        }
     </style>
 </head>
 
@@ -1147,6 +1191,12 @@
             <div class="registry">
                 <h4>On-chain registry</h4>
                 <div id="reg"></div>
+            </div>
+            <div class="docs-rail">
+                <h4>Technical docs</h4>
+                <a href="doc-score.html">DojangScore spec</a>
+                <a href="doc-vault.html">WonVault spec</a>
+                <a href="doc-swap.html">GIWASwap spec</a>
             </div>
         </aside>
 
