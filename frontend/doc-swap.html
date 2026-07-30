@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GIWASwap — Technical Specification</title>
+    <meta name="description" content="GIWASwap constant-product AMM technical one-pager: tiered swap fees by DojangScore trust, pricing math, LP mechanics, and security model on GIWA Sepolia." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink:       #0c0f0e;
+            --ink2:      #101413;
+            --panel:     #141a17;
+            --panel2:    #18201c;
+            --panel3:    #1d2722;
+            --line:      #27332c;
+            --line2:     #33443b;
+            --bone:      #ece7da;
+            --muted:     #93a39a;
+            --faint:     #647569;
+            --jade:      #5fe0a8;
+            --jade-dim:  #2c6b51;
+            --jade-deep: #0e2a20;
+            --gold:      #e3b96a;
+            --slate:     #86b6cb;
+            --rose:      #e0918f;
+            --disp: 'Syne', sans-serif;
+            --body: 'IBM Plex Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { background: var(--ink); color: var(--bone); font-family: var(--body); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+        ::selection { background: var(--jade); color: var(--ink); }
+
+        /* ── Layout ──────────────────────────────────────────── */
+        .wrap { position: relative; z-index: 2; max-width: 920px; margin: 0 auto; padding: 0 30px; }
+        @media(max-width:680px) { .wrap { padding: 0 18px; } }
+
+        .gridbg { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background: radial-gradient(120% 80% at 8% -5%, #13241c 0%, transparent 55%),
+                        radial-gradient(90%  70% at 100% 110%, #1a160c 0%, transparent 50%), var(--ink); }
+        .gridbg::after { content: ""; position: absolute; inset: 0;
+            background-image: radial-gradient(var(--line) 1px, transparent 1.4px);
+            background-size: 34px 34px; animation: pan 50s linear infinite; opacity: .4; }
+        @keyframes pan { to { background-position: 34px 68px; } }
+        .scan { position: fixed; left: 0; width: 100%; height: 30vh; z-index: 0; pointer-events: none; opacity: .4;
+            background: linear-gradient(to bottom, transparent, rgba(95,224,168,.04), transparent);
+            animation: scan 9s linear infinite; }
+        @keyframes scan { 0% { top: -30vh; } 100% { top: 100vh; } }
+
+        /* ── Opening invariant ───────────────────────────────── */
+        .amm-hero { text-align: center; padding: 90px 0 44px; position: relative; }
+        .invariant { font-family: var(--mono); font-weight: 700;
+            font-size: clamp(4rem, 18vw, 10rem); color: var(--bone);
+            letter-spacing: -.04em; line-height: 1; }
+        .invariant .op  { color: var(--jade); }
+        .invariant .var { color: var(--gold); }
+        .invariant-label { font-family: var(--mono); font-size: .78rem; letter-spacing: .18em;
+            color: var(--faint); text-transform: uppercase; margin-top: 16px; }
+
+        /* reserve diagram */
+        .res-diagram { display: inline-flex; align-items: center; gap: 0; margin: 28px auto 0;
+            border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+        .res-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            padding: 10px 18px; min-width: 80px; }
+        .res-col .rval { font-family: var(--mono); font-size: .8rem; color: var(--muted); margin-bottom: 6px; }
+        .res-bar { width: 32px; border-radius: 3px 3px 0 0; transition: height .4s ease; }
+        .res-col .rlbl { font-family: var(--mono); font-size: .62rem; letter-spacing: .12em;
+            text-transform: uppercase; color: var(--faint); margin-top: 8px; }
+        .res-div { width: 1px; background: var(--line); align-self: stretch; }
+        .res-eq { font-family: var(--mono); font-size: 1.5rem; color: var(--jade); padding: 0 16px; }
+
+        /* ── Shared components ───────────────────────────────── */
+        .chap { padding: 52px 0 20px; }
+        .chap-eyebrow { font-family: var(--mono); font-size: .64rem; letter-spacing: .28em;
+            color: var(--gold); text-transform: uppercase; }
+        .chap h2 { font-family: var(--disp); font-weight: 700;
+            font-size: clamp(1.7rem, 5vw, 2.6rem); letter-spacing: -.02em; line-height: 1.1; margin: 8px 0 0; }
+        .chap h2 em { font-style: normal; color: var(--jade); }
+        .chap .deck { color: var(--muted); max-width: 68ch; margin-top: 14px; font-size: 1.05rem; line-height: 1.6; }
+
+        .card { background: linear-gradient(180deg, var(--panel2), var(--panel));
+            border: 1px solid var(--line); border-radius: 10px; padding: 24px;
+            position: relative; overflow: hidden; margin-top: 24px; }
+        .card .tag { font-family: var(--mono); font-size: .58rem; letter-spacing: .2em;
+            color: var(--faint); text-transform: uppercase; display: block; margin-bottom: 10px; }
+        .card h3 { font-family: var(--disp); font-weight: 700; font-size: 1.18rem;
+            margin-bottom: 14px; letter-spacing: .01em; }
+        .card p { color: var(--muted); font-size: .97rem; line-height: 1.65; }
+        .card p + p { margin-top: 12px; }
+        .card p b { color: var(--bone); font-weight: 600; }
+        .card p code, li code, td code, p code { font-family: var(--mono); font-size: .84em;
+            color: var(--jade); background: var(--jade-deep); padding: 2px 6px; border-radius: 4px; }
+
+        .feat { list-style: none; margin-top: 16px; }
+        .feat li { position: relative; padding: 9px 0 9px 26px; border-top: 1px solid var(--line);
+            font-size: .96rem; color: var(--muted); line-height: 1.55; }
+        .feat li:first-child { border-top: none; }
+        .feat li::before { content: ""; position: absolute; left: 0; top: 17px; width: 12px; height: 2px; background: var(--jade); }
+        .feat li b { color: var(--bone); font-weight: 600; }
+
+        .tscroll { overflow-x: auto; margin-top: 24px; border: 1px solid var(--line); border-radius: 10px; }
+        .tscroll table { width: 100%; border-collapse: collapse; min-width: 480px; text-align: left; }
+        .tscroll th { font-family: var(--mono); font-size: .58rem; letter-spacing: .16em;
+            text-transform: uppercase; color: var(--faint); background: var(--panel);
+            padding: 11px 15px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+        .tscroll td { padding: 13px 15px; border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line); font-size: .88rem; color: var(--muted); vertical-align: middle; }
+        .tscroll tr:last-child td { border-bottom: none; }
+        .tscroll th:last-child, .tscroll td:last-child { border-right: none; }
+        .tscroll td b { color: var(--bone); }
+        .tscroll td.hi { color: var(--jade); font-family: var(--mono); }
+        .tscroll td.num { font-family: var(--mono); }
+
+        .formula-card { font-family: var(--mono); font-size: .9rem; color: var(--jade);
+            background: var(--jade-deep); border: 1px solid var(--jade-dim);
+            border-radius: 8px; padding: 18px 22px; margin-top: 18px; line-height: 2; }
+        .formula-card span.c  { color: var(--faint); }
+        .formula-card span.h  { color: var(--bone); }
+        .formula-card span.g  { color: var(--gold); }
+        .formula-card span.r  { color: var(--rose); }
+
+        .note { background: rgba(95,224,168,.05); border-left: 3px solid var(--jade-dim);
+            padding: 16px 20px; font-size: .92rem; color: var(--muted);
+            margin-top: 20px; border-radius: 0 6px 6px 0; line-height: 1.6; }
+        .note b { color: var(--bone); font-weight: 600; }
+        .note.warn { background: rgba(224,145,143,.06); border-left-color: var(--rose); }
+        .note.warn b { color: var(--rose); }
+        .note.gold { background: rgba(227,185,106,.06); border-left-color: #7a5d28; }
+        .note.gold b { color: var(--gold); }
+
+        .pull { margin: 36px 0; padding: 26px 0 26px 28px; border-left: 3px solid var(--jade);
+            font-family: var(--disp); font-weight: 600; font-size: clamp(1.3rem, 4vw, 2rem);
+            line-height: 1.3; color: var(--bone); letter-spacing: -.01em; }
+
+        .tier-chip { display: inline-block; font-family: var(--mono); font-size: .62rem;
+            padding: 2px 8px; border-radius: 12px; vertical-align: middle; margin-right: 4px; }
+        .tier-chip.p { background: var(--jade-deep); color: var(--jade); }
+        .tier-chip.g { background: rgba(227,185,106,.1); color: var(--gold); }
+        .tier-chip.s { background: rgba(134,182,203,.1); color: var(--slate); }
+        .tier-chip.u { background: var(--panel2); color: var(--muted); }
+
+        /* ── Swap calculator ─────────────────────────────────── */
+        .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+        @media(max-width:640px) { .calc-grid { grid-template-columns: 1fr; } }
+        .calc-field { display: flex; flex-direction: column; gap: 6px; }
+        .calc-field label { font-family: var(--mono); font-size: .6rem; letter-spacing: .2em;
+            text-transform: uppercase; color: var(--faint); }
+        .calc-field input, .calc-field select {
+            background: var(--panel); border: 1px solid var(--line2); border-radius: 6px;
+            color: var(--bone); padding: 10px 14px; font-family: var(--mono); font-size: .92rem;
+            outline: none; transition: .18s; width: 100%; }
+        .calc-field input:focus, .calc-field select:focus { border-color: var(--jade); box-shadow: 0 0 0 3px var(--jade-deep); }
+        select option { background: var(--panel2); }
+
+        .result-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 20px; }
+        @media(max-width:640px) { .result-strip { grid-template-columns: 1fr 1fr; } }
+        .res-tile { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; transition: .2s; }
+        .res-tile:hover { border-color: var(--jade-dim); }
+        .res-tile .k { font-family: var(--mono); font-size: .56rem; letter-spacing: .18em;
+            text-transform: uppercase; color: var(--faint); display: block; margin-bottom: 6px; }
+        .res-tile .v { font-family: var(--mono); font-weight: 700; font-size: 1.35rem; color: var(--bone); }
+        .res-tile .v.pos { color: var(--jade); }
+        .res-tile .v.neg { color: var(--rose); }
+
+        /* 4-tier comparison */
+        .compare-wrap { margin-top: 24px; }
+        .compare-row { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+        .compare-lbl { font-family: var(--mono); font-size: .78rem; width: 90px; flex-shrink: 0; }
+        .compare-bar-track { flex: 1; height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; }
+        .compare-bar { height: 100%; border-radius: 5px; transition: width .35s ease; }
+        .compare-out { font-family: var(--mono); font-size: .82rem; color: var(--bone);
+            width: 74px; text-align: right; flex-shrink: 0; }
+        .compare-fee { font-family: var(--mono); font-size: .7rem; color: var(--faint);
+            width: 60px; text-align: right; flex-shrink: 0; }
+
+        .sybil-note { margin-top: 20px; padding: 14px 18px; border-radius: 6px;
+            background: rgba(95,224,168,.07); border: 1px solid var(--jade-deep);
+            font-family: var(--mono); font-size: .84rem; color: var(--jade); line-height: 1.6; }
+
+        /* Security items */
+        .sec-item { border-left: 3px solid var(--line2); padding: 16px 20px; margin-top: 16px;
+            border-radius: 0 8px 8px 0; background: var(--panel2); transition: border-left-color .2s; }
+        .sec-item:hover { border-left-color: var(--jade-dim); }
+        .sec-item h4 { font-family: var(--disp); font-weight: 600; font-size: 1.05rem; color: var(--bone); margin-bottom: 8px; }
+        .sec-item p { color: var(--muted); font-size: .93rem; line-height: 1.6; }
+        .sec-item p b { color: var(--bone); font-weight: 600; }
+        .sec-item.crit { border-left-color: var(--rose); }
+        .sec-item.crit:hover { border-left-color: var(--rose); }
+        .sec-item.crit h4 { color: var(--rose); }
+
+        /* Footer */
+        .foot { margin-top: 80px; padding: 40px 0; border-top: 1px solid var(--line);
+            font-family: var(--mono); font-size: .7rem; color: var(--faint); text-align: center; line-height: 2.2; }
+        .foot a { color: var(--muted); text-decoration: none; margin: 0 8px;
+            display: inline-block; transition: .2s; }
+        .foot a:hover { color: var(--jade); text-decoration: underline; }
+
+        /* flash */
+        @keyframes flash-jade { 0% { color: var(--jade); text-shadow: 0 0 16px rgba(95,224,168,.7); } 100% { text-shadow: none; } }
+        .flash { animation: flash-jade .8s ease; }
+
+        /* ── Print ───────────────────────────────────────────── */
+        @media print {
+            .gridbg, .scan { display: none; }
+            body { background: #fff; color: #111; font-size: 11pt; }
+            .wrap { max-width: 100%; padding: 0; }
+            .invariant { color: #111; font-size: 5rem; }
+            .invariant .op { color: #111; }
+            .invariant .var { color: #555; }
+            .res-diagram { border-color: #ccc; }
+            .res-bar { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            .card, .tscroll, .sec-item { border-color: #ccc; background: none; }
+            .formula-card { background: #f5f5f5; border: 1px solid #ccc; color: #111; }
+            .formula-card span.c { color: #777; }
+            .note, .sybil-note { background: #f9f9f9; border-left-color: #555; color: #444; }
+            .pull { border-left-color: #555; color: #111; }
+            .feat li::before { background: #111; }
+            .chap h2, .sec-item h4, .card h3 { color: #111; }
+            .chap .deck, .card p, .feat li { color: #444; }
+            .compare-bar { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            a { color: #111 !important; }
+            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+<div class="gridbg"></div>
+<div class="scan"></div>
+
+<div class="wrap">
+
+    <!-- ── OPENER: x·y=k invariant + reserve diagram ──────────── -->
+    <div class="amm-hero">
+        <div class="invariant">
+            <span class="var">x</span><span class="op"> · </span><span class="var">y</span><span class="op"> = </span><span class="var">k</span>
+        </div>
+        <div class="invariant-label">GIWASwap · constant-product AMM · GIWA Sepolia 91342</div>
+
+        <div class="res-diagram" id="resDiagram">
+            <div class="res-col">
+                <div class="rval" id="rdX">10000</div>
+                <div class="res-bar" id="barX" style="height:80px; background:var(--jade);"></div>
+                <div class="rlbl">TKRW (x)</div>
+            </div>
+            <div class="res-div"></div>
+            <div class="res-eq">=</div>
+            <div class="res-div"></div>
+            <div class="res-col">
+                <div class="rval" id="rdK">1e8</div>
+                <div class="res-bar" style="height:26px; background:var(--faint);"></div>
+                <div class="rlbl">k</div>
+            </div>
+            <div class="res-div"></div>
+            <div class="res-eq">=</div>
+            <div class="res-div"></div>
+            <div class="res-col">
+                <div class="rval" id="rdY">10000</div>
+                <div class="res-bar" id="barY" style="height:80px; background:var(--gold);"></div>
+                <div class="rlbl">TUSD (y)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── §1 ARCHITECTURE ─────────────────────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 1</div>
+        <h2>Architecture — <em>Factory + Pool</em></h2>
+        <div class="deck">One canonical pool per pair, deployed by the Factory and self-contained as an ERC-20 LP token.</div>
+    </div>
+
+    <div class="card">
+        <span class="tag">Factory: GIWASwapFactory</span>
+        <p><code>createPool(tokenA, tokenB)</code> deploys one <code>GIWASwapPool</code> and stores both orderings in <code>getPool[a][b]</code> and <code>getPool[b][a]</code>. The factory enforces: <b>tokenA ≠ tokenB</b>, both non-zero addresses, and no duplicate pair. Canonical ordering is <code>token0 &lt; token1</code> by address.</p>
+        <p><b>Pool: GIWASwapPool (GLP)</b> — The Pool is itself an ERC-20 LP token ("GLP") whose total supply represents pro-rata ownership of the reserves. State: <code>reserve0</code> and <code>reserve1</code>. Every action (swap, mint, burn) re-syncs reserves from actual balances and emits the corresponding event. Reserves can never silently drift from balances.</p>
+    </div>
+
+    <!-- ── §2 PRICING MATH ─────────────────────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 2</div>
+        <h2>Pricing math — <em>exact</em></h2>
+        <div class="deck">Every number a UI or router shows must follow from these formulas. No approximation.</div>
+    </div>
+
+    <div class="formula-card">
+        <span class="c">// swap output (Solidity, integer arithmetic)</span><br>
+        amtAfterFee = amountIn × (10000 − <span class="g">feeBps</span>) / 10000<br>
+        amountOut   = amtAfterFee × rOut / (rIn + amtAfterFee)<br><br>
+        <span class="c">// slippage guard</span><br>
+        <span class="h">require</span>(amountOut ≥ amountOutMin, "slippage");<br><br>
+        <span class="c">// effective price and impact</span><br>
+        effectivePrice = amountOut / amountIn<br>
+        midPrice       = rOut / rIn<br>
+        priceImpact    = 1 − (effectivePrice / midPrice)
+    </div>
+
+    <div class="formula-card" style="margin-top:12px;">
+        <span class="c">// LP: first mint (one-time geometric mean seed)</span><br>
+        liquidity = <span class="h">sqrt</span>(amount0 × amount1) − 1000<br>
+        <span class="c">// 1000 wei minted to address(0) — permanent lock, prevents donation attack</span><br><br>
+        <span class="c">// LP: subsequent mint (proportional)</span><br>
+        liquidity = <span class="h">min</span>(amount0 / reserve0, amount1 / reserve1) × totalSupply<br><br>
+        <span class="c">// LP: burn</span><br>
+        amount0 = liquidity / totalSupply × reserve0<br>
+        amount1 = liquidity / totalSupply × reserve1
+    </div>
+
+    <!-- ── §3 TIERED SWAP FEE + CALCULATOR ────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 3</div>
+        <h2>Trust-tiered swap fee — <em>the differentiator</em></h2>
+        <div class="deck">Fee tier read live from <code>DojangScore.feeBpsFor(swapper)</code> at swap time. Verified wallets pay less; bots pay the base rate.</div>
+    </div>
+
+    <div class="tscroll">
+        <table>
+            <tr>
+                <th>Tier</th>
+                <th>Basis points</th>
+                <th>Swap fee %</th>
+                <th>Condition</th>
+            </tr>
+            <tr>
+                <td><span class="tier-chip p">Platinum</span><b>Platinum</b></td>
+                <td class="hi">10 bps</td>
+                <td class="num">0.10 %</td>
+                <td>DojangScore ≥ 800</td>
+            </tr>
+            <tr>
+                <td><span class="tier-chip g">Gold</span><b>Gold</b></td>
+                <td class="hi" style="color:var(--gold)">15 bps</td>
+                <td class="num">0.15 %</td>
+                <td>Score 500 – 799</td>
+            </tr>
+            <tr>
+                <td><span class="tier-chip s">Silver</span><b>Silver</b></td>
+                <td class="hi" style="color:var(--slate)">20 bps</td>
+                <td class="num">0.20 %</td>
+                <td>Score 200 – 499</td>
+            </tr>
+            <tr>
+                <td><span class="tier-chip u">Standard</span><b>Unverified</b></td>
+                <td style="color:var(--muted)">30 bps</td>
+                <td class="num">0.30 %</td>
+                <td>Score &lt; 200</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <span class="tag">Interactive swap calculator</span>
+
+        <div class="calc-grid">
+            <div class="calc-field">
+                <label>Amount In</label>
+                <input type="number" id="swAmtIn" value="100" min="0" step="any" oninput="calcSwap()">
+            </div>
+            <div class="calc-field">
+                <label>Tier (active swap)</label>
+                <select id="swTier" onchange="calcSwap()">
+                    <option value="10">Platinum — 10 bps</option>
+                    <option value="15">Gold — 15 bps</option>
+                    <option value="20">Silver — 20 bps</option>
+                    <option value="30" selected>Unverified — 30 bps</option>
+                </select>
+            </div>
+            <div class="calc-field">
+                <label>Reserve In</label>
+                <input type="number" id="swRIn" value="10000" min="1" step="any" oninput="calcSwap()">
+            </div>
+            <div class="calc-field">
+                <label>Reserve Out</label>
+                <input type="number" id="swROut" value="10000" min="1" step="any" oninput="calcSwap()">
+            </div>
+        </div>
+
+        <div class="result-strip">
+            <div class="res-tile">
+                <span class="k">Fee paid</span>
+                <div class="v neg" id="outFee">—</div>
+            </div>
+            <div class="res-tile">
+                <span class="k">Amt after fee</span>
+                <div class="v" id="outAft">—</div>
+            </div>
+            <div class="res-tile">
+                <span class="k">Amount out</span>
+                <div class="v pos" id="outAmt">—</div>
+            </div>
+            <div class="res-tile">
+                <span class="k">Price impact</span>
+                <div class="v" id="outImpact">—</div>
+            </div>
+        </div>
+
+        <!-- 4-tier comparison -->
+        <div class="compare-wrap" id="compareWrap">
+            <div style="font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:16px;">All tiers — same trade</div>
+
+            <div class="compare-row">
+                <span class="compare-lbl" style="color:var(--jade)">Platinum</span>
+                <div class="compare-bar-track"><div class="compare-bar" id="bar-p" style="width:100%;background:var(--jade)"></div></div>
+                <span class="compare-out" id="cout-p">—</span>
+                <span class="compare-fee" id="cfee-p">—</span>
+            </div>
+            <div class="compare-row">
+                <span class="compare-lbl" style="color:var(--gold)">Gold</span>
+                <div class="compare-bar-track"><div class="compare-bar" id="bar-g" style="width:97%;background:var(--gold)"></div></div>
+                <span class="compare-out" id="cout-g">—</span>
+                <span class="compare-fee" id="cfee-g">—</span>
+            </div>
+            <div class="compare-row">
+                <span class="compare-lbl" style="color:var(--slate)">Silver</span>
+                <div class="compare-bar-track"><div class="compare-bar" id="bar-s" style="width:94%;background:var(--slate)"></div></div>
+                <span class="compare-out" id="cout-s">—</span>
+                <span class="compare-fee" id="cfee-s">—</span>
+            </div>
+            <div class="compare-row">
+                <span class="compare-lbl" style="color:var(--muted)">Unverified</span>
+                <div class="compare-bar-track"><div class="compare-bar" id="bar-u" style="width:88%;background:var(--muted)"></div></div>
+                <span class="compare-out" id="cout-u">—</span>
+                <span class="compare-fee" id="cfee-u">—</span>
+            </div>
+        </div>
+
+        <div class="sybil-note" id="sybilNote">
+            A bot staying anonymous pays 3× the fee — the cheapest Sybil-resistance marketing on the chain.
+        </div>
+    </div>
+
+    <!-- ── §4 WHY THIS CAN'T BE PORTED ────────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 4</div>
+        <h2>Why this <em>can't be ported</em></h2>
+    </div>
+
+    <div class="card">
+        <p>The tiered-fee mechanism requires <b>DojangScore</b> and the <b>Upbit attester</b>, which exist only on GIWA. There is no address to call on Ethereum mainnet, Arbitrum, or any other chain — the attestation infrastructure is chain-local and Dunamu-specific.</p>
+        <p>Combined with GIWA's <b>~200ms Flashblocks</b>, the swap UX is faster and cheaper for verified wallets than any existing DEX offering. A Platinum user paying 0.10% on GIWA Sepolia is paying less than any Uniswap v3 pool (lowest: 0.01%, but only for stablecoin pairs and with no trust discount).</p>
+        <p>GIWASwap's strategic role is threefold: <b>foundational liquidity + price discovery</b> for the GIWA ecosystem's assets, a <b>verification flywheel</b> (every swap incentivizes KYC so the next one is cheaper), and <b>fee revenue</b> for the protocol. It is not a DEX-for-its-own-sake.</p>
+    </div>
+
+    <!-- ── §5 REVENUE MODEL ─────────────────────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 5</div>
+        <h2>Revenue model</h2>
+    </div>
+
+    <ul class="feat">
+        <li><b>Protocol fee slice:</b> A configurable cut of each swap's LP fee (e.g. the protocol takes 1/6 of the tier fee when the switch is enabled, à la Uniswap v2's <code>feeTo</code> mechanism). Default: off. When on, the LP keeps 5/6 and protocol treasury takes 1/6.</li>
+        <li><b>LP fees to providers:</b> The bulk of swap fees always flow to LPs proportional to pool share. Protocol-owned liquidity is a roadmap strategy: the protocol seeds its own GLP position and earns LP fees alongside external providers.</li>
+        <li><b>Gated launchpad / listing:</b> An optional flat listing fee for new pairs (ethically-optional: defaulting off, never required for public permissionless pairs). Applies only if the operator wants a curated registry.</li>
+    </ul>
+
+    <div class="formula-card">
+        <span class="c">// protocol fee (when enabled)</span><br>
+        lpFee       = amountIn × <span class="g">feeBps</span> / 10000<br>
+        protocolCut = lpFee × 1 / 6<br>
+        lpShare     = lpFee × 5 / 6<br><br>
+        <span class="c">// protocolCut → treasury; lpShare → reserve (earns LPs implicitly)</span>
+    </div>
+
+    <!-- ── §6 SECURITY ─────────────────────────────────────────── -->
+    <div class="chap">
+        <div class="chap-eyebrow">§ 6</div>
+        <h2>Security assumptions</h2>
+        <div class="deck">Read before auditing, forking, or routing external assets through this pool.</div>
+    </div>
+
+    <div class="sec-item">
+        <h4>Oracle-free pricing by design</h4>
+        <p>The pool's own reserves are the canonical price. This means the pool <b>cannot be manipulated by an external oracle failure</b>, but any external UI, router, or strategy that displays or acts on the pool's price must use a <b>TWAP</b> (e.g. accumulated price over N blocks), not the spot reserve ratio. Spot quotes are manipulable within a single block via flash loans — using them as triggers for external logic is a known attack vector.</p>
+    </div>
+
+    <div class="sec-item">
+        <h4>First-LP &amp; seeding policy</h4>
+        <p>The <code>sqrt(x·y) − 1000</code> first-mint formula permanently locks 1000 GLP wei to <code>address(0)</code>. This means total supply is always ≥ 1000 after the first deposit, preventing a full drain back to zero shares and the accompanying reserve-ratio manipulation. Recommended seeding: operator bootstraps with a balanced initial position before opening to public LPs.</p>
+    </div>
+
+    <div class="sec-item">
+        <h4>DojangScore dependency</h4>
+        <p>A wrong DojangScore sets the wrong fee tier for a swap. This means a verified user might pay Unverified rates, or vice versa. <b>This is a pricing error, not an AMM correctness error.</b> The constant-product invariant still holds; <code>amountOut</code> is still correctly computed for whatever fee bps is returned. The trust discount is a perk, not a safety property. The pool settles correctly regardless.</p>
+    </div>
+
+    <div class="sec-item crit">
+        <h4>Token risk — arbitrary ERC-20s</h4>
+        <p>The current implementation trusts that <code>transfer</code> / <code>transferFrom</code> behave as standard ERC-20: no fee-on-transfer, no rebasing, no reentrancy in the token hook. Malicious or non-standard tokens can break the reserve integrity invariant silently. <b>Roadmap:</b> an allowlist of approved token addresses + <code>safeTransfer</code> wrappers + post-transfer balance checks. The demo pairs (TKRW / TUSD) are our own MockERC20 instances with no surprises.</p>
+    </div>
+
+    <div class="sec-item">
+        <h4>Reserves integrity</h4>
+        <p>Every action recomputes reserves from <code>balanceOf(address(this))</code> after the transfer, not from a stored accumulator. This means reserves can never drift from actual balances due to direct token sends. It is the same discipline that caught the vault's 1e21 share price: <b>the dashboard that must never lie is a security control, not decoration</b>. If the pool holds what the state says, any inconsistency surfaces immediately.</p>
+    </div>
+
+    <!-- ── PULL ─────────────────────────────────────────────────── -->
+    <div class="pull">
+        Verified wallets pay less. Bots pay triple. Trust, finally, has a price — and the price is the point.
+    </div>
+
+    <!-- ── FOOTER ─────────────────────────────────────────────────── -->
+    <div class="foot">
+        <a href="doc-score.html">DojangScore Docs</a>
+        <a href="doc-vault.html">WonVault Docs</a>
+        <a href="index.html">Live App</a>
+        <br>
+        Pool: <a href="https://sepolia-explorer.giwa.io/address/0x8813361aA6FFdC1B5926FA95d756b7390C680059" target="_blank" rel="noopener">0x8813361aA6FFdC1B5926FA95d756b7390C680059</a>
+        &nbsp;·&nbsp;
+        Factory: <a href="https://sepolia-explorer.giwa.io/address/0x7c7825AEF6b8b590dcF48d8C5059F3594B84a99F" target="_blank" rel="noopener">0x7c7825AEF6b8b590dcF48d8C5059F3594B84a99F</a>
+    </div>
+
+</div><!-- /wrap -->
+
+<script>
+    const TIER_CONFIGS = [
+        { id: "p", bps: 10,  color: "var(--jade)",  label: "Platinum" },
+        { id: "g", bps: 15,  color: "var(--gold)",  label: "Gold" },
+        { id: "s", bps: 20,  color: "var(--slate)", label: "Silver" },
+        { id: "u", bps: 30,  color: "var(--muted)", label: "Unverified" }
+    ];
+
+    function swapOut(amtIn, rIn, rOut, bps) {
+        const aft = amtIn * (10000 - bps) / 10000;
+        const out = aft * rOut / (rIn + aft);
+        const fee = amtIn - aft;
+        const mid = rOut / rIn;
+        const eff = out / amtIn;
+        const impact = (1 - eff / mid) * 100;
+        return { aft, out, fee, impact };
+    }
+
+    function calcSwap() {
+        const amtIn = parseFloat(document.getElementById("swAmtIn").value) || 0;
+        const rIn   = parseFloat(document.getElementById("swRIn").value)   || 10000;
+        const rOut  = parseFloat(document.getElementById("swROut").value)  || 10000;
+        const bps   = parseInt(document.getElementById("swTier").value)    || 30;
+
+        if (amtIn <= 0 || rIn <= 0 || rOut <= 0) return;
+
+        // Single-tier display
+        const { aft, out, fee, impact } = swapOut(amtIn, rIn, rOut, bps);
+        document.getElementById("outFee").textContent    = fee.toFixed(4);
+        document.getElementById("outAft").textContent    = aft.toFixed(4);
+        document.getElementById("outAmt").textContent    = out.toFixed(4);
+        document.getElementById("outImpact").textContent = impact.toFixed(4) + "%";
+
+        // Flash the out value
+        const outEl = document.getElementById("outAmt");
+        outEl.classList.remove("flash");
+        void outEl.offsetWidth;
+        outEl.classList.add("flash");
+
+        // 4-tier comparison
+        const results = TIER_CONFIGS.map(t => ({ ...t, ...swapOut(amtIn, rIn, rOut, t.bps) }));
+        const maxOut  = Math.max(...results.map(r => r.out));
+
+        results.forEach(r => {
+            const pct = maxOut > 0 ? (r.out / maxOut) * 100 : 100;
+            document.getElementById(`bar-${r.id}`).style.width = pct.toFixed(2) + "%";
+            document.getElementById(`cout-${r.id}`).textContent = r.out.toFixed(4);
+            document.getElementById(`cfee-${r.id}`).textContent = "fee " + r.fee.toFixed(4);
+        });
+
+        // Sybil note
+        const plat = results.find(r => r.id === "p");
+        const unv  = results.find(r => r.id === "u");
+        const ratio = (unv.fee / plat.fee).toFixed(2);
+        const gap   = (plat.out - unv.out).toFixed(4);
+        document.getElementById("sybilNote").innerHTML =
+            `A bot staying anonymous pays <b>${ratio}×</b> the fee — gets <b>${gap}</b> fewer tokens out — ` +
+            `the cheapest Sybil-resistance marketing on the chain.`;
+
+        // Update reserve diagram bars
+        const newRIn  = rIn  + plat.aft;   // after Platinum swap
+        const newROut = rOut - plat.out;
+        const scale   = 80 / Math.max(newRIn, newROut);
+        document.getElementById("barX").style.height = Math.max(8, newRIn  * scale).toFixed(1) + "px";
+        document.getElementById("barY").style.height = Math.max(8, newROut * scale).toFixed(1) + "px";
+        document.getElementById("rdX").textContent = newRIn.toFixed(0);
+        document.getElementById("rdY").textContent = newROut.toFixed(0);
+        const k = newRIn * newROut;
+        document.getElementById("rdK").textContent = k >= 1e9 ? (k / 1e9).toFixed(2) + "B" :
+                                                      k >= 1e6 ? (k / 1e6).toFixed(2) + "M" :
+                                                      k.toFixed(0);
+    }
+
+    window.addEventListener("DOMContentLoaded", calcSwap);
+</script>
+</body>
+</html>
