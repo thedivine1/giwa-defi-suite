@@ -1,276 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proven — The trust layer for GIWA</title>
-    <style>
-        :root {
-            --bg-color: #070c14; /* Dark navy */
-            --text-color: #eaf2ec;
-            --accent-color: #6fe3b0; /* Jade */
-            --code-bg: #0d1624;
-            --border-color: #223029;
-            
-            --jade: #6fe3b0;
-            --body: 'IBM Plex Sans', sans-serif;
-            --disp: 'Syne', sans-serif;
-            --text: #eaf2ec;
-            --muted: #8aa396;
-            --line: #223029;
-            --bg: #070c14;
-        }
-        body {
-            font-family: var(--body);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-            flex: 1;
-        }
-        h1, h2, h3 { 
-            color: var(--accent-color); 
-            font-family: var(--disp);
-        }
-        h1 {
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
-        code {
-            background-color: var(--code-bg);
-            padding: 0.2em 0.4em;
-            border-radius: 3px;
-            font-family: monospace;
-            border: 1px solid var(--border-color);
-            color: #e7c277; /* gold */
-        }
-        pre {
-            background-color: var(--code-bg);
-            padding: 1rem;
-            border-radius: 5px;
-            overflow-x: auto;
-            border: 1px solid var(--border-color);
-        }
-        pre code {
-            background-color: transparent;
-            padding: 0;
-            border: none;
-            color: inherit;
-        }
-        .endpoint {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            background-color: #0b111a;
-        }
-        .url-block {
-            display: inline-block;
-            background: var(--code-bg);
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 2rem;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1.5rem 0;
-        }
-        th, td {
-            text-align: left;
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        th {
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-        a {
-            color: var(--accent-color);
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Proven Nav Styles */
-        .proven-nav {
-            position: sticky;
-            top: 0;
-            z-index: 10000;
-            background: #070c14;
-            border-bottom: 1px solid var(--jade, #6fe3b0);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 24px;
-            font-family: var(--body, 'IBM Plex Sans', sans-serif);
-        }
-        .proven-nav-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .proven-nav-logo {
-            width: 32px;
-            height: 32px;
-        }
-        .proven-nav-title {
-            font-family: var(--disp, 'Syne', sans-serif);
-            font-weight: 800;
-            font-size: 22px;
-            color: var(--text, #eaf2ec);
-            text-decoration: none;
-            letter-spacing: 1px;
-        }
-        .proven-nav-tag {
-            font-size: 13px;
-            color: var(--jade, #6fe3b0);
-            margin-left: 4px;
-            opacity: 0.9;
-        }
-        .proven-nav-right {
-            display: flex;
-            gap: 24px;
-            align-items: center;
-        }
-        .proven-nav-link {
-            color: var(--text, #eaf2ec);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        .proven-nav-link:hover {
-            color: var(--jade, #6fe3b0);
-        }
-        .proven-footer {
-            text-align: center;
-            padding: 40px 20px;
-            font-family: var(--body, 'IBM Plex Sans', sans-serif);
-            font-size: 14px;
-            color: var(--muted, #8aa396);
-            border-top: 1px solid var(--line, #223029);
-            background: var(--bg, #0a0e0c);
-            margin-top: auto;
-        }
-    </style>
-  <link rel="icon" type="image/png" href="assets/proven-icon.png" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DojangScore API — Reference · Proven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+<style>
+:root{--ink:#070c14;--panel:#0d1420;--panel2:#111a29;--line:#1d2a3d;--line2:#2a3b52;--bone:#e8edf4;--text:#dfe7f0;--muted:#8fa1b8;--faint:#5d7089;--jade:#6fe3b0;--jade-dim:#2f6f54;--jade-deep:#0e2a20;--gold:#e7c277;--slate:#86b6cb;--rose:#e0918f;--vio:#c79bd6;--disp:'Syne',sans-serif;--body:'IBM Plex Sans',sans-serif;--mono:'JetBrains Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--text);font-family:var(--body);font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+::selection{background:var(--jade);color:var(--ink)}
+.bg{position:fixed;inset:0;z-index:-2;background:radial-gradient(120% 80% at 8% -5%,#0e1a2b 0%,transparent 55%),radial-gradient(90% 70% at 100% 110%,#101322 0%,transparent 50%),var(--ink)}
+.bg.grid{z-index:-1;opacity:.4;background-image:radial-gradient(var(--line) 1px,transparent 1.4px);background-size:32px 32px;animation:pan 60s linear infinite}
+@keyframes pan{to{background-position:32px 64px}}
+.scan{position:fixed;left:0;width:100%;height:30vh;z-index:-1;opacity:.35;background:linear-gradient(to bottom,transparent,rgba(111,227,176,.05),transparent);animation:scan 10s linear infinite}
+@keyframes scan{0%{top:-30vh}100%{top:100vh}}
+a{color:var(--jade);text-decoration:none}a:hover{text-decoration:underline}
+code,kbd{font-family:var(--mono)}
+/* top bar */
+.top{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:18px;padding:12px 22px;background:rgba(7,12,20,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .logo{font-family:var(--disp);font-weight:800;letter-spacing:.02em;color:var(--bone);font-size:1.05rem}
+.top .logo em{font-style:normal;color:var(--jade)}
+.top .api{font-family:var(--mono);font-size:.7rem;color:var(--muted);border:1px solid var(--line2);border-radius:20px;padding:3px 10px}
+.top .ver{font-family:var(--mono);font-size:.68rem;color:var(--jade);background:var(--jade-deep);border:1px solid var(--jade-dim);border-radius:20px;padding:3px 10px}
+.top .spacer{flex:1}
+.top .key{font-family:var(--mono);font-size:.72rem;color:var(--ink);background:var(--jade);border-radius:6px;padding:7px 14px;font-weight:700}
+/* layout */
+.shell{display:grid;grid-template-columns:220px minmax(0,1fr);gap:34px;max-width:1240px;margin:0 auto;padding:30px 22px 90px}
+@media(max-width:960px){.shell{grid-template-columns:1fr}.sidenav{display:none}}
+.sidenav{position:sticky;top:70px;align-self:start;font-family:var(--mono);font-size:.74rem}
+.sidenav .h{color:var(--faint);letter-spacing:.18em;text-transform:uppercase;font-size:.6rem;margin:16px 0 6px}
+.sidenav a{display:block;color:var(--muted);padding:4px 0 4px 12px;border-left:2px solid var(--line)}
+.sidenav a:hover{color:var(--bone);text-decoration:none}
+.sidenav a.on{color:var(--jade);border-left-color:var(--jade)}
+/* opener terminal */
+.open{display:grid;grid-template-columns:1fr 1.1fr;gap:26px;align-items:center;margin-bottom:20px}
+@media(max-width:860px){.open{grid-template-columns:1fr}}
+.open .t{font-family:var(--disp);font-weight:800;font-size:clamp(2rem,5vw,3.4rem);line-height:.95;letter-spacing:-.02em;color:var(--bone)}
+.open .t em{font-style:normal;color:var(--jade)}
+.open .sub{color:var(--muted);margin-top:12px;max-width:44ch}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.badge{font-family:var(--mono);font-size:.64rem;border-radius:20px;padding:4px 11px;border:1px solid var(--line2);color:var(--muted)}
+.badge.j{color:var(--jade);border-color:var(--jade-dim);background:var(--jade-deep)}
+.term{background:#050a12;border:1px solid var(--line2);border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.term .bar{display:flex;gap:6px;align-items:center;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+.term .bar i{width:10px;height:10px;border-radius:50%;background:var(--line2)}
+.term .bar i:nth-child(1){background:var(--rose)}.term .bar i:nth-child(2){background:var(--gold)}.term .bar i:nth-child(3){background:var(--jade)}
+.term .bar span{margin-left:8px;font-family:var(--mono);font-size:.68rem;color:var(--faint)}
+.term pre{padding:16px 18px;font-size:.78rem;line-height:1.7;color:var(--text);overflow-x:auto;min-height:250px}
+.term .c{color:var(--jade)}.term .k{color:var(--slate)}.term .s{color:var(--gold)}.term .d{color:var(--faint)}
+.cursor{display:inline-block;width:8px;height:14px;background:var(--jade);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+/* sections */
+section{margin-top:56px;scroll-margin-top:80px}
+h2{font-family:var(--disp);font-weight:700;font-size:clamp(1.4rem,3vw,2rem);color:var(--bone);letter-spacing:-.01em}
+h2 .n{color:var(--jade);font-family:var(--mono);font-size:.8em;margin-right:10px}
+h3{font-family:var(--disp);font-weight:700;font-size:1.08rem;color:var(--bone);margin:26px 0 10px}
+p{color:var(--muted);margin:10px 0;max-width:72ch}
+p b,li b{color:var(--bone)}
+.lead{font-size:1.05rem}
+/* endpoint header */
+.ep{display:flex;align-items:center;gap:12px;margin:34px 0 6px;flex-wrap:wrap}
+.ep .m{font-family:var(--mono);font-weight:700;font-size:.72rem;border-radius:6px;padding:5px 11px;letter-spacing:.06em}
+.m.get{background:var(--jade-deep);color:var(--jade);border:1px solid var(--jade-dim)}
+.m.post{background:#10202a;color:var(--slate);border:1px solid #234a5c}
+.ep .path{font-family:var(--mono);font-size:.92rem;color:var(--bone)}
+.ep .pill{font-family:var(--mono);font-size:.6rem;border-radius:20px;padding:3px 9px;border:1px solid var(--line2);color:var(--faint)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:560px}
+th,td{padding:10px 14px;text-align:left;border-top:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);background:var(--panel)}
+td{color:var(--muted)}td code{color:var(--jade);font-size:.78rem}
+td .req{color:var(--rose);font-size:.66rem}
+/* code blocks + tabs */
+.codewrap{border:1px solid var(--line2);border-radius:10px;overflow:hidden;margin:14px 0;background:#050a12}
+.tabs{display:flex;background:var(--panel);border-bottom:1px solid var(--line)}
+.tabs button{font-family:var(--mono);font-size:.7rem;color:var(--muted);background:none;border:none;padding:9px 16px;cursor:pointer;border-right:1px solid var(--line)}
+.tabs button.on{color:var(--jade);background:#050a12;box-shadow:inset 0 2px 0 var(--jade)}
+.codewrap pre{padding:15px 17px;font-size:.78rem;line-height:1.7;overflow-x:auto;color:var(--text)}
+.codewrap pre[hidden]{display:none}
+.copy{margin-left:auto;font-family:var(--mono);font-size:.64rem;color:var(--faint);background:none;border:none;border-left:1px solid var(--line);padding:9px 14px;cursor:pointer}
+.copy:hover{color:var(--jade)}
+/* callouts */
+.note{border:1px dashed var(--line2);border-radius:10px;padding:14px 16px;margin:16px 0;font-size:.85rem;color:var(--muted)}
+.note b{color:var(--gold)}
+.warn{border-left:3px solid var(--rose);background:rgba(224,145,143,.06);border-radius:0 10px 10px 0;padding:12px 16px;margin:16px 0;font-size:.85rem;color:var(--muted)}
+.good{border-left:3px solid var(--jade);background:rgba(111,227,176,.06);border-radius:0 10px 10px 0;padding:12px 16px;margin:16px 0;font-size:.85rem;color:var(--muted)}
+/* playground */
+.pg{border:1px solid var(--line2);border-radius:12px;background:var(--panel);padding:20px;margin:18px 0}
+.pg .row{display:flex;gap:10px;flex-wrap:wrap}
+.pg input{flex:1;min-width:240px;background:#050a12;border:1px solid var(--line2);border-radius:8px;color:var(--bone);font-family:var(--mono);font-size:.82rem;padding:11px 14px;outline:none}
+.pg input:focus{border-color:var(--jade)}
+.pg button{font-family:var(--mono);font-weight:700;font-size:.76rem;color:var(--ink);background:var(--jade);border:none;border-radius:8px;padding:11px 20px;cursor:pointer}
+.pg button:disabled{opacity:.5;cursor:wait}
+.pg .out{margin-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:760px){.pg .out{grid-template-columns:1fr 1fr}}
+.pg .cell{background:#050a12;border:1px solid var(--line);border-radius:8px;padding:12px}
+.pg .cell .k{font-family:var(--mono);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.pg .cell .v{font-family:var(--mono);font-weight:700;font-size:1.3rem;margin-top:4px;color:var(--bone)}
+.pg .cell .v.j{color:var(--jade)}.pg .cell .v.g{color:var(--gold)}
+.pg .msg{margin-top:12px;font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+.pg .msg.err{color:var(--rose)}
+/* reveal */
+.js .rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.js .rv.in{opacity:1;transform:none}
+.foot{margin-top:70px;border-top:1px solid var(--line);padding-top:24px;font-family:var(--mono);font-size:.68rem;color:var(--faint);line-height:2;text-align:center}
+@media print{.bg,.scan,.sidenav,.top{display:none}body{background:#fff;color:#111}.js .rv{opacity:1;transform:none}}
+</style>
 </head>
 <body>
+<div class="bg"></div><div class="bg grid"></div><div class="scan"></div>
 
-<nav class="proven-nav">
-    <div class="proven-nav-left">
-        <img src="assets/proven-icon.png" alt="Proven Icon" class="proven-nav-logo" />
-        <a href="index.html" class="proven-nav-title">PROVEN</a>
-        <span class="proven-nav-tag">the trust layer for GIWA</span>
-    </div>
-    <div class="proven-nav-right">
-        <a href="index.html" class="proven-nav-link">App</a>
-        <a href="doc-score-v2.html" class="proven-nav-link">Score V2</a>
-        <a href="api-quickstart.html" class="proven-nav-link" style="color: var(--jade)">Docs</a>
-        <a href="architecture.html" class="proven-nav-link">Architecture</a>
-        <a href="story.html" class="proven-nav-link">Story</a>
-        <a href="deck.html" class="proven-nav-link">Deck</a>
-    </div>
-</nav>
-
-<div class="container">
-    <h1>DojangScore API &mdash; Quickstart</h1>
-    <p style="color: var(--muted); margin-bottom: 2rem;">Integrate Proven trust data into your application.</p>
-
-    <div class="url-block">
-        <strong>Base URL:</strong> <code>https://giwa-defi-suite.vercel.app</code>
-    </div>
-
-    <h2>Authentication</h2>
-    <p>All requests must include the <code>x-proven-key</code> header. Missing or invalid keys will return a <code>401 Unauthorized</code> response.</p>
-    <div class="endpoint">
-        <p><strong>Header format:</strong> <code>x-proven-key: &lt;your-key&gt;</code></p>
-        <p style="margin-bottom: 0;"><em>Note: Pilot keys are issued manually by the Proven team. <a href="index.html">Contact us or visit the app</a> to request access.</em></p>
-    </div>
-
-    <h2>Endpoints</h2>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>Method</th>
-                <th>Endpoint</th>
-                <th>Response Shape</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><code>GET</code></td>
-                <td><code>/api/score/{address}</code></td>
-                <td>
-                    <code>{ address, score, tier, tierName, ceiling, ceilingProvenance, provenance{baseAttestation,trustlessState,reporterActivity,consentedProofs}, cached, usage }</code>
-                </td>
-            </tr>
-            <tr>
-                <td><code>GET</code></td>
-                <td><code>/api/tier/{address}</code></td>
-                <td>
-                    <code>{ address, tier, tierName, fees{swap, vaultEntry} }</code>
-                </td>
-            </tr>
-            <tr>
-                <td><code>GET</code></td>
-                <td><code>/api/health</code></td>
-                <td>
-                    <code>{ ok, chain, block }</code>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-    <h2 style="margin-top: 3rem;">Example Request</h2>
-    <pre><code>curl -s -H "x-proven-key: your-pilot-key" \
-https://giwa-defi-suite.vercel.app/api/score/0xDe9De6f3d4a50BF414927EF6D523aFa65355492a</code></pre>
-
-    <h3>Example JSON Response</h3>
-    <pre><code>{
-  "address": "0xDe9De6f3d4a50BF414927EF6D523aFa65355492a",
-  "score": 850,
-  "tier": 3,
-  "tierName": "PLATINUM",
-  "ceiling": 900,
-  "ceilingProvenance": "BEHAVIORAL",
-  "provenance": {
-    "baseAttestation": 400,
-    "trustlessState": 250,
-    "reporterActivity": 150,
-    "consentedProofs": 50
-  },
-  "holdsLP": true,
-  "holdsVault": false,
-  "chain": 91342,
-  "cachedAt": 1718023450000,
-  "cached": false,
-  "usage": 1
-}</code></pre>
-
-    <h2 style="margin-top: 3rem;">Pricing</h2>
-    <div class="endpoint">
-        <p><strong>Pilot Phase:</strong> Free up to 1,000 API calls per month.</p>
-        <p style="margin-bottom: 0; color: var(--muted);">Paid tiers with higher rate limits and SLA guarantees will be available in future releases. <a href="index.html">Visit the main app</a> for updates.</p>
-    </div>
+<div class="top">
+  <span class="logo">PRO<em>V</em>EN</span>
+  <span class="api">DojangScore API</span>
+  <span class="ver">v1 · testnet</span>
+  <span class="spacer"></span>
+  <a class="key" href="#getkey">Get a key</a>
 </div>
 
-<footer class="proven-footer">
-    Proven &mdash; verified, secure, decentralized. Built on GIWA Sepolia (chain 91342).
-</footer>
+<div class="shell">
+<nav class="sidenav">
+  <div class="h">Start</div>
+  <a href="#overview" class="on">Overview</a>
+  <a href="#quickstart">Quickstart</a>
+  <a href="#auth">Authentication</a>
+  <div class="h">Learn</div>
+  <a href="#concepts">Core concepts</a>
+  <a href="#tiers">Tiers &amp; fees</a>
+  <a href="#provenance">Provenance &amp; ceiling</a>
+  <div class="h">Reference</div>
+  <a href="#ep-score">GET /score</a>
+  <a href="#ep-tier">GET /tier</a>
+  <a href="#ep-health">GET /health</a>
+  <a href="#ep-batch">POST /batch</a>
+  <a href="#errors">Errors</a>
+  <a href="#limits">Rate limits</a>
+  <div class="h">Build</div>
+  <a href="#playground">Playground</a>
+  <a href="#playbooks">Playbooks</a>
+  <a href="#onchain">On-chain vs API</a>
+  <a href="#roadmap">Roadmap</a>
+</nav>
 
+<main>
+<!-- ============ OPENER ============ -->
+<header class="open">
+  <div>
+    <div class="t">Read the<br><em>trust layer.</em></div>
+    <p class="sub">One call returns a wallet's 0–1000 trust score, its tier, the provenance behind it, and the fee discounts it unlocks on GIWA. Cached, keyed, and ready for your launchpad, airdrop, or payment flow.</p>
+    <div class="badges">
+      <span class="badge j">GIWA Sepolia · 91342</span>
+      <span class="badge">REST · JSON</span>
+      <span class="badge">45s cache</span>
+      <span class="badge">OP Stack</span>
+    </div>
+  </div>
+  <div class="term">
+    <div class="bar"><i></i><i></i><i></i><span>proven@api — request</span></div>
+    <pre id="term"><span class="c">$</span> <span id="typed"></span><span class="cursor"></span>
+<span id="termout" style="display:none">
+<span class="d"># 200 OK · 41ms · cached:false</span>
+{
+  <span class="k">"address"</span>: <span class="s">"0xE5EF…B147"</span>,
+  <span class="k">"score"</span>: <span class="s">991</span>,
+  <span class="k">"tierName"</span>: <span class="s">"Platinum"</span>,
+  <span class="k">"ceilingProvenance"</span>: <span class="s">"ATTESTER"</span>,
+  <span class="k">"fees"</span>: { <span class="k">"swap"</span>: <span class="s">"0.10%"</span>, <span class="k">"vaultEntry"</span>: <span class="s">"0.50%"</span> }
+}</span></pre>
+  </div>
+</header>
+
+<!-- ============ OVERVIEW ============ -->
+<section id="overview" class="rv">
+  <h2><span class="n">01</span>Overview</h2>
+  <p class="lead">The DojangScore API is a thin, authenticated read-layer over the <b>DojangScoreV2</b> contract on GIWA. It converts on-chain attestations (Upbit KYC via Dojang, verified balance, account age, verified code) plus on-chain behaviour into a single <b>0–1000 trust score</b> with a <b>tier</b> and a <b>provenance ceiling</b>.</p>
+  <p>Use it to gate, weight, or price anything off-chain: launchpad allocations, airdrop multipliers, trading fees, remittance limits, quest rewards. For settlement-critical logic, read the contract on-chain instead (see <a href="#onchain">On-chain vs API</a>).</p>
+  <div class="good"><b>Design principle:</b> the API never invents trust. Every point it returns is traceable to a provenance class, and the score can never exceed the ceiling set by the strongest proof a wallet holds.</div>
+</section>
+
+<!-- ============ QUICKSTART ============ -->
+<section id="quickstart" class="rv">
+  <h2><span class="n">02</span>Quickstart</h2>
+  <p>Three steps to a live score.</p>
+  <h3>1 · Get a key</h3>
+  <p>Request a pilot key (see <a href="#getkey">Get a key</a>). Keys are issued per project and carry a monthly quota.</p>
+  <h3>2 · Make your first request</h3>
+  <div class="codewrap">
+    <div class="tabs"><button class="on" data-lang="curl">cURL</button><button data-lang="js">JavaScript</button><button data-lang="py">Python</button><button class="copy" data-copy="qs">copy</button></div>
+    <pre data-lang="curl" id="qs-curl">curl -H "x-proven-key: YOUR_KEY" \
+  https://giwa-defi-suite.vercel.app/api/score/0xE5EFB15259292F5B60A1DB074B708712998dB147</pre>
+    <pre data-lang="js" id="qs-js" hidden>const res = await fetch(
+  "https://giwa-defi-suite.vercel.app/api/score/0xE5EF…B147",
+  { headers: { "x-proven-key": process.env.PROVEN_KEY } }
+);
+const score = await res.json();
+console.log(score.tierName, score.score);</pre>
+    <pre data-lang="py" id="qs-py" hidden>import requests
+r = requests.get(
+  "https://giwa-defi-suite.vercel.app/api/score/0xE5EF…B147",
+  headers={"x-proven-key": PROVEN_KEY})
+print(r.json()["tierName"], r.json()["score"])</pre>
+  </div>
+  <h3>3 · Read the response</h3>
+  <p><code>score</code> is the clamped 0–1000 value, <code>tierName</code> the band, <code>ceilingProvenance</code> the strongest proof class, and <code>fees</code> the on-chain discounts the tier unlocks. Full schema under <a href="#ep-score">GET /score</a>.</p>
+</section>
+
+<!-- ============ AUTH ============ -->
+<section id="auth" class="rv">
+  <h2><span class="n">03</span>Authentication</h2>
+  <p>Every request requires the <code>x-proven-key</code> header. Missing or invalid keys return <code>401</code>.</p>
+  <div class="tbl"><table>
+    <tr><th>Header</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>x-proven-key</code></td><td>string</td><td>Your issued API key. Keep it server-side; never ship it in client bundles.</td></tr>
+  </table></div>
+  <div class="warn"><b>Security:</b> keys identify your project for quota + billing. If a key leaks, rotate it by requesting a re-issue; the old key is invalidated on next deploy.</div>
+  <p>Responses include rate-limit headers (<code>X-RateLimit-Limit</code>, <code>-Remaining</code>, <code>-Reset</code>) so you can throttle client-side. See <a href="#limits">Rate limits</a>.</p>
+</section>
+
+<!-- ============ CONCEPTS ============ -->
+<section id="concepts" class="rv">
+  <h2><span class="n">04</span>Core concepts</h2>
+  <p>The score is a <b>sum of capped provenance contributions</b>, clamped by a <b>ceiling</b>. Understanding both is the whole model.</p>
+  <div class="tbl"><table>
+    <tr><th>Term</th><th>Range</th><th>Meaning</th></tr>
+    <tr><td><code>score</code></td><td>0–1000</td><td>Final clamped trust score. The value to gate on.</td></tr>
+    <tr><td><code>tier</code> / <code>tierName</code></td><td>0–3</td><td>Band derived from score (see tiers).</td></tr>
+    <tr><td><code>rawSum</code></td><td>int</td><td>Sum of capped contributions <i>before</i> the ceiling clamp.</td></tr>
+    <tr><td><code>ceiling</code></td><td>int</td><td>Hard cap set by the strongest provenance class present.</td></tr>
+    <tr><td><code>ceilingProvenance</code></td><td>enum</td><td>The class that set the ceiling.</td></tr>
+  </table></div>
+</section>
+
+<section id="tiers" class="rv">
+  <h3>Tiers &amp; on-chain fees</h3>
+  <div class="tbl"><table>
+    <tr><th>Tier</th><th>Score</th><th>GIWASwap fee</th><th>WonVault entry</th><th>Typical gate</th></tr>
+    <tr><td>Standard</td><td>0–199</td><td>0.30%</td><td>2.00%</td><td>unverified / bot-risk</td></tr>
+    <tr><td>Silver</td><td>200–499</td><td>0.20%</td><td>1.50%</td><td>behavioural proof</td></tr>
+    <tr><td>Gold</td><td>500–799</td><td>0.15%</td><td>1.00%</td><td>consented identity</td></tr>
+    <tr><td>Platinum</td><td>800–1000</td><td>0.10%</td><td>0.50%</td><td>regulated attester</td></tr>
+  </table></div>
+  <p>The same tier that the API reports is what the on-chain contracts charge — so an off-chain gate and the on-chain fee always agree.</p>
+</section>
+
+<section id="provenance" class="rv">
+  <h3>Provenance &amp; the ceiling</h3>
+  <div class="tbl"><table>
+    <tr><th>Class</th><th>Source</th><th>Ceiling</th><th>How a wallet gets it</th></tr>
+    <tr><td><code>ATTESTER</code></td><td>Regulated attester (Upbit / Dojang)</td><td>1000</td><td>KYC attestation on-chain</td></tr>
+    <tr><td><code>CONSENTED</code></td><td>Self-submitted consented proofs</td><td>799</td><td>Wallet submits proofs (ENS, Passport, renewals)</td></tr>
+    <tr><td><code>BEHAVIORAL</code></td><td>Reporter-attested on-chain activity</td><td>499</td><td>Swaps, LP, vault holds, votes</td></tr>
+    <tr><td><code>STATE</code></td><td>Trustless on-chain state</td><td>499</td><td>Currently holds LP / vault shares</td></tr>
+    <tr><td><code>NONE</code></td><td>—</td><td>0</td><td>No signal</td></tr>
+  </table></div>
+  <div class="good"><b>Why the ceiling matters:</b> a wallet can <i>earn</i> points from behaviour, but it can never <i>claim</i> a higher ceiling than its strongest proof. A sybil farm can grind to Silver; it cannot buy its way to Platinum. That is the anti-fraud guarantee your gates inherit for free.</div>
+</section>
+
+<!-- ============ ENDPOINTS ============ -->
+<section id="ep-score" class="rv">
+  <div class="ep"><span class="m get">GET</span><span class="path">/api/score/{address}</span><span class="pill">auth</span><span class="pill">cached 45s</span></div>
+  <p>Returns the full trust breakdown for a wallet.</p>
+  <h3>Path parameters</h3>
+  <div class="tbl"><table>
+    <tr><th>Param</th><th>Type</th><th></th><th>Description</th></tr>
+    <tr><td><code>address</code></td><td>string</td><td><span class="req">required</span></td><td>0x-prefixed, 40-hex EVM address. Returns <code>400</code> if malformed.</td></tr>
+  </table></div>
+  <h3>Response · 200</h3>
+  <div class="tbl"><table>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>address</code></td><td>string</td><td>Checksummed address.</td></tr>
+    <tr><td><code>score</code></td><td>int</td><td>Final clamped score 0–1000.</td></tr>
+    <tr><td><code>tier</code></td><td>int</td><td>0–3.</td></tr>
+    <tr><td><code>tierName</code></td><td>string</td><td>Standard / Silver / Gold / Platinum.</td></tr>
+    <tr><td><code>ceiling</code></td><td>int</td><td>Provenance ceiling.</td></tr>
+    <tr><td><code>ceilingProvenance</code></td><td>string</td><td>NONE / BEHAVIORAL / CONSENTED / ATTESTER.</td></tr>
+    <tr><td><code>provenance.baseAttestation</code></td><td>int</td><td>Capped attester-rooted contribution (0–1000).</td></tr>
+    <tr><td><code>provenance.trustlessState</code></td><td>int</td><td>Capped trustless state contribution (0–100).</td></tr>
+    <tr><td><code>provenance.reporterActivity</code></td><td>int</td><td>Capped behavioural contribution (0–250).</td></tr>
+    <tr><td><code>provenance.consentedProofs</code></td><td>int</td><td>Capped consented contribution (0–250).</td></tr>
+    <tr><td><code>rawSum</code></td><td>int</td><td>Sum before clamp.</td></tr>
+    <tr><td><code>holdsLP</code> / <code>holdsVault</code></td><td>bool</td><td>Current on-chain LP / vault position.</td></tr>
+    <tr><td><code>cached</code></td><td>bool</td><td>True if served from the 45s cache.</td></tr>
+    <tr><td><code>cachedAt</code></td><td>ISO-8601</td><td>When the cached value was read.</td></tr>
+  </table></div>
+  <div class="codewrap">
+    <div class="tabs"><button class="on" data-lang="curl">cURL</button><button data-lang="js">JavaScript</button><button data-lang="py">Python</button><button class="copy" data-copy="sc">copy</button></div>
+    <pre data-lang="curl" id="sc-curl">curl -H "x-proven-key: $PROVEN_KEY" \
+  .../api/score/0xADDRESS</pre>
+    <pre data-lang="js" id="sc-js" hidden>const { score, tierName, ceilingProvenance, provenance } =
+  await (await fetch(URL, { headers: H })).json();
+
+if (ceilingProvenance === "ATTESTER")   // regulated — full trust
+else if (score >= 200)                  // behavioural floor</pre>
+    <pre data-lang="py" id="sc-py" hidden>d = requests.get(URL, headers=H).json()
+if d["ceilingProvenance"] == "ATTESTER": ...</pre>
+  </div>
+</section>
+
+<section id="ep-tier" class="rv">
+  <div class="ep"><span class="m get">GET</span><span class="path">/api/tier/{address}</span><span class="pill">auth</span><span class="pill">cached 45s</span></div>
+  <p>Lightweight tier + fee lookup when you don't need the full breakdown.</p>
+  <div class="tbl"><table>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>tier</code> / <code>tierName</code></td><td>int / string</td><td>Band.</td></tr>
+    <tr><td><code>scoreRange</code></td><td>[int,int]</td><td>Inclusive score band.</td></tr>
+    <tr><td><code>fees.swap</code></td><td>string</td><td>On-chain GIWASwap fee for this tier.</td></tr>
+    <tr><td><code>fees.vaultEntry</code></td><td>string</td><td>On-chain WonVault entry fee.</td></tr>
+  </table></div>
+</section>
+
+<section id="ep-health" class="rv">
+  <div class="ep"><span class="m get">GET</span><span class="path">/api/health</span><span class="pill">no auth</span></div>
+  <p>Liveness + chain head. No key required.</p>
+  <div class="tbl"><table>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>ok</code></td><td>bool</td><td>Service up.</td></tr>
+    <tr><td><code>chain</code> / <code>chainId</code></td><td>string / int</td><td>GIWA Sepolia / 91342.</td></tr>
+    <tr><td><code>block</code></td><td>int</td><td>Latest block seen.</td></tr>
+    <tr><td><code>contract</code></td><td>string</td><td>DojangScoreV2 address.</td></tr>
+  </table></div>
+</section>
+
+<section id="ep-batch" class="rv">
+  <div class="ep"><span class="m post">POST</span><span class="path">/api/score/batch</span><span class="pill">pilot access</span></div>
+  <p>Score up to N addresses in one call for airdrop / allowlist sweeps. <b>Pilot access only</b> — request it with your key. Returns an array of score objects plus a per-address <code>error</code> field for malformed entries so one bad address never fails the batch.</p>
+  <div class="note"><b>Status:</b> batch is being rolled out to pilot keys. The schema is stable; treat field order as unordered JSON.</div>
+</section>
+
+<!-- ============ ERRORS ============ -->
+<section id="errors" class="rv">
+  <h2><span class="n">05</span>Errors</h2>
+  <div class="tbl"><table>
+    <tr><th>Code</th><th>Meaning</th><th>Handle by</th></tr>
+    <tr><td><code>400</code></td><td>Malformed address</td><td>Validate 0x + 40 hex client-side first.</td></tr>
+    <tr><td><code>401</code></td><td>Missing / invalid key</td><td>Check header + key validity.</td></tr>
+    <tr><td><code>404</code></td><td>Unknown route</td><td>Fix path.</td></tr>
+    <tr><td><code>429</code></td><td>Rate limited</td><td>Back off using <code>Retry-After</code>.</td></tr>
+    <tr><td><code>500</code></td><td>Internal error</td><td>Retry with backoff; report if persistent.</td></tr>
+    <tr><td><code>503</code></td><td>Upstream RPC unavailable</td><td>Retry; fall back to on-chain read if critical.</td></tr>
+  </table></div>
+  <p>Error bodies are <code>{ "error": "message", "code": "…" }</code>.</p>
+</section>
+
+<!-- ============ LIMITS ============ -->
+<section id="limits" class="rv">
+  <h2><span class="n">06</span>Rate limits &amp; caching</h2>
+  <div class="tbl"><table>
+    <tr><th>Key tier</th><th>Burst</th><th>Monthly</th><th>Notes</th></tr>
+    <tr><td>Pilot</td><td>60 req/min</td><td>1,000</td><td>Free during testnet.</td></tr>
+    <tr><td>Builder</td><td>300 req/min</td><td>50,000</td><td>Paid.</td></tr>
+    <tr><td>Scale</td><td>custom</td><td>custom</td><td>Talk to us.</td></tr>
+  </table></div>
+  <p>Responses are cached for <b>45 seconds</b> per address; <code>cached:true</code> tells you a value came from cache. For most gating use-cases 45s staleness is irrelevant; for settlement, read on-chain.</p>
+</section>
+
+<!-- ============ PLAYGROUND ============ -->
+<section id="playground" class="rv">
+  <h2><span class="n">07</span>Playground <span style="font-family:var(--mono);font-size:.6em;color:var(--faint)">· reads the chain live, no key needed</span></h2>
+  <p>This reads <b>DojangScoreV2</b> directly over public RPC — the same source the API caches — so you can verify any wallet right now.</p>
+  <div class="pg">
+    <div class="row">
+      <input id="pgAddr" placeholder="0x… wallet address" value="0xE5EFB15259292F5B60A1DB074B708712998dB147"/>
+      <button id="pgBtn">Read score</button>
+    </div>
+    <div class="out">
+      <div class="cell"><div class="k">Score</div><div class="v j" id="oScore">—</div></div>
+      <div class="cell"><div class="k">Tier</div><div class="v" id="oTier">—</div></div>
+      <div class="cell"><div class="k">Ceiling</div><div class="v g" id="oCeil">—</div></div>
+      <div class="cell"><div class="k">Provenance</div><div class="v" id="oProv" style="font-size:.9rem">—</div></div>
+    </div>
+    <div class="msg" id="oMsg"></div>
+  </div>
+</section>
+
+<!-- ============ PLAYBOOKS ============ -->
+<section id="playbooks" class="rv">
+  <h2><span class="n">08</span>Playbooks</h2>
+  <p>Drop-in gating patterns. Each is a few lines because the hard part (provenance) is already on-chain.</p>
+  <h3>Launchpad · sybil-resistant allocation</h3>
+  <div class="codewrap"><div class="tabs"><button class="on" data-lang="js">JavaScript</button></div>
+  <pre data-lang="js">// Only wallets with a real proof get an allocation; weight by tier.
+const s = await score(addr);
+if (s.ceilingProvenance === "NONE")        reject();          // no proof, no alloc
+const mult = [0, 1, 1.5, 2][s.tier];       // Standard..Platinum
+alloc = base * mult;</pre></div>
+  <h3>Airdrop · tier multipliers</h3>
+  <div class="codewrap"><div class="tabs"><button class="on" data-lang="js">JavaScript</button></div>
+  <pre data-lang="js">const MULT = { Standard:1, Silver:1.25, Gold:1.5, Platinum:2 };
+payout = base * MULT[s.tierName];</pre></div>
+  <h3>Payments / remittance · tiered limits</h3>
+  <div class="codewrap"><div class="tabs"><button class="on" data-lang="js">JavaScript</button></div>
+  <pre data-lang="js">const DAILY = { Standard:500, Silver:2500, Gold:10000, Platinum:50000 };
+limit = DAILY[s.tierName];</pre></div>
+  <h3>Quests · gate high-value tasks</h3>
+  <div class="codewrap"><div class="tabs"><button class="on" data-lang="js">JavaScript</button></div>
+  <pre data-lang="js">if (s.tier >= 1) unlock("high-value quest");  // Silver+</pre></div>
+</section>
+
+<!-- ============ ONCHAIN ============ -->
+<section id="onchain" class="rv">
+  <h2><span class="n">09</span>On-chain vs API</h2>
+  <div class="tbl"><table>
+    <tr><th></th><th>API</th><th>On-chain</th></tr>
+    <tr><td>Latency</td><td>~tens of ms, cached</td><td>RPC round-trip</td></tr>
+    <tr><td>Cost</td><td>quota</td><td>your RPC</td></tr>
+    <tr><td>Trust</td><td>trust Proven's cache</td><td>trustless — the contract is truth</td></tr>
+    <tr><td>Use for</td><td>off-chain gating, UI, sweeps</td><td>fee charging, settlement, anything monetary</td></tr>
+  </table></div>
+  <p>Contract: <code>0xDe9De6f3d4a50BF414927EF6D523aFa65355492a</code> (DojangScoreV2). Minimal ABI:</p>
+  <div class="codewrap"><div class="tabs"><button class="on" data-lang="js">Solidity ABI</button></div>
+  <pre data-lang="js">["function score(address) view returns (uint16)",
+ "function tierOfWallet(address) view returns (uint8)",
+ "function scoreBreakdown(address) view returns (tuple(uint16,uint16,uint16,uint16,uint16,uint16,uint8,uint16,uint8,bool,bool))"]</pre></div>
+  <div class="warn"><b>Rule of thumb:</b> if money moves based on the value, read it on-chain. If a human/UI/off-chain service consumes it, use the API.</div>
+</section>
+
+<!-- ============ ROADMAP ============ -->
+<section id="roadmap" class="rv">
+  <h2><span class="n">10</span>Roadmap</h2>
+  <div class="tbl"><table>
+    <tr><th>Item</th><th>Status</th></tr>
+    <tr><td>score / tier / health + caching + pilot keys</td><td>live (testnet)</td></tr>
+    <tr><td>batch scoring</td><td>pilot rollout</td></tr>
+    <tr><td>webhooks on tier change</td><td>planned</td></tr>
+    <tr><td>mainnet deployment</td><td>planned</td></tr>
+    <tr><td>multi-attester quorum scoring</td><td>planned</td></tr>
+  </table></div>
+</section>
+
+<!-- ============ GET KEY ============ -->
+<section id="getkey" class="rv">
+  <h2><span class="n">11</span>Get a key</h2>
+  <p>Pilot keys are free during testnet and issued per project. Tell us what you're building (launchpad, airdrop, payments, quests) and we'll issue a key sized to your sweep. Reach out via the Proven X profile or the GASOK cohort channel — the same humans who built the contracts answer.</p>
+  <div class="good"><b>Why builders adopt it:</b> one header replaces your own sybil heuristics, and the ceiling means you inherit an anti-fraud guarantee you didn't have to design.</div>
+</section>
+
+<footer class="foot">
+  PROVEN · DojangScore API v1 · GIWA Sepolia 91342 · verified, not claimed<br>
+  contract 0xDe9De6f3d4a50BF414927EF6D523aFa65355492a · <a href="/">app</a> · <a href="architecture.html">architecture</a>
+</footer>
+</main>
+</div>
+
+<script>
+document.documentElement.classList.add('js');
+/* language tabs */
+document.querySelectorAll('.tabs').forEach(t=>{
+  t.querySelectorAll('button[data-lang]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const wrap=t.parentElement;
+      t.parentElement.parentElement.querySelectorAll('button[data-lang]').forEach(x=>x.classList.toggle('on',x===b));
+      wrap.querySelectorAll('pre[data-lang]').forEach(p=>p.hidden=(p.dataset.lang!==b.dataset.lang));
+    });
+  });
+});
+/* copy */
+document.querySelectorAll('.copy').forEach(c=>c.addEventListener('click',()=>{
+  const wrap=c.closest('.codewrap');const pre=wrap.querySelector('pre:not([hidden])');
+  navigator.clipboard&&navigator.clipboard.writeText(pre.textContent);
+  const o=c.textContent;c.textContent='copied';setTimeout(()=>c.textContent=o,900);
+}));
+/* terminal typing */
+(function(){
+  const cmd='curl -H "x-proven-key: ••••" https://giwa-defi-suite.vercel.app/api/score/0xE5EF…B147';
+  const el=document.getElementById('typed');let i=0;
+  (function tick(){ if(i<=cmd.length){el.textContent=cmd.slice(0,i++);setTimeout(tick,26);} else {document.getElementById('termout').style.display='inline';} })();
+})();
+/* scrollspy */
+const links=[...document.querySelectorAll('.sidenav a')];
+const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){links.forEach(l=>l.classList.toggle('on',l.getAttribute('href')==='#'+e.target.id));} }),{rootMargin:'-40% 0px -55% 0px'});
+document.querySelectorAll('section[id]').forEach(s=>io.observe(s));
+/* reveal */
+const rv=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rv.unobserve(e.target);}}),{threshold:.08});
+document.querySelectorAll('.rv').forEach(el=>rv.observe(el));
+/* playground: direct on-chain read */
+const RPC="https://sepolia-rpc.giwa.io",V2="0xDe9De6f3d4a50BF414927EF6D523aFa65355492a";
+const ABI=["function score(address) view returns (uint16)","function tierOfWallet(address) view returns (uint8)","function scoreBreakdown(address) view returns (tuple(uint16 baseAttestation,uint16 trustlessState,uint16 reporterActivity,uint16 consentedProofs,uint16 rawSum,uint16 ceiling,uint8 ceilingProvenance,uint16 finalScore,uint8 tier,bool holdsLP,bool holdsVault))"];
+const PROV=["NONE","BEHAVIORAL","CONSENTED","ATTESTER"],TIER=["Standard","Silver","Gold","Platinum"];
+document.getElementById('pgBtn').addEventListener('click',async()=>{
+  const a=document.getElementById('pgAddr').value.trim(),m=document.getElementById('oMsg');
+  const btn=document.getElementById('pgBtn');btn.disabled=true;m.className='msg';m.textContent='reading DojangScoreV2…';
+  try{
+    if(!/^0x[0-9a-fA-F]{40}$/.test(a))throw new Error('invalid address');
+    const p=new ethers.JsonRpcProvider(RPC);const c=new ethers.Contract(V2,ABI,p);
+    const b=await c.scoreBreakdown(a);
+    document.getElementById('oScore').textContent=b.finalScore;
+    document.getElementById('oTier').textContent=TIER[b.tier];
+    document.getElementById('oCeil').textContent=b.ceiling;
+    document.getElementById('oProv').textContent=PROV[b.ceilingProvenance];
+    m.textContent='live on-chain read · rawSum '+b.rawSum+' clamped to '+b.finalScore+' ('+PROV[b.ceilingProvenance]+' ceiling)';
+  }catch(e){ m.className='msg err'; m.textContent='error: '+(e.shortMessage||e.message); }
+  finally{ btn.disabled=false; }
+});
+</script>
 </body>
 </html>
