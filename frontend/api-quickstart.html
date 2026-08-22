@@ -6,112 +6,168 @@
     <title>Proven — The trust layer for GIWA</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --text-color: #e0e0e0;
-            --accent-color: #00ff88;
-            --code-bg: #1e1e1e;
+            --bg-color: #070c14; /* Dark navy */
+            --text-color: #eaf2ec;
+            --accent-color: #6fe3b0; /* Jade */
+            --code-bg: #0d1624;
+            --border-color: #223029;
+            
+            --jade: #6fe3b0;
+            --body: 'IBM Plex Sans', sans-serif;
+            --disp: 'Syne', sans-serif;
+            --text: #eaf2ec;
+            --muted: #8aa396;
+            --line: #223029;
+            --bg: #070c14;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--body);
             background-color: var(--bg-color);
             color: var(--text-color);
             line-height: 1.6;
             margin: 0;
-            padding: 2rem;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-        h1, h2, h3 { color: var(--accent-color); }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            flex: 1;
+        }
+        h1, h2, h3 { 
+            color: var(--accent-color); 
+            font-family: var(--disp);
+        }
+        h1 {
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
         code {
             background-color: var(--code-bg);
             padding: 0.2em 0.4em;
             border-radius: 3px;
             font-family: monospace;
+            border: 1px solid var(--border-color);
+            color: #e7c277; /* gold */
         }
         pre {
             background-color: var(--code-bg);
             padding: 1rem;
             border-radius: 5px;
             overflow-x: auto;
+            border: 1px solid var(--border-color);
         }
         pre code {
             background-color: transparent;
             padding: 0;
+            border: none;
+            color: inherit;
         }
         .endpoint {
             margin-bottom: 2rem;
-            padding: 1rem;
-            border: 1px solid #333;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
             border-radius: 5px;
+            background-color: #0b111a;
+        }
+        .url-block {
+            display: inline-block;
+            background: var(--code-bg);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        th {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Proven Nav Styles */
+        .proven-nav {
+            position: sticky;
+            top: 0;
+            z-index: 10000;
+            background: #070c14;
+            border-bottom: 1px solid var(--jade, #6fe3b0);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            font-family: var(--body, 'IBM Plex Sans', sans-serif);
+        }
+        .proven-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .proven-nav-logo {
+            width: 32px;
+            height: 32px;
+        }
+        .proven-nav-title {
+            font-family: var(--disp, 'Syne', sans-serif);
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--text, #eaf2ec);
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+        .proven-nav-tag {
+            font-size: 13px;
+            color: var(--jade, #6fe3b0);
+            margin-left: 4px;
+            opacity: 0.9;
+        }
+        .proven-nav-right {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .proven-nav-link {
+            color: var(--text, #eaf2ec);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .proven-nav-link:hover {
+            color: var(--jade, #6fe3b0);
+        }
+        .proven-footer {
+            text-align: center;
+            padding: 40px 20px;
+            font-family: var(--body, 'IBM Plex Sans', sans-serif);
+            font-size: 14px;
+            color: var(--muted, #8aa396);
+            border-top: 1px solid var(--line, #223029);
+            background: var(--bg, #0a0e0c);
+            margin-top: auto;
         }
     </style>
   <link rel="icon" type="image/png" href="assets/proven-icon.png" />
 </head>
 <body>
-
-<style>
-    .proven-nav {
-        position: sticky;
-        top: 0;
-        z-index: 10000;
-        background: #070c14;
-        border-bottom: 1px solid var(--jade, #6fe3b0);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 24px;
-        font-family: var(--body, 'IBM Plex Sans', sans-serif);
-    }
-    .proven-nav-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    .proven-nav-logo {
-        width: 32px;
-        height: 32px;
-    }
-    .proven-nav-title {
-        font-family: var(--disp, 'Syne', sans-serif);
-        font-weight: 800;
-        font-size: 22px;
-        color: var(--text, #eaf2ec);
-        text-decoration: none;
-        letter-spacing: 1px;
-    }
-    .proven-nav-tag {
-        font-size: 13px;
-        color: var(--jade, #6fe3b0);
-        margin-left: 4px;
-        opacity: 0.9;
-    }
-    .proven-nav-right {
-        display: flex;
-        gap: 24px;
-        align-items: center;
-    }
-    .proven-nav-link {
-        color: var(--text, #eaf2ec);
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: 500;
-        transition: color 0.2s;
-    }
-    .proven-nav-link:hover {
-        color: var(--jade, #6fe3b0);
-    }
-    .proven-footer {
-        text-align: center;
-        padding: 40px 20px;
-        font-family: var(--body, 'IBM Plex Sans', sans-serif);
-        font-size: 14px;
-        color: var(--muted, #8aa396);
-        border-top: 1px solid var(--line, #223029);
-        background: var(--bg, #0a0e0c);
-        margin-top: auto;
-    }
-</style>
 
 <nav class="proven-nav">
     <div class="proven-nav-left">
@@ -122,95 +178,95 @@
     <div class="proven-nav-right">
         <a href="index.html" class="proven-nav-link">App</a>
         <a href="doc-score-v2.html" class="proven-nav-link">Score V2</a>
-        <a href="api-quickstart.html" class="proven-nav-link">Docs</a>
+        <a href="api-quickstart.html" class="proven-nav-link" style="color: var(--jade)">Docs</a>
         <a href="architecture.html" class="proven-nav-link">Architecture</a>
         <a href="story.html" class="proven-nav-link">Story</a>
         <a href="deck.html" class="proven-nav-link">Deck</a>
     </div>
 </nav>
 
-    <h1>Dojang Trust-Score API Quickstart</h1>
-    <p>A thin, production-lean REST API for on-chain trust scores on GIWA Sepolia.</p>
+<div class="container">
+    <h1>DojangScore API &mdash; Quickstart</h1>
+    <p style="color: var(--muted); margin-bottom: 2rem;">Integrate Proven trust data into your application.</p>
 
-    <h2>Base URL</h2>
-    <p><code>https://your-deployment-url.vercel.app/api</code></p>
+    <div class="url-block">
+        <strong>Base URL:</strong> <code>https://giwa-defi-suite.vercel.app</code>
+    </div>
 
     <h2>Authentication</h2>
-    <p>Include the <code>x-proven-key</code> header in all requests.</p>
-    <p>To get a pilot key, contact us via email or DM. Pilot tier includes 1,000 free calls per month. Paid tiers coming soon.</p>
+    <p>All requests must include the <code>x-proven-key</code> header. Missing or invalid keys will return a <code>401 Unauthorized</code> response.</p>
+    <div class="endpoint">
+        <p><strong>Header format:</strong> <code>x-proven-key: &lt;your-key&gt;</code></p>
+        <p style="margin-bottom: 0;"><em>Note: Pilot keys are issued manually by the Proven team. <a href="index.html">Contact us or visit the app</a> to request access.</em></p>
+    </div>
 
     <h2>Endpoints</h2>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Response Shape</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>GET</code></td>
+                <td><code>/api/score/{address}</code></td>
+                <td>
+                    <code>{ address, score, tier, tierName, ceiling, ceilingProvenance, provenance{baseAttestation,trustlessState,reporterActivity,consentedProofs}, cached, usage }</code>
+                </td>
+            </tr>
+            <tr>
+                <td><code>GET</code></td>
+                <td><code>/api/tier/{address}</code></td>
+                <td>
+                    <code>{ address, tier, tierName, fees{swap, vaultEntry} }</code>
+                </td>
+            </tr>
+            <tr>
+                <td><code>GET</code></td>
+                <td><code>/api/health</code></td>
+                <td>
+                    <code>{ ok, chain, block }</code>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
-    <div class="endpoint">
-        <h3>GET /api/score/:address</h3>
-        <p>Retrieves the trust score and breakdown for a given wallet address.</p>
-        <h4>Example Request</h4>
-        <pre><code>curl -H "x-proven-key: pilot_demo" https://your-deployment-url.vercel.app/api/score/0xDe9De6f3d4a50BF414927EF6D523aFa65355492a</code></pre>
-        <h4>Example Response</h4>
-        <pre><code>{
+    <h2 style="margin-top: 3rem;">Example Request</h2>
+    <pre><code>curl -s -H "x-proven-key: your-pilot-key" \
+https://giwa-defi-suite.vercel.app/api/score/0xDe9De6f3d4a50BF414927EF6D523aFa65355492a</code></pre>
+
+    <h3>Example JSON Response</h3>
+    <pre><code>{
   "address": "0xDe9De6f3d4a50BF414927EF6D523aFa65355492a",
   "score": 850,
-  "tier": 2,
-  "tierName": "Silver",
+  "tier": 3,
+  "tierName": "PLATINUM",
   "ceiling": 900,
-  "ceilingProvenance": "CONSENTED",
+  "ceilingProvenance": "BEHAVIORAL",
   "provenance": {
     "baseAttestation": 400,
-    "trustlessState": 200,
+    "trustlessState": 250,
     "reporterActivity": 150,
-    "consentedProofs": 100
+    "consentedProofs": 50
   },
   "holdsLP": true,
   "holdsVault": false,
   "chain": 91342,
-  "cachedAt": 1718293940123,
+  "cachedAt": 1718023450000,
   "cached": false,
-  "usage": 42
+  "usage": 1
 }</code></pre>
-    </div>
 
+    <h2 style="margin-top: 3rem;">Pricing</h2>
     <div class="endpoint">
-        <h3>GET /api/tier/:address</h3>
-        <p>Retrieves the fee tier for a wallet.</p>
-        <h4>Example Request</h4>
-        <pre><code>curl -H "x-proven-key: pilot_demo" https://your-deployment-url.vercel.app/api/tier/0xDe9De6f3d4a50BF414927EF6D523aFa65355492a</code></pre>
+        <p><strong>Pilot Phase:</strong> Free up to 1,000 API calls per month.</p>
+        <p style="margin-bottom: 0; color: var(--muted);">Paid tiers with higher rate limits and SLA guarantees will be available in future releases. <a href="index.html">Visit the main app</a> for updates.</p>
     </div>
-
-    <div class="endpoint">
-        <h3>GET /api/health</h3>
-        <p>Checks API and RPC health.</p>
-        <h4>Example Request</h4>
-        <pre><code>curl -H "x-proven-key: pilot_demo" https://your-deployment-url.vercel.app/api/health</code></pre>
-    </div>
-
-    <h2>On-chain Fee Tiers</h2>
-    <table border="1" style="border-collapse: collapse; width: 100%; text-align: left;">
-        <tr>
-            <th style="padding: 8px;">Tier</th>
-            <th style="padding: 8px;">Swap Fee</th>
-            <th style="padding: 8px;">Vault Fee</th>
-        </tr>
-        <tr>
-            <td style="padding: 8px;">0</td>
-            <td style="padding: 8px;">0.30%</td>
-            <td style="padding: 8px;">2.00%</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px;">1</td>
-            <td style="padding: 8px;">0.20%</td>
-            <td style="padding: 8px;">1.50%</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px;">2</td>
-            <td style="padding: 8px;">0.15%</td>
-            <td style="padding: 8px;">1.00%</td>
-        </tr>
-        <tr>
-            <td style="padding: 8px;">3</td>
-            <td style="padding: 8px;">0.10%</td>
-            <td style="padding: 8px;">0.50%</td>
-        </tr>
-    </table>
+</div>
 
 <footer class="proven-footer">
     Proven &mdash; verified, secure, decentralized. Built on GIWA Sepolia (chain 91342).
