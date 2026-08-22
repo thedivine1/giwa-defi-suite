@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Repo #9 — A Field Journal</title>
+    <title>Proven — The trust layer for GIWA</title>
     <script>document.documentElement.className += ' js'</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -528,9 +528,90 @@
             }
         }
     </style>
+  <link rel="icon" type="image/png" href="assets/proven-icon.png" />
 </head>
 
 <body>
+
+<style>
+    .proven-nav {
+        position: sticky;
+        top: 0;
+        z-index: 10000;
+        background: #070c14;
+        border-bottom: 1px solid var(--jade, #6fe3b0);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+    }
+    .proven-nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .proven-nav-logo {
+        width: 32px;
+        height: 32px;
+    }
+    .proven-nav-title {
+        font-family: var(--disp, 'Syne', sans-serif);
+        font-weight: 800;
+        font-size: 22px;
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        letter-spacing: 1px;
+    }
+    .proven-nav-tag {
+        font-size: 13px;
+        color: var(--jade, #6fe3b0);
+        margin-left: 4px;
+        opacity: 0.9;
+    }
+    .proven-nav-right {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+    .proven-nav-link {
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .proven-nav-link:hover {
+        color: var(--jade, #6fe3b0);
+    }
+    .proven-footer {
+        text-align: center;
+        padding: 40px 20px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+        font-size: 14px;
+        color: var(--muted, #8aa396);
+        border-top: 1px solid var(--line, #223029);
+        background: var(--bg, #0a0e0c);
+        margin-top: auto;
+    }
+</style>
+
+<nav class="proven-nav">
+    <div class="proven-nav-left">
+        <img src="assets/proven-icon.png" alt="Proven Icon" class="proven-nav-logo" />
+        <a href="index.html" class="proven-nav-title">PROVEN</a>
+        <span class="proven-nav-tag">the trust layer for GIWA</span>
+    </div>
+    <div class="proven-nav-right">
+        <a href="index.html" class="proven-nav-link">App</a>
+        <a href="doc-score-v2.html" class="proven-nav-link">Score V2</a>
+        <a href="api-quickstart.html" class="proven-nav-link">Docs</a>
+        <a href="architecture.html" class="proven-nav-link">Architecture</a>
+        <a href="story.html" class="proven-nav-link">Story</a>
+        <a href="deck.html" class="proven-nav-link">Deck</a>
+    </div>
+</nav>
+
     <div class="gridbg"></div>
     <div class="grain"></div>
     <div class="prog" id="prog"></div>
@@ -543,7 +624,7 @@
             <p class="cap">That was the share price on our vault the night we broke it. A real on-chain number, on a
                 real testnet, dividing trapped assets by almost-no-shares. Most teams would have hidden it. We <b>stared
                     at it</b> — and that stare is the whole story.</p>
-            <div class="byline"><span><b>subject</b> GIWA DeFi Suite</span><span><b>built in</b> 72
+            <div class="byline"><span><b>subject</b>Proven</span><span><b>built in</b> 72
                     hours</span><span><b>by</b> an operator · 17 yrs BD & GTM in industrial automation · in crypto since
                     2011 · first on-chain build</span><span><b>result</b> repo #9 on a chain that had 8</span></div>
         </header>
@@ -786,6 +867,11 @@
             addEventListener('scroll', function () { var h = document.documentElement.scrollHeight - innerHeight; p.style.width = (scrollY / h * 100) + '%'; }, { passive: true });
         } catch (e) { }
     </script>
+
+<footer class="proven-footer">
+    Proven &mdash; verified, secure, decentralized. Built on GIWA Sepolia (chain 91342).
+</footer>
+
 </body>
 
 </html>

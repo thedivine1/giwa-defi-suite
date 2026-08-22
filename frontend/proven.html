@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proven — The trust layer for GIWA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0a0e0c;
+            --panel: #0f1512;
+            --panel2: #131b16;
+            --line: #223029;
+            --line2: #2d4036;
+            --bone: #ece7da;
+            --muted: #8aa396;
+            --faint: #5d7568;
+            --jade: #6fe3b0;
+            --jade-dim: #2f6f54;
+            --jade-deep: #0e2a20;
+            --gold: #e7c277;
+            --slate: #86b6cb;
+            --rose: #e0918f;
+            --disp: 'Syne', sans-serif;
+            --body: 'IBM Plex Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            background: var(--ink);
+            color: var(--bone);
+            font-family: var(--body);
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden
+        }
+
+        ::selection {
+            background: var(--jade);
+            color: var(--ink)
+        }
+
+        /* ambient, family-consistent */
+        .grain {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: .05;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
+        }
+
+        .gridbg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: .5;
+            background: radial-gradient(120% 80% at 8% -5%, #13241c 0%, transparent 55%), radial-gradient(90% 70% at 100% 110%, #1a160c 0%, transparent 50%), var(--ink)
+        }
+
+        .gridbg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(var(--line) 1px, transparent 1.4px);
+            background-size: 34px 34px;
+            animation: pan 50s linear infinite
+        }
+
+        @keyframes pan {
+            to {
+                background-position: 34px 68px
+            }
+        }
+
+        .scan {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 30vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: .45;
+            background: linear-gradient(to bottom, transparent, rgba(111, 227, 176, .05), transparent);
+            animation: scan 9s linear infinite
+        }
+
+        @keyframes scan {
+            0% {
+                top: -30vh
+            }
+
+            100% {
+                top: 100vh
+            }
+        }
+
+        .dot {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--jade);
+            opacity: .3;
+            z-index: 0;
+            box-shadow: 0 0 8px var(--jade);
+            animation: float 14s ease-in-out infinite
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-26px)
+            }
+        }
+
+        /* ticker */
+        .ticker {
+            position: relative;
+            z-index: 5;
+            background: rgba(10, 14, 12, .86);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--line);
+            overflow: hidden
+        }
+
+        .ticker .track {
+            display: inline-flex;
+            white-space: nowrap;
+            animation: marq 40s linear infinite;
+            font-family: var(--mono);
+            font-size: .68rem;
+            letter-spacing: .06em;
+            color: var(--muted);
+            padding: 8px 0
+        }
+
+        .ticker .track span {
+            padding: 0 22px
+        }
+
+        .ticker .track b {
+            color: var(--jade);
+            font-weight: 500
+        }
+
+        .ticker .track i {
+            color: var(--gold);
+            font-style: normal
+        }
+
+        @keyframes marq {
+            to {
+                transform: translateX(-50%)
+            }
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 2;
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 30px
+        }
+
+        @media(max-width:680px) {
+            .wrap {
+                padding: 0 18px
+            }
+        }
+
+        /* COVER FRAME — the screenshot-able composition */
+        .cover {
+            display: grid;
+            grid-template-columns: minmax(280px, 360px) 1fr;
+            gap: 48px;
+            align-items: center;
+            padding: 64px 0 56px
+        }
+
+        @media(max-width:860px) {
+            .cover {
+                grid-template-columns: 1fr;
+                gap: 34px;
+                text-align: center;
+                padding: 44px 0 40px
+            }
+        }
+
+        /* the seal / crest */
+        .sealwrap {
+            display: flex;
+            justify-content: center
+        }
+
+        .seal {
+            width: min(78vw, 320px);
+            aspect-ratio: 1;
+            animation: stamp .9s cubic-bezier(.18, .9, .3, 1.2) both;
+            transition: transform .4s ease
+        }
+
+        .seal:hover {
+            transform: rotate(-3deg) scale(1.02)
+        }
+
+        @keyframes stamp {
+            0% {
+                transform: scale(1.16);
+                opacity: 0
+            }
+
+            55% {
+                opacity: 1
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .seal svg {
+            width: 100%;
+            height: 100%;
+            display: block
+        }
+
+        .seal .edge {
+            fill: none;
+            stroke: var(--jade-dim);
+            stroke-width: 6;
+            stroke-dasharray: 1.5 4
+        }
+
+        .seal .ring {
+            fill: none;
+            stroke: var(--line2);
+            stroke-width: 1
+        }
+
+        .seal .motto {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 3.4px;
+            fill: var(--muted)
+        }
+
+        .seal .est {
+            font-family: var(--mono);
+            font-size: 7.5px;
+            letter-spacing: 2.5px;
+            fill: var(--faint)
+        }
+
+        .seal .check {
+            fill: none;
+            stroke: var(--jade);
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: draw .7s ease .55s forwards;
+            filter: drop-shadow(0 0 6px rgba(111, 227, 176, .5))
+        }
+
+        @keyframes draw {
+            to {
+                stroke-dashoffset: 0
+            }
+        }
+
+        .seal .pip {
+            fill: var(--jade)
+        }
+
+        /* wordmark panel */
+        .kick {
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .3em;
+            color: var(--jade);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 9px
+        }
+
+        @media(max-width:860px) {
+            .kick {
+                justify-content: center
+            }
+        }
+
+        .kick .p {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--jade);
+            box-shadow: 0 0 0 0 rgba(111, 227, 176, .6);
+            animation: pulse 2.4s infinite
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(111, 227, 176, .5)
+            }
+
+            70% {
+                box-shadow: 0 0 0 9px rgba(111, 227, 176, 0)
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(111, 227, 176, 0)
+            }
+        }
+
+        .wordmark {
+            font-family: var(--disp);
+            font-weight: 800;
+            line-height: .82;
+            letter-spacing: -.03em;
+            text-transform: uppercase;
+            font-size: clamp(3.6rem, 12vw, 8rem);
+            margin: 14px 0 0;
+            color: var(--bone);
+            text-shadow: 0 0 40px rgba(111, 227, 176, .12)
+        }
+
+        .wordmark em {
+            font-style: normal;
+            color: var(--jade)
+        }
+
+        .rule {
+            width: 64px;
+            height: 3px;
+            background: var(--jade);
+            margin: 18px 0 16px;
+            border-radius: 3px
+        }
+
+        @media(max-width:860px) {
+            .rule {
+                margin-left: auto;
+                margin-right: auto
+            }
+        }
+
+        .tagline {
+            font-family: var(--mono);
+            font-size: .8rem;
+            letter-spacing: .22em;
+            text-transform: uppercase;
+            color: var(--gold)
+        }
+
+        .sub {
+            max-width: 46ch;
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 1.04rem
+        }
+
+        .sub b {
+            color: var(--bone);
+            font-weight: 600
+        }
+
+        @media(max-width:860px) {
+            .sub {
+                margin-left: auto;
+                margin-right: auto
+            }
+        }
+
+        .founder {
+            margin-top: 16px;
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--faint);
+            line-height: 1.7;
+            max-width: 48ch
+        }
+
+        .founder b {
+            color: var(--muted);
+            font-weight: 500
+        }
+
+        @media(max-width:860px) {
+            .founder {
+                margin-left: auto;
+                margin-right: auto
+            }
+        }
+
+        /* proof ledger (addresses) */
+        .proof {
+            margin-top: 26px;
+            border-top: 1px solid var(--line)
+        }
+
+        .proof .h {
+            font-family: var(--mono);
+            font-size: .58rem;
+            letter-spacing: .22em;
+            color: var(--faint);
+            text-transform: uppercase;
+            padding: 12px 0 4px
+        }
+
+        .prow {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 1px solid var(--line);
+            transition: .2s
+        }
+
+        .prow:first-of-type {
+            border-top: none
+        }
+
+        .prow:hover {
+            padding-left: 6px
+        }
+
+        .prow .ix {
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--jade-dim)
+        }
+
+        .prow .nm {
+            font-family: var(--disp);
+            font-weight: 600;
+            font-size: .92rem
+        }
+
+        .prow .ad {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-self: end
+        }
+
+        .prow .ad a {
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--muted);
+            text-decoration: none;
+            transition: .18s;
+            word-break: break-all;
+            text-align: right
+        }
+
+        .prow .ad a:hover {
+            color: var(--jade)
+        }
+
+        .cp {
+            font-family: var(--mono);
+            font-size: .58rem;
+            letter-spacing: .06em;
+            color: var(--faint);
+            background: transparent;
+            border: 1px solid var(--line2);
+            border-radius: 4px;
+            padding: 3px 7px;
+            cursor: pointer;
+            transition: .18s;
+            white-space: nowrap
+        }
+
+        .cp:hover {
+            border-color: var(--jade);
+            color: var(--jade)
+        }
+
+        .cp.ok {
+            border-color: var(--jade);
+            color: var(--jade);
+            background: var(--jade-deep)
+        }
+
+        .footad {
+            margin-top: 10px;
+            font-family: var(--mono);
+            font-size: .62rem;
+            color: var(--faint);
+            line-height: 1.9
+        }
+
+        .footad a {
+            color: var(--muted);
+            text-decoration: none
+        }
+
+        .footad a:hover {
+            color: var(--jade)
+        }
+
+        /* scroll sections */
+        .sec {
+            padding: 54px 0 8px;
+            border-top: 1px solid var(--line);
+            margin-top: 30px
+        }
+
+        .sec .ey {
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .26em;
+            color: var(--gold);
+            text-transform: uppercase
+        }
+
+        .sec h2 {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: clamp(1.7rem, 5vw, 2.8rem);
+            line-height: .98;
+            letter-spacing: -.02em;
+            margin: 8px 0 0;
+            max-width: 20ch
+        }
+
+        .sec h2 .j {
+            color: var(--jade)
+        }
+
+        /* numbered ledger of what Proven ships */
+        .ledger {
+            margin-top: 26px
+        }
+
+        .lrow {
+            display: grid;
+            grid-template-columns: 64px 1fr;
+            gap: 18px;
+            align-items: start;
+            padding: 20px 0;
+            border-top: 1px solid var(--line);
+            transition: .25s
+        }
+
+        .lrow:hover {
+            padding-left: 8px;
+            border-top-color: var(--jade-dim)
+        }
+
+        .lrow .n {
+            font-family: var(--disp);
+            font-weight: 800;
+            font-size: 2rem;
+            color: transparent;
+            -webkit-text-stroke: 1.3px var(--line2);
+            line-height: 1;
+            transition: .25s
+        }
+
+        .lrow:hover .n {
+            -webkit-text-stroke-color: var(--jade)
+        }
+
+        .lrow .nm {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: 1.2rem
+        }
+
+        .lrow .d {
+            color: var(--muted);
+            margin-top: 5px;
+            font-size: .96rem;
+            max-width: 60ch
+        }
+
+        .lrow .d b {
+            color: var(--bone);
+            font-weight: 600
+        }
+
+        .lrow .gate {
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--jade);
+            margin-top: 8px;
+            letter-spacing: .04em
+        }
+
+        .pull {
+            margin: 40px 0;
+            padding: 26px 0 26px 26px;
+            border-left: 3px solid var(--jade);
+            font-family: var(--disp);
+            font-weight: 600;
+            font-size: clamp(1.4rem, 4vw, 2.1rem);
+            line-height: 1.25;
+            color: var(--bone);
+            letter-spacing: -.01em
+        }
+
+        .pull .by {
+            display: block;
+            margin-top: 12px;
+            font-family: var(--mono);
+            font-size: .64rem;
+            letter-spacing: .14em;
+            color: var(--faint);
+            text-transform: uppercase;
+            font-weight: 400
+        }
+
+        .foot {
+            padding: 36px 0 80px;
+            border-top: 1px solid var(--line);
+            margin-top: 36px;
+            font-family: var(--mono);
+            font-size: .66rem;
+            color: var(--faint);
+            line-height: 2;
+            text-align: center
+        }
+
+        .foot a {
+            color: var(--muted);
+            text-decoration: none
+        }
+
+        .foot a:hover {
+            color: var(--jade)
+        }
+
+        .foot .big {
+            font-family: var(--disp);
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: .04em;
+            color: var(--bone);
+            text-transform: uppercase
+        }
+
+        .foot .big em {
+            font-style: normal;
+            color: var(--jade)
+        }
+
+        /* reveal */
+        .js .rv {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity .7s cubic-bezier(.2, .7, .2, 1), transform .7s cubic-bezier(.2, .7, .2, 1)
+        }
+
+        .js .rv.in {
+            opacity: 1;
+            transform: none
+        }
+
+        @media (prefers-reduced-motion:reduce) {
+
+            .gridbg::after,
+            .scan,
+            .dot,
+            .ticker .track,
+            .seal,
+            .seal .check,
+            .kick .p {
+                animation: none !important
+            }
+
+            .seal .check {
+                stroke-dashoffset: 0
+            }
+
+            .seal {
+                opacity: 1;
+                transform: none
+            }
+
+            .js .rv {
+                opacity: 1 !important;
+                transform: none !important
+            }
+        }
+
+        @media print {
+
+            .grain,
+            .gridbg,
+            .scan,
+            .dot,
+            .ticker {
+                display: none !important
+            }
+
+            body {
+                background: #0a0e0c;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact
+            }
+
+            .js .rv {
+                opacity: 1 !important;
+                transform: none !important
+            }
+
+            .seal {
+                animation: none
+            }
+
+            .seal .check {
+                stroke-dashoffset: 0
+            }
+
+            .cover,
+            .sec {
+                break-inside: avoid
+            }
+        }
+    </style>
+  <link rel="icon" type="image/png" href="assets/proven-icon.png" />
+</head>
+
+<body>
+
+<style>
+    .proven-nav {
+        position: sticky;
+        top: 0;
+        z-index: 10000;
+        background: #070c14;
+        border-bottom: 1px solid var(--jade, #6fe3b0);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+    }
+    .proven-nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .proven-nav-logo {
+        width: 32px;
+        height: 32px;
+    }
+    .proven-nav-title {
+        font-family: var(--disp, 'Syne', sans-serif);
+        font-weight: 800;
+        font-size: 22px;
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        letter-spacing: 1px;
+    }
+    .proven-nav-tag {
+        font-size: 13px;
+        color: var(--jade, #6fe3b0);
+        margin-left: 4px;
+        opacity: 0.9;
+    }
+    .proven-nav-right {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+    .proven-nav-link {
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .proven-nav-link:hover {
+        color: var(--jade, #6fe3b0);
+    }
+    .proven-footer {
+        text-align: center;
+        padding: 40px 20px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+        font-size: 14px;
+        color: var(--muted, #8aa396);
+        border-top: 1px solid var(--line, #223029);
+        background: var(--bg, #0a0e0c);
+        margin-top: auto;
+    }
+</style>
+
+<nav class="proven-nav">
+    <div class="proven-nav-left">
+        <img src="assets/proven-icon.png" alt="Proven Icon" class="proven-nav-logo" />
+        <a href="index.html" class="proven-nav-title">PROVEN</a>
+        <span class="proven-nav-tag">the trust layer for GIWA</span>
+    </div>
+    <div class="proven-nav-right">
+        <a href="index.html" class="proven-nav-link">App</a>
+        <a href="doc-score-v2.html" class="proven-nav-link">Score V2</a>
+        <a href="api-quickstart.html" class="proven-nav-link">Docs</a>
+        <a href="architecture.html" class="proven-nav-link">Architecture</a>
+        <a href="story.html" class="proven-nav-link">Story</a>
+        <a href="deck.html" class="proven-nav-link">Deck</a>
+    </div>
+</nav>
+
+    <div class="gridbg"></div>
+    <div class="scan"></div>
+    <div class="grain"></div>
+    <div class="dot" style="top:16%;left:7%;animation-delay:0s"></div>
+    <div class="dot" style="top:70%;left:92%;animation-delay:3s"></div>
+    <div class="dot" style="top:84%;left:22%;animation-delay:6s"></div>
+
+    <div class="ticker">
+        <div class="track">
+            <span><b>●</b> PROVEN</span><span>team &amp; brand · GASOK 2026</span><span>DojangScore
+                <i>0xefE4…d48f</i></span><span>WonVault <i>0xEE4E…69F5</i></span><span>GIWASwap
+                <i>0x8813…0059</i></span><span>on <b>GIWA Sepolia · 91342</b></span><span>reads Dojang · attester
+                <b>Upbit Korea</b></span><span>tagline · <i>verified, not claimed</i></span>
+            <span><b>●</b> PROVEN</span><span>team &amp; brand · GASOK 2026</span><span>DojangScore
+                <i>0xefE4…d48f</i></span><span>WonVault <i>0xEE4E…69F5</i></span><span>GIWASwap
+                <i>0x8813…0059</i></span><span>on <b>GIWA Sepolia · 91342</b></span><span>reads Dojang · attester
+                <b>Upbit Korea</b></span><span>tagline · <i>verified, not claimed</i></span>
+        </div>
+    </div>
+
+    <div class="wrap">
+
+        <!-- COVER FRAME -->
+        <header class="cover">
+            <div class="sealwrap">
+                <div class="seal" title="Proven — verified, not claimed">
+                    <svg viewBox="0 0 200 200" role="img" aria-label="Proven seal">
+                        <defs>
+                            <path id="arcTop" d="M 24,100 A 76,76 0 0 1 176,100" fill="none" />
+                        </defs>
+                        <circle class="edge" cx="100" cy="100" r="94" />
+                        <circle class="ring" cx="100" cy="100" r="86" />
+                        <circle class="ring" cx="100" cy="100" r="62" />
+                        <text class="motto">
+                            <textPath href="#arcTop" startOffset="50%" text-anchor="middle">VERIFIED · NOT · CLAIMED
+                            </textPath>
+                        </text>
+                        <circle class="pip" cx="24" cy="100" r="2.2" />
+                        <circle class="pip" cx="176" cy="100" r="2.2" />
+                        <path class="check" pathLength="100" d="M80 96 L94 110 L122 80" />
+                        <text class="est" x="100" y="138" text-anchor="middle">EST · 2026</text>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="mark">
+                <div class="kick"><span class="p"></span>TEAM &amp; BRAND · GASOK 2026</div>
+                <h1 class="wordmark">PRO<em>V</em>EN</h1>
+                <div class="rule"></div>
+                <div class="tagline">Verified, not claimed.</div>
+                <p class="sub">The first application layer on GIWA's <b>Dojang</b> trust infrastructure — a credit
+                    score, a yield vault, and a DEX that all read the same attestations.</p>
+                <p class="founder">Founded by <b>Chaitanya Patankar</b> · 17+ yrs industrial-automation BD &amp; GTM
+                    (Rockwell · Siemens · Schneider) · in crypto since 2011 · two products shipped.</p>
+
+                <div class="proof">
+                    <div class="h">On-chain proof · GIWA Sepolia</div>
+                    <div class="prow"><span class="ix">01</span><span class="nm">DojangScore</span><span class="ad"><a
+                                target="_blank" rel="noopener"
+                                href="https://sepolia-explorer.giwa.io/address/0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f">0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f</a><button
+                                class="cp" data-copy="0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f">copy</button></span>
+                    </div>
+                    <div class="prow"><span class="ix">02</span><span class="nm">WonVault</span><span class="ad"><a
+                                target="_blank" rel="noopener"
+                                href="https://sepolia-explorer.giwa.io/address/0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5">0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5</a><button
+                                class="cp" data-copy="0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5">copy</button></span>
+                    </div>
+                    <div class="prow"><span class="ix">03</span><span class="nm">GIWASwap Pool</span><span class="ad"><a
+                                target="_blank" rel="noopener"
+                                href="https://sepolia-explorer.giwa.io/address/0x8813361aA6FFdC1B5926FA95d756b7390C680059">0x8813361aA6FFdC1B5926FA95d756b7390C680059</a><button
+                                class="cp" data-copy="0x8813361aA6FFdC1B5926FA95d756b7390C680059">copy</button></span>
+                    </div>
+                    <div class="footad">
+                        Factory <a target="_blank" rel="noopener"
+                            href="https://sepolia-explorer.giwa.io/address/0x7c7825AEF6b8b590dcF48d8C5059F3594B84a99F">0x7c78…a99F</a>
+                        · TKRW <a target="_blank" rel="noopener"
+                            href="https://sepolia-explorer.giwa.io/address/0x11DF7b38DA5F496F2B02bb6E51eAcDFEfcAB4f40">0x11DF…4f40</a>
+                        · TUSD <a target="_blank" rel="noopener"
+                            href="https://sepolia-explorer.giwa.io/address/0x84D986ac1B5913253a417a1AB68F94CD77e59a80">0x84D9…9a80</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- WHAT PROVEN SHIPS -->
+        <section class="sec rv">
+            <div class="ey">What Proven ships</div>
+            <h2>Three protocols. <span class="j">One trust source.</span></h2>
+            <div class="ledger">
+                <div class="lrow">
+                    <div class="n">01</div>
+                    <div>
+                        <div class="nm">DojangScore</div>
+                        <div class="d">Reads four Dojang attestations — verified address, verified balance, account age,
+                            verified code — and returns one composite trust score, <b>0–1000</b>, in four tiers. The
+                            primitive every other protocol on GIWA can gate on.</div>
+                        <div class="gate">→ the credit bureau of the chain</div>
+                    </div>
+                </div>
+                <div class="lrow">
+                    <div class="n">02</div>
+                    <div>
+                        <div class="nm">WonVault</div>
+                        <div class="d">An ERC-4626 KRW yield vault where your trust tier sets your <b>entry fee</b>, not
+                            your yield — 2.00% unverified down to 0.50% at Platinum. Hardened against the ERC-4626
+                            inflation attack we caught live and patched.</div>
+                        <div class="gate">→ verifying literally keeps more of your money earning</div>
+                    </div>
+                </div>
+                <div class="lrow">
+                    <div class="n">03</div>
+                    <div>
+                        <div class="nm">GIWASwap</div>
+                        <div class="d">The first DEX on GIWA — a constant-product AMM where verified wallets pay a
+                            <b>lower swap fee</b> (0.30% → 0.10%). A bot that stays anonymous pays triple; the cheapest
+                            Sybil-resistance marketing a chain will ever run.
+                        </div>
+                        <div class="gate">→ trust, finally, has a price</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="pull rv">Trust shouldn't be a claim. It should be a receipt you can read on-chain — and a fee you
+            pay for ignoring it.<span class="by">the Proven principle</span></div>
+
+        <footer class="foot rv">
+            <div class="big">PRO<em>V</em>EN</div>
+            verified, not claimed · the application layer on GIWA's Dojang<br>
+            <a target="_blank" rel="noopener" href="https://giwa-defi-suite.vercel.app">live demo</a> · <a
+                target="_blank" rel="noopener" href="https://github.com/thedivine1/giwa-defi-suite">repository</a> · <a
+                target="_blank" rel="noopener"
+                href="https://sepolia-explorer.giwa.io/address/0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f">on-chain</a><br>
+            GIWA Sepolia · OP Stack · chain 91342 · GASOK 2026
+        </footer>
+
+    </div>
+
+    <script>
+        try {
+            // copy buttons
+            document.querySelectorAll('.cp').forEach(function (b) {
+                b.addEventListener('click', function () {
+                    var t = b.getAttribute('data-copy');
+                    var done = function () { var o = b.textContent; b.textContent = 'copied'; b.classList.add('ok'); setTimeout(function () { b.textContent = o; b.classList.remove('ok'); }, 1000); };
+                    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t).then(done).catch(done); } else { done(); }
+                });
+            });
+            // scroll reveal
+            var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .12 });
+            document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
+        } catch (e) { }
+    </script>
+
+<footer class="proven-footer">
+    Proven &mdash; verified, secure, decentralized. Built on GIWA Sepolia (chain 91342).
+</footer>
+
+</body>
+
+</html>

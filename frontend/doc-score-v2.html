@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proven — The trust layer for GIWA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+    <style>
+        :root {
+            --ink: #0a0e0c;
+            --panel: #0f1512;
+            --panel2: #131b16;
+            --line: #223029;
+            --line2: #2d4036;
+            --bone: #ece7da;
+            --text: #eaf2ec;
+            --muted: #8aa396;
+            --faint: #5d7568;
+            --jade: #6fe3b0;
+            --jade-dim: #2f6f54;
+            --jade-deep: #0e2a20;
+            --gold: #e7c277;
+            --slate: #86b6cb;
+            --rose: #e0918f;
+            --vio: #c79bd6;
+            --disp: 'Syne', sans-serif;
+            --body: 'IBM Plex Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            background: var(--ink);
+            color: var(--text);
+            font-family: var(--body);
+            font-size: 15px;
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased
+        }
+
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(120% 80% at 8% -5%, #13241c 0%, transparent 55%), radial-gradient(90% 70% at 100% 110%, #1a160c 0%, transparent 50%), var(--ink)
+        }
+
+        .wrap {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 46px 26px 80px
+        }
+
+        .kick {
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .3em;
+            color: var(--jade);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 9px
+        }
+
+        .kick .p {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--jade);
+            animation: pulse 2.4s infinite
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(111, 227, 176, .5)
+            }
+
+            70% {
+                box-shadow: 0 0 0 9px rgba(111, 227, 176, 0)
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(111, 227, 176, 0)
+            }
+        }
+
+        h1 {
+            font-family: var(--disp);
+            font-weight: 800;
+            line-height: .86;
+            letter-spacing: -.03em;
+            text-transform: uppercase;
+            font-size: clamp(2.2rem, 7vw, 4rem);
+            margin: 14px 0 0
+        }
+
+        h1 em {
+            font-style: normal;
+            color: var(--jade)
+        }
+
+        .lede {
+            max-width: 62ch;
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 1.02rem
+        }
+
+        .lede b {
+            color: var(--bone)
+        }
+
+        .rule {
+            width: 58px;
+            height: 3px;
+            background: var(--jade);
+            border-radius: 3px;
+            margin: 18px 0
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.15fr .85fr;
+            gap: 22px;
+            margin-top: 8px
+        }
+
+        @media(max-width:880px) {
+            .grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .card {
+            background: linear-gradient(180deg, var(--panel2), var(--panel));
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 22px
+        }
+
+        .card .h {
+            font-family: var(--mono);
+            font-size: .58rem;
+            letter-spacing: .22em;
+            color: var(--faint);
+            text-transform: uppercase;
+            margin-bottom: 14px
+        }
+
+        .grp {
+            font-family: var(--mono);
+            font-size: .56rem;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            margin: 16px 0 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .grp:first-child {
+            margin-top: 0
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 22px 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+            padding: 9px 0;
+            border-top: 1px solid var(--line)
+        }
+
+        .row input[type=checkbox] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--jade);
+            cursor: pointer
+        }
+
+        .row .lab {
+            font-weight: 600;
+            font-size: .92rem
+        }
+
+        .row .lab small {
+            color: var(--faint);
+            font-weight: 400;
+            font-family: var(--mono);
+            font-size: .62rem
+        }
+
+        .row .wt {
+            width: 58px;
+            background: var(--panel);
+            border: 1px solid var(--line2);
+            border-radius: 5px;
+            color: var(--jade);
+            font-family: var(--mono);
+            font-size: .8rem;
+            padding: 5px 7px;
+            text-align: center
+        }
+
+        .row .wtu {
+            font-family: var(--mono);
+            font-size: .62rem;
+            color: var(--faint)
+        }
+
+        .badge {
+            font-family: var(--mono);
+            font-size: .52rem;
+            letter-spacing: .08em;
+            padding: 3px 7px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            white-space: nowrap
+        }
+
+        .b-ATTESTER {
+            background: var(--jade-deep);
+            color: var(--jade);
+            border: 1px solid var(--jade-dim)
+        }
+
+        .b-CONSENTED {
+            background: #10202a;
+            color: var(--slate);
+            border: 1px solid #234a5c
+        }
+
+        .b-BEHAVIORAL {
+            background: #1a160c;
+            color: var(--gold);
+            border: 1px solid #4a3c1c
+        }
+
+        .b-STATE {
+            background: #1c1320;
+            color: var(--vio);
+            border: 1px solid #4a2f57
+        }
+
+        /* composite */
+        .big {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: clamp(3.4rem, 12vw, 5.4rem);
+            line-height: .85;
+            letter-spacing: -.03em;
+            color: var(--jade)
+        }
+
+        .tierchip {
+            display: inline-block;
+            margin-top: 10px;
+            font-family: var(--mono);
+            font-size: .74rem;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--jade-dim);
+            color: var(--jade);
+            background: var(--jade-deep)
+        }
+
+        .bar {
+            position: relative;
+            height: 26px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--line2);
+            margin: 18px 0 6px;
+            display: flex;
+            background: #0a0d0c
+        }
+
+        .bar .seg {
+            height: 100%;
+            transition: .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: .6rem;
+            color: var(--ink);
+            font-weight: 700;
+            overflow: hidden
+        }
+
+        .bar .marker {
+            position: absolute;
+            top: -3px;
+            bottom: -3px;
+            width: 2px;
+            background: var(--rose);
+            box-shadow: 0 0 8px var(--rose)
+        }
+
+        .bar .marker span {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--mono);
+            font-size: .54rem;
+            color: var(--rose);
+            white-space: nowrap
+        }
+
+        .clamp {
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--muted);
+            min-height: 18px
+        }
+
+        .clamp b {
+            color: var(--rose)
+        }
+
+        .ceil {
+            margin-top: 14px;
+            border-top: 1px dashed var(--line);
+            padding-top: 12px
+        }
+
+        .ceil .line {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--mono);
+            font-size: .8rem;
+            padding: 4px 0
+        }
+
+        .ceil .line .k {
+            color: var(--muted)
+        }
+
+        .ceil .line .v {
+            color: var(--bone);
+            font-weight: 700
+        }
+
+        .fees {
+            margin-top: 14px;
+            border-top: 1px solid var(--line);
+            padding-top: 12px
+        }
+
+        .fees .line {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--mono);
+            font-size: .92rem;
+            padding: 5px 0
+        }
+
+        .fees .line .k {
+            color: var(--muted)
+        }
+
+        .fees .line .v {
+            color: var(--bone);
+            font-weight: 700
+        }
+
+        /* live */
+        .live {
+            margin-top: 26px
+        }
+
+        .live .bar2 {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        .btn {
+            font-family: var(--mono);
+            font-size: .74rem;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            background: var(--jade);
+            color: var(--ink);
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: .16s
+        }
+
+        .btn:hover {
+            filter: brightness(1.08)
+        }
+
+        .btn.ghost {
+            background: transparent;
+            border: 1px solid var(--line2);
+            color: var(--muted)
+        }
+
+        .btn.ghost:hover {
+            border-color: var(--jade);
+            color: var(--jade)
+        }
+
+        .btn:disabled {
+            opacity: .4;
+            cursor: not-allowed
+        }
+
+        .inp {
+            background: var(--panel);
+            border: 1px solid var(--line2);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: .78rem;
+            padding: 9px 11px;
+            outline: none
+        }
+
+        .inp:focus {
+            border-color: var(--jade)
+        }
+
+        .addr {
+            font-family: var(--mono);
+            font-size: .74rem;
+            color: var(--slate);
+            word-break: break-all
+        }
+
+        .cats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px
+        }
+
+        .cat {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            background: var(--panel)
+        }
+
+        .cat .t {
+            font-family: var(--mono);
+            font-size: .54rem;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--faint)
+        }
+
+        .cat .n {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-top: 3px
+        }
+
+        .msg {
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--muted);
+            margin-top: 10px;
+            min-height: 16px
+        }
+
+        .msg.err {
+            color: var(--rose)
+        }
+
+        .msg.ok {
+            color: var(--jade)
+        }
+
+        .note {
+            margin-top: 18px;
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--muted);
+            line-height: 1.7;
+            border: 1px dashed var(--line2);
+            border-radius: 8px;
+            padding: 14px
+        }
+
+        .note b {
+            color: var(--gold)
+        }
+
+        .foot {
+            margin-top: 40px;
+            border-top: 1px solid var(--line);
+            padding-top: 20px;
+            font-family: var(--mono);
+            font-size: .66rem;
+            color: var(--faint);
+            text-align: center;
+            line-height: 2
+        }
+
+        .foot a {
+            color: var(--muted);
+            text-decoration: none
+        }
+
+        .foot a:hover {
+            color: var(--jade)
+        }
+
+        @media print {
+            .bg {
+                display: none
+            }
+
+            body {
+                background: #0a0e0c;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact
+            }
+        }
+    </style>
+  <link rel="icon" type="image/png" href="assets/proven-icon.png" />
+</head>
+
+<body>
+
+<style>
+    .proven-nav {
+        position: sticky;
+        top: 0;
+        z-index: 10000;
+        background: #070c14;
+        border-bottom: 1px solid var(--jade, #6fe3b0);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+    }
+    .proven-nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .proven-nav-logo {
+        width: 32px;
+        height: 32px;
+    }
+    .proven-nav-title {
+        font-family: var(--disp, 'Syne', sans-serif);
+        font-weight: 800;
+        font-size: 22px;
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        letter-spacing: 1px;
+    }
+    .proven-nav-tag {
+        font-size: 13px;
+        color: var(--jade, #6fe3b0);
+        margin-left: 4px;
+        opacity: 0.9;
+    }
+    .proven-nav-right {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+    .proven-nav-link {
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .proven-nav-link:hover {
+        color: var(--jade, #6fe3b0);
+    }
+    .proven-footer {
+        text-align: center;
+        padding: 40px 20px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+        font-size: 14px;
+        color: var(--muted, #8aa396);
+        border-top: 1px solid var(--line, #223029);
+        background: var(--bg, #0a0e0c);
+        margin-top: auto;
+    }
+</style>
+
+<nav class="proven-nav">
+    <div class="proven-nav-left">
+        <img src="assets/proven-icon.png" alt="Proven Icon" class="proven-nav-logo" />
+        <a href="index.html" class="proven-nav-title">PROVEN</a>
+        <span class="proven-nav-tag">the trust layer for GIWA</span>
+    </div>
+    <div class="proven-nav-right">
+        <a href="index.html" class="proven-nav-link">App</a>
+        <a href="doc-score-v2.html" class="proven-nav-link">Score V2</a>
+        <a href="api-quickstart.html" class="proven-nav-link">Docs</a>
+        <a href="architecture.html" class="proven-nav-link">Architecture</a>
+        <a href="story.html" class="proven-nav-link">Story</a>
+        <a href="deck.html" class="proven-nav-link">Deck</a>
+    </div>
+</nav>
+
+    <div class="bg"></div>
+    <div class="wrap">
+        <div class="kick"><span class="p"></span>DOJANGSCORE V2 · PROVENANCE-CEILING ENGINE</div>
+        <h1>Score everyone. <em>Cap by proof.</em></h1>
+        <p class="lede">V2 reads four provenance-bearing sources and applies one rule: the <b>strongest proof a wallet
+                holds sets a hard ceiling</b> on its score. A wallet that vouches for itself (consented) can reach
+            <b>Gold</b>; only a regulated attester root reaches <b>Platinum</b>. On-chain state (<code>balanceOf</code>)
+            scores a non-Upbit wallet for free. Toggle signals to model it; switch to <b>Live</b> to read the real
+            contract.
+        </p>
+        <div class="rule"></div>
+
+        <div class="grid">
+            <!-- SIMULATOR -->
+            <div class="card">
+                <div class="h">Signals · provenance-tagged · caps enforced</div>
+                <div id="signals"></div>
+            </div>
+
+            <!-- COMPOSITE -->
+            <div class="card">
+                <div class="h">Composite outcome</div>
+                <div class="big" id="sVal">1000</div>
+                <div><span class="tierchip" id="sTier">Platinum</span></div>
+                <div class="bar" id="bar"></div>
+                <div class="clamp" id="clamp"></div>
+                <div class="ceil">
+                    <div class="line"><span class="k">Raw capped sum</span><span class="v" id="cRaw">1000</span></div>
+                    <div class="line"><span class="k">Active ceiling</span><span class="v" id="cCeil">1000</span></div>
+                    <div class="line"><span class="k">Ceiling set by</span><span class="v" id="cProv">ATTESTER</span>
+                    </div>
+                </div>
+                <div class="fees">
+                    <div class="line"><span class="k">WonVault entry</span><span class="v" id="fV">0.50%</span></div>
+                    <div class="line"><span class="k">GIWASwap fee</span><span class="v" id="fS">0.10%</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIVE ON-CHAIN -->
+        <div class="card live">
+            <div class="h">Live on-chain · DojangScoreV2.scoreBreakdown(wallet)</div>
+            <div class="bar2">
+                <button class="btn" id="conn">Connect wallet</button>
+                <span class="addr" id="who">not connected</span>
+            </div>
+            <div class="msg" id="lm"></div>
+            <div class="cats" id="cats" style="display:none"></div>
+            <div class="bar2" style="margin-top:14px">
+                <input class="inp" id="kickAddr" placeholder="target address (default = you)"
+                    style="flex:1;min-width:200px">
+                <input class="inp" id="kickDelta" type="number" value="120" style="width:90px">
+                <button class="btn ghost" id="kick" disabled>Record behavioral (reporter)</button>
+                <button class="btn ghost" id="proof" disabled>Submit ENS proof (self)</button>
+            </div>
+            <div class="msg" id="wm"></div>
+            <div class="note"><b>How the live ladder works:</b> a wallet that merely holds vault shares reads
+                <b>Silver</b> from the trustless <code>balanceOf</code> lookup — no Upbit, no reporter. <b>Submit a
+                    proof</b> (you vouch for yourself) → ceiling opens to <b>Gold</b>. A reporter (the indexer, or the
+                deployer via the kick) adds behavioral activity. <b>Platinum</b> requires the regulated attester — on
+                testnet, the owner's stand-in override. Self-attestation <i>cannot</i> reach Platinum: that cap is the
+                whole point.
+            </div>
+        </div>
+
+        <div class="note"><b>Model ↔ contract parity:</b> category caps (attest 1000 · behavioral 250 · consented 250 ·
+            state 100) and ceilings (behavioral 499 · consented 799 · attester 1000) are identical in this simulator and
+            in <code>DojangScoreV2.sol</code>. The simulator shows per-signal detail; on-chain stores capped category
+            aggregates + provenance classes (cheaper, audit-friendly). The two agree on the final number.</div>
+
+        <div class="foot">
+            PRO<em style="color:var(--jade)">V</em>EN · DojangScore V2 · verified, not claimed<br>
+            <a href="doc-score.html">v1 model</a> · <a href="architecture.html">architecture</a> · <a target="_blank"
+                rel="noopener" href="https://giwa-defi-suite.vercel.app">live demo</a> · GIWA Sepolia · 91342
+        </div>
+    </div>
+
+    <script>
+        /* ====== CONFIG: paste the deployed V2 address here after deploy ====== */
+        const V2 = "0x8D0A4989e4a48bDc115Bd7104D87e28dBbCd3401";
+        const CHAIN = 91342;
+
+        /* category meta — caps & ceilings MUST match the contract */
+        const CAT = {
+            ATTESTER: { cap: 1000, ceil: 1000, prov: 3, color: 'var(--jade)', name: 'ATTESTER', tag: 'regulated root' },
+            BEHAVIORAL: { cap: 250, ceil: 499, prov: 1, color: 'var(--gold)', name: 'BEHAVIORAL', tag: 'reporter / indexer' },
+            STATE: { cap: 100, ceil: 499, prov: 1, color: 'var(--vio)', name: 'STATE', tag: 'on-chain · trustless' },
+            CONSENTED: { cap: 250, ceil: 799, prov: 2, color: 'var(--slate)', name: 'CONSENTED', tag: 'self-submitted' }
+        };
+        const PROVNAME = { 0: 'NONE', 1: 'BEHAVIORAL', 2: 'CONSENTED', 3: 'ATTESTER' };
+        const FEE_V = { 0: "2.00%", 1: "1.50%", 2: "1.00%", 3: "0.50%" };
+        const FEE_S = { 0: "0.30%", 1: "0.20%", 2: "0.15%", 3: "0.10%" };
+
+        /* signal rows (provenance class + weight). Defaults ON = the 4 attester rows. */
+        const SIGNALS = [
+            { g: 'ATTESTER', cat: 'ATTESTER', lab: 'Verified Address', w: 400, on: true },
+            { g: 'ATTESTER', cat: 'ATTESTER', lab: 'Verified Balance', w: 300, on: true },
+            { g: 'ATTESTER', cat: 'ATTESTER', lab: 'Account Age &gt;90d', w: 200, on: true },
+            { g: 'ATTESTER', cat: 'ATTESTER', lab: 'Verified Code (2FA)', w: 100, on: true },
+            { g: 'BEHAVIORAL', cat: 'BEHAVIORAL', lab: '≥1 GIWASwap swap', w: 40, on: false },
+            { g: 'BEHAVIORAL', cat: 'BEHAVIORAL', lab: 'Provided LP once', w: 60, on: false },
+            { g: 'BEHAVIORAL', cat: 'BEHAVIORAL', lab: 'Held WonVault shares ≥30d', w: 80, on: false },
+            { g: 'BEHAVIORAL', cat: 'BEHAVIORAL', lab: 'Cast a governance vote', w: 50, on: false },
+            { g: 'BEHAVIORAL', cat: 'BEHAVIORAL', lab: 'Referred a verified wallet', w: 30, on: false },
+            { g: 'STATE', cat: 'STATE', lab: 'Currently holds GLP', w: 50, on: false, live: 'pool.balanceOf' },
+            { g: 'STATE', cat: 'STATE', lab: 'Currently holds vault shares', w: 50, on: false, live: 'vault.balanceOf' },
+            { g: 'CONSENTED', cat: 'CONSENTED', lab: 'Attestation renewed ≥3×', w: 70, on: false },
+            { g: 'CONSENTED', cat: 'CONSENTED', lab: 'Zero revocation events', w: 20, on: false },
+            { g: 'CONSENTED', cat: 'CONSENTED', lab: 'Owns ENS / web3 name', w: 60, on: false },
+            { g: 'CONSENTED', cat: 'CONSENTED', lab: 'Holds Gitcoin Passport stamp', w: 50, on: false }
+        ];
+
+        function tierOf(s) { return s < 200 ? 0 : s < 500 ? 1 : s < 800 ? 2 : 3; }
+        function tierName(t) { return ["Unverified", "Silver", "Gold", "Platinum"][t]; }
+
+        /* build the signal list */
+        const sigEl = document.getElementById('signals');
+        let lastGroup = '';
+        SIGNALS.forEach((s, i) => {
+            if (s.g !== lastGroup) {
+                lastGroup = s.g; const d = document.createElement('div'); d.className = 'grp';
+                d.innerHTML = '<span class="badge b-' + s.cat + '">' + CAT[s.cat].name + '</span> ' + CAT[s.cat].tag; sigEl.appendChild(d);
+            }
+            const r = document.createElement('div'); r.className = 'row';
+            r.innerHTML = '<input type="checkbox" ' + (s.on ? 'checked' : '') + ' data-i="' + i + '">' +
+                '<span class="lab">' + s.lab + (s.live ? ' <small>(live: ' + s.live + ')</small>' : '') + '</span>' +
+                '<input class="wt" type="number" value="' + s.w + '" data-i="' + i + '"><span class="wtu">wt</span>';
+            sigEl.appendChild(r);
+        });
+        sigEl.querySelectorAll('input[type=checkbox]').forEach(c => c.addEventListener('change', e => { SIGNALS[+e.target.dataset.i].on = e.target.checked; compute(); }));
+        sigEl.querySelectorAll('input.wt').forEach(c => c.addEventListener('input', e => { SIGNALS[+e.target.dataset.i].w = Math.max(0, +e.target.value || 0); compute(); }));
+
+        function compute() {
+            // sum per category, then cap
+            const sum = { ATTESTER: 0, BEHAVIORAL: 0, STATE: 0, CONSENTED: 0 };
+            SIGNALS.forEach(s => { if (s.on) sum[s.cat] += s.w; });
+            const capped = {}; let raw = 0; let maxProv = 0;
+            for (const k in CAT) {
+                capped[k] = Math.min(sum[k], CAT[k].cap); raw += capped[k];
+                if (capped[k] > 0 && CAT[k].prov > maxProv) maxProv = CAT[k].prov;
+            }
+            const ceil = maxProv === 3 ? 1000 : maxProv === 2 ? 799 : maxProv === 1 ? 499 : 0;
+            const final = Math.min(raw, ceil);
+            render(capped, raw, ceil, maxProv, final);
+        }
+        function render(capped, raw, ceil, prov, final) {
+            const t = tierOf(final);
+            document.getElementById('sVal').textContent = final;
+            document.getElementById('sTier').textContent = tierName(t);
+            document.getElementById('cRaw').textContent = raw;
+            document.getElementById('cCeil').textContent = ceil;
+            const pe = document.getElementById('cProv'); pe.textContent = PROVNAME[prov];
+            pe.className = 'v'; pe.style.color = prov === 3 ? 'var(--jade)' : prov === 2 ? 'var(--slate)' : prov === 1 ? 'var(--gold)' : 'var(--faint)';
+            document.getElementById('fV').textContent = FEE_V[t];
+            document.getElementById('fS').textContent = FEE_S[t];
+            // stacked bar of capped categories, scaled to max(raw,ceil); ceiling marker
+            const scale = Math.max(raw, ceil, 1);
+            const order = ['ATTESTER', 'BEHAVIORAL', 'CONSENTED', 'STATE'];
+            const bar = document.getElementById('bar'); bar.innerHTML = '';
+            order.forEach(k => {
+                if (capped[k] > 0) {
+                    const seg = document.createElement('div'); seg.className = 'seg';
+                    seg.style.flex = capped[k]; seg.style.background = CAT[k].color; seg.textContent = capped[k]; bar.appendChild(seg);
+                }
+            });
+            if (ceil > 0 && raw > 0) {
+                const m = document.createElement('div'); m.className = 'marker'; m.style.left = (ceil / scale * 100) + '%';
+                m.innerHTML = '<span>ceiling ' + ceil + '</span>'; bar.appendChild(m);
+            }
+            const cl = document.getElementById('clamp');
+            cl.innerHTML = raw > ceil ? 'raw <b>' + raw + '</b> clamped to ceiling → <b>' + final + '</b>' : (ceil > 0 ? 'within ceiling · no clamp' : 'no provenance present → score 0');
+        }
+        compute();
+
+        /* ===================== LIVE ON-CHAIN ===================== */
+        const ABI = [
+            "function scoreBreakdown(address) view returns (tuple(uint16 baseAttestation,uint16 trustlessState,uint16 reporterActivity,uint16 consentedProofs,uint16 rawSum,uint16 ceiling,uint8 ceilingProvenance,uint16 finalScore,uint8 tier,bool holdsLP,bool holdsVault))",
+            "function addBehavioral(address,uint128)",
+            "function submitProof(uint8,bytes32)",
+            "function hasRole(bytes32,address) view returns (bool)",
+            "function reporterRole() view returns (bytes32)",
+            "function behavioral(address) view returns (uint128)"
+        ];
+        let provider, signer, user, v2c, isReporter = false, isAdmin = false;
+        const wired = /^0x[0-9a-fA-F]{40}$/.test(V2) && !/PASTE/.test(V2);
+        const $ = id => document.getElementById(id);
+        if (!wired) { $('lm').textContent = 'V2 not wired yet — paste the deployed address into const V2 at the top of this file, save, refresh.'; $('lm').className = 'msg err'; }
+
+        async function connect() {
+            if (!window.ethereum) { $('lm').textContent = 'Install Rabby / MetaMask.'; $('lm').className = 'msg err'; return; }
+            if (!wired) { $('lm').textContent = 'Wire the V2 address first (const V2).'; $('lm').className = 'msg err'; return; }
+            try {
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+                const hex = await window.ethereum.request({ method: "eth_chainId" });
+                if (parseInt(hex, 16) !== CHAIN) { try { await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0x" + CHAIN.toString(16) }] }); } catch (e) { $('lm').textContent = 'Switch to GIWA Sepolia (91342).'; $('lm').className = 'msg err'; return; } }
+                provider = new ethers.BrowserProvider(window.ethereum); signer = await provider.getSigner(); user = await signer.getAddress();
+                v2c = new ethers.Contract(V2, ABI, signer);
+                const rr = await v2c.reporterRole();
+                isReporter = await v2c.hasRole(rr, user); isAdmin = await v2c.hasRole("0x0000000000000000000000000000000000000000000000000000000000000000", user);
+                $('who').textContent = user.slice(0, 6) + '…' + user.slice(-4) + (isReporter ? ' · REPORTER' : '') + (isAdmin ? ' · ADMIN' : '');
+                $('kick').disabled = !isReporter; $('proof').disabled = false;
+                $('kickAddr').placeholder = 'target (default ' + user.slice(0, 6) + '…)';
+                $('lm').className = 'msg ok'; $('lm').textContent = 'Connected. Reading live breakdown…';
+                await readLive();
+            } catch (e) { $('lm').textContent = 'Connect error: ' + (e.shortMessage || e.message); $('lm').className = 'msg err'; }
+        }
+        async function readLive() {
+            if (!v2c || !user) return;
+            try {
+                const b = await v2c.scoreBreakdown(user);
+                const N = x => Number(x);
+                $('cats').style.display = 'grid';
+                $('cats').innerHTML =
+                    cat('ATTESTER-rooted', N(b.baseAttestation), 'b-ATTESTER', 'live DojangScroll read') +
+                    cat('ON-CHAIN STATE', N(b.trustlessState), 'b-STATE', (b.holdsLP ? 'LP ' : '') + (b.holdsVault ? 'vault' : 'none') + ' · trustless') +
+                    cat('BEHAVIORAL', N(b.reporterActivity), 'b-BEHAVIORAL', 'reporter aggregate') +
+                    cat('CONSENTED', N(b.consentedProofs), 'b-CONSENTED', 'self-submitted');
+                $('lm').className = 'msg ok';
+                $('lm').innerHTML = 'live score <b style="color:var(--jade)">' + N(b.finalScore) + '</b> · ' + tierName(N(b.tier)) +
+                    ' · raw ' + N(b.rawSum) + ' · ceiling ' + N(b.ceiling) + ' (' + PROVNAME[N(b.ceilingProvenance)] + ')' +
+                    (N(b.rawSum) > N(b.ceiling) ? ' · <span style="color:var(--rose)">clamped</span>' : '');
+            } catch (e) { $('lm').textContent = 'Read error: ' + (e.shortMessage || e.message); $('lm').className = 'msg err'; }
+        }
+        function cat(t, v, cls, sub) { return '<div class="cat"><div class="t">' + t + '</div><div class="n">' + v + '</div><div style="margin-top:6px"><span class="badge ' + cls + '">' + sub + '</span></div></div>'; }
+
+        async function doKick() {
+            const tgt = ($('kickAddr').value.trim() || user); const d = +($('kickDelta').value || 0);
+            if (!isReporter) { $('wm').textContent = 'Connected wallet is not a REPORTER.'; $('wm').className = 'msg err'; return; }
+            $('wm').className = 'msg'; $('wm').textContent = 'Signing addBehavioral…';
+            try { const tx = await v2c.addBehavioral(tgt, d); await tx.wait(); $('wm').className = 'msg ok'; $('wm').textContent = '✓ behavioral +' + d + ' recorded for ' + tgt.slice(0, 6) + '…'; await readLive(); }
+            catch (e) { $('wm').className = 'msg err'; $('wm').textContent = '✗ ' + (e.shortMessage || e.message); }
+        }
+        async function doProof() {
+            $('wm').className = 'msg'; $('wm').textContent = 'Signing submitProof (ENS, type 2)…';
+            try {
+                const hash = ethers.id("ens-claim-" + user + "-" + Date.now()); const tx = await v2c.submitProof(2, hash); await tx.wait();
+                $('wm').className = 'msg ok'; $('wm').textContent = '✓ consented proof submitted — ceiling now opens to Gold (799).'; await readLive();
+            }
+            catch (e) { $('wm').className = 'msg err'; $('wm').textContent = '✗ ' + (e.shortMessage || e.message); }
+        }
+        $('conn').addEventListener('click', connect);
+        $('kick').addEventListener('click', doKick);
+        $('proof').addEventListener('click', doProof);
+        if (window.ethereum) { window.ethereum.on && window.ethereum.on('accountsChanged', () => { user = null; $('who').textContent = 'not connected'; $('cats').style.display = 'none'; }); }
+    </script>
+
+<footer class="proven-footer">
+    Proven &mdash; verified, secure, decentralized. Built on GIWA Sepolia (chain 91342).
+</footer>
+
+</body>
+
+</html>

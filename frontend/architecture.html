@@ -1,0 +1,1968 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proven — The trust layer for GIWA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --ink: #0a0e0c;
+            --panel: #0f1512;
+            --panel2: #131b16;
+            --panel3: #17211b;
+            --line: #223029;
+            --line2: #2d4036;
+            --bone: #ece7da;
+            --text: #eaf2ec;
+            --muted: #8aa396;
+            --faint: #5d7568;
+            --jade: #6fe3b0;
+            --jade-dim: #2f6f54;
+            --jade-deep: #0e2a20;
+            --gold: #e7c277;
+            --slate: #86b6cb;
+            --rose: #e0918f;
+            --disp: 'Syne', sans-serif;
+            --body: 'IBM Plex Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            background: var(--ink);
+            color: var(--text);
+            font-family: var(--body);
+            font-size: 16px;
+            line-height: 1.62;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden
+        }
+
+        ::selection {
+            background: var(--jade);
+            color: var(--ink)
+        }
+
+        /* ambient */
+        .grain {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: .05;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
+        }
+
+        .gridbg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: .5;
+            background: radial-gradient(120% 80% at 8% -5%, #13241c 0%, transparent 55%), radial-gradient(90% 70% at 100% 110%, #1a160c 0%, transparent 50%), var(--ink)
+        }
+
+        .gridbg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(var(--line) 1px, transparent 1.4px);
+            background-size: 34px 34px;
+            animation: pan 50s linear infinite
+        }
+
+        @keyframes pan {
+            to {
+                background-position: 34px 68px
+            }
+        }
+
+        .scan {
+            position: fixed;
+            left: 0;
+            width: 100%;
+            height: 30vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: .45;
+            background: linear-gradient(to bottom, transparent, rgba(111, 227, 176, .05), transparent);
+            animation: scan 9s linear infinite
+        }
+
+        @keyframes scan {
+            0% {
+                top: -30vh
+            }
+
+            100% {
+                top: 100vh
+            }
+        }
+
+        .dot {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--jade);
+            opacity: .3;
+            z-index: 0;
+            box-shadow: 0 0 8px var(--jade);
+            animation: float 14s ease-in-out infinite
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-26px)
+            }
+        }
+
+        .prog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--jade), var(--gold));
+            z-index: 60;
+            width: 0;
+            box-shadow: 0 0 10px var(--jade)
+        }
+
+        /* ticker */
+        .ticker {
+            position: relative;
+            z-index: 5;
+            background: rgba(10, 14, 12, .86);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--line);
+            overflow: hidden
+        }
+
+        .ticker .track {
+            display: inline-flex;
+            white-space: nowrap;
+            animation: marq 46s linear infinite;
+            font-family: var(--mono);
+            font-size: .68rem;
+            letter-spacing: .05em;
+            color: var(--muted);
+            padding: 8px 0
+        }
+
+        .ticker .track span {
+            padding: 0 20px
+        }
+
+        .ticker .track b {
+            color: var(--jade);
+            font-weight: 500
+        }
+
+        .ticker .track i {
+            color: var(--gold);
+            font-style: normal
+        }
+
+        @keyframes marq {
+            to {
+                transform: translateX(-50%)
+            }
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 2;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 30px
+        }
+
+        @media(max-width:680px) {
+            .wrap {
+                padding: 0 18px
+            }
+        }
+
+        /* OPENER — rail + live diagram (the architecture IS the opener) */
+        .open {
+            display: grid;
+            grid-template-columns: minmax(240px, 330px) 1fr;
+            gap: 40px;
+            align-items: start;
+            padding: 56px 0 30px
+        }
+
+        @media(max-width:920px) {
+            .open {
+                grid-template-columns: 1fr;
+                gap: 26px
+            }
+        }
+
+        /* the rail is a container-query context so the wordmark scales to ITS width, never the viewport */
+        .rail {
+            min-width: 0;
+            container-type: inline-size
+        }
+
+        .rail .kick {
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .3em;
+            color: var(--jade);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap
+        }
+
+        .rail .kick .p {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--jade);
+            box-shadow: 0 0 0 0 rgba(111, 227, 176, .6);
+            animation: pulse 2.4s infinite
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(111, 227, 176, .5)
+            }
+
+            70% {
+                box-shadow: 0 0 0 9px rgba(111, 227, 176, 0)
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(111, 227, 176, 0)
+            }
+        }
+
+        .rail .wm {
+            font-family: var(--disp);
+            font-weight: 800;
+            line-height: .82;
+            letter-spacing: -.04em;
+            text-transform: uppercase;
+            margin: 16px 0 0;
+            white-space: nowrap;
+            max-width: 100%;
+            font-size: clamp(2.2rem, 4.2vw, 4rem);
+            /* fallback for browsers without container queries */
+            font-size: clamp(2.2rem, 17cqw, 5rem);
+            /* scales to the rail's own width — guaranteed to fit */
+        }
+
+        .rail .wm em {
+            font-style: normal;
+            color: var(--jade)
+        }
+
+        .rail .rule {
+            width: 58px;
+            height: 3px;
+            background: var(--jade);
+            border-radius: 3px;
+            margin: 16px 0
+        }
+
+        .rail .thesis {
+            color: var(--muted);
+            font-size: 1.02rem;
+            max-width: 30ch
+        }
+
+        .rail .thesis b {
+            color: var(--bone);
+            font-weight: 600
+        }
+
+        .rail .doc {
+            margin-top: 16px;
+            font-family: var(--mono);
+            font-size: .64rem;
+            letter-spacing: .16em;
+            color: var(--faint);
+            text-transform: uppercase;
+            line-height: 1.9
+        }
+
+        .rail .doc b {
+            color: var(--muted)
+        }
+
+        /* diagram */
+        .diagram {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: linear-gradient(180deg, var(--panel2), var(--panel));
+            padding: 14px;
+            position: relative;
+            overflow: hidden
+        }
+
+        .diagram .dtag {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            font-family: var(--mono);
+            font-size: .56rem;
+            letter-spacing: .22em;
+            color: var(--faint);
+            text-transform: uppercase;
+            z-index: 3
+        }
+
+        .diagram .dlegend {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            font-family: var(--mono);
+            font-size: .56rem;
+            letter-spacing: .1em;
+            color: var(--faint);
+            z-index: 3;
+            display: flex;
+            gap: 12px
+        }
+
+        .diagram .dlegend i {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle
+        }
+
+        .diagram svg {
+            width: 100%;
+            height: auto;
+            display: block
+        }
+
+        .nd rect {
+            fill: var(--panel3);
+            stroke: var(--line2);
+            stroke-width: 1.4;
+            transition: .25s;
+            cursor: pointer
+        }
+
+        .nd text {
+            font-family: var(--mono);
+            fill: var(--bone);
+            pointer-events: none
+        }
+
+        .nd .nm {
+            font-size: 13px;
+            font-weight: 700
+        }
+
+        .nd .rl {
+            font-size: 8.5px;
+            fill: var(--muted);
+            letter-spacing: .08em
+        }
+
+        .nd.up rect {
+            fill: #0c1712
+        }
+
+        .nd.engine rect {
+            fill: var(--jade-deep);
+            stroke: var(--jade-dim);
+            stroke-width: 1.8
+        }
+
+        .nd.engine .nm {
+            fill: var(--jade)
+        }
+
+        .nd.cons rect {
+            fill: #10160f
+        }
+
+        .nd:hover rect {
+            stroke: var(--jade);
+            filter: drop-shadow(0 0 8px rgba(111, 227, 176, .35))
+        }
+
+        .nd.active rect {
+            stroke: var(--jade);
+            stroke-width: 2.4;
+            filter: drop-shadow(0 0 12px rgba(111, 227, 176, .5))
+        }
+
+        .edge {
+            fill: none;
+            stroke: var(--line2);
+            stroke-width: 1.6
+        }
+
+        .flow {
+            fill: var(--jade);
+            filter: drop-shadow(0 0 4px var(--jade))
+        }
+
+        .tierlab {
+            font-family: var(--mono);
+            font-size: 8px;
+            fill: var(--faint);
+            letter-spacing: .18em
+        }
+
+        /* node detail */
+        .detail {
+            margin-top: 14px;
+            border: 1px solid var(--line2);
+            border-radius: 10px;
+            background: var(--panel);
+            padding: 16px 18px;
+            min-height: 150px;
+            transition: .2s
+        }
+
+        .detail .dh {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .detail .dn {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: 1.2rem
+        }
+
+        .detail .drole {
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .14em;
+            color: var(--gold);
+            text-transform: uppercase
+        }
+
+        .detail .daddr {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 10px 0 12px;
+            font-family: var(--mono);
+            font-size: .74rem;
+            color: var(--muted);
+            flex-wrap: wrap
+        }
+
+        .detail .daddr a {
+            color: var(--slate);
+            text-decoration: none;
+            word-break: break-all
+        }
+
+        .detail .daddr a:hover {
+            color: var(--jade)
+        }
+
+        .cp {
+            font-family: var(--mono);
+            font-size: .56rem;
+            letter-spacing: .06em;
+            color: var(--faint);
+            background: transparent;
+            border: 1px solid var(--line2);
+            border-radius: 4px;
+            padding: 3px 7px;
+            cursor: pointer;
+            transition: .18s;
+            white-space: nowrap
+        }
+
+        .cp:hover {
+            border-color: var(--jade);
+            color: var(--jade)
+        }
+
+        .cp.ok {
+            border-color: var(--jade);
+            color: var(--jade);
+            background: var(--jade-deep)
+        }
+
+        .detail .dfns {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px
+        }
+
+        .detail .dfns li {
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--jade);
+            background: var(--jade-deep);
+            border: 1px solid var(--jade-dim);
+            border-radius: 5px;
+            padding: 3px 8px
+        }
+
+        .detail .dinv {
+            font-size: .9rem;
+            color: var(--muted);
+            border-left: 2px solid var(--jade-dim);
+            padding-left: 12px
+        }
+
+        .detail .dinv b {
+            color: var(--bone)
+        }
+
+        /* sections */
+        .sec {
+            padding: 50px 0 8px;
+            border-top: 1px solid var(--line);
+            margin-top: 34px;
+            position: relative
+        }
+
+        .sec .num {
+            font-family: var(--disp);
+            font-weight: 800;
+            font-size: clamp(3.4rem, 12vw, 8rem);
+            line-height: .7;
+            color: transparent;
+            -webkit-text-stroke: 1.3px var(--line2);
+            letter-spacing: -.04em;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            user-select: none;
+            transition: .4s
+        }
+
+        .sec:hover .num {
+            -webkit-text-stroke-color: var(--jade-dim)
+        }
+
+        .sec .ey {
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .26em;
+            color: var(--gold);
+            text-transform: uppercase
+        }
+
+        .sec h2 {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: clamp(1.7rem, 5vw, 2.8rem);
+            line-height: .98;
+            letter-spacing: -.02em;
+            margin: 8px 0 0;
+            max-width: 20ch
+        }
+
+        .sec h2 .j {
+            color: var(--jade)
+        }
+
+        .sec .sub {
+            color: var(--muted);
+            max-width: 64ch;
+            margin-top: 12px;
+            font-size: 1.04rem
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 22px
+        }
+
+        @media(max-width:780px) {
+            .grid2 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .grid3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 22px
+        }
+
+        @media(max-width:780px) {
+            .grid3 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .card {
+            background: linear-gradient(180deg, var(--panel2), var(--panel));
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: .25s
+        }
+
+        .card:hover {
+            border-color: var(--line2);
+            transform: translateY(-2px)
+        }
+
+        .card .tag {
+            font-family: var(--mono);
+            font-size: .56rem;
+            letter-spacing: .2em;
+            color: var(--faint);
+            text-transform: uppercase
+        }
+
+        .card h3 {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: 1.16rem;
+            margin: 6px 0 12px
+        }
+
+        .feat {
+            list-style: none
+        }
+
+        .feat li {
+            position: relative;
+            padding: 8px 0 8px 24px;
+            border-top: 1px solid var(--line);
+            font-size: .92rem;
+            color: var(--muted)
+        }
+
+        .feat li:first-child {
+            border-top: none
+        }
+
+        .feat li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 15px;
+            width: 11px;
+            height: 2px;
+            background: var(--jade)
+        }
+
+        .feat li b {
+            color: var(--bone);
+            font-weight: 600
+        }
+
+        .feat li code,
+        .mono {
+            font-family: var(--mono);
+            font-size: .82em;
+            color: var(--jade);
+            background: var(--jade-deep);
+            padding: 1px 6px;
+            border-radius: 4px
+        }
+
+        /* stat tiles */
+        .statrow {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 22px
+        }
+
+        @media(max-width:780px) {
+            .statrow {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        .stat {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 15px;
+            transition: .25s
+        }
+
+        .stat:hover {
+            border-color: var(--jade-dim);
+            transform: translateY(-3px)
+        }
+
+        .stat .k {
+            font-family: var(--mono);
+            font-size: .55rem;
+            letter-spacing: .16em;
+            color: var(--faint);
+            text-transform: uppercase
+        }
+
+        .stat .v {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-top: 5px
+        }
+
+        .stat .v.j {
+            color: var(--jade)
+        }
+
+        .stat .v.g {
+            color: var(--gold)
+        }
+
+        .stat .v.s {
+            color: var(--slate)
+        }
+
+        .stat .n {
+            font-size: .72rem;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        /* formula card */
+        .formula {
+            font-family: var(--mono);
+            font-size: clamp(.8rem, 2.4vw, 1.05rem);
+            color: var(--bone);
+            background: #0a0d0c;
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--jade);
+            border-radius: 0 8px 8px 0;
+            padding: 16px 18px;
+            line-height: 1.8;
+            overflow-x: auto
+        }
+
+        .formula .op {
+            color: var(--gold)
+        }
+
+        .formula .fn {
+            color: var(--jade)
+        }
+
+        .formula .cm {
+            color: var(--faint)
+        }
+
+        /* weight bar */
+        .wbar {
+            display: flex;
+            height: 30px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--line2);
+            margin: 14px 0 8px
+        }
+
+        .wbar .seg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--mono);
+            font-size: .66rem;
+            color: var(--ink);
+            font-weight: 700;
+            transition: .3s
+        }
+
+        .wbar .seg:hover {
+            filter: brightness(1.12)
+        }
+
+        .wbar .s1 {
+            background: var(--jade);
+            flex: 400
+        }
+
+        .wbar .s2 {
+            background: var(--gold);
+            flex: 300
+        }
+
+        .wbar .s3 {
+            background: var(--slate);
+            flex: 200
+        }
+
+        .wbar .s4 {
+            background: #c79bd6;
+            flex: 100
+        }
+
+        .wleg {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-family: var(--mono);
+            font-size: .68rem;
+            color: var(--muted)
+        }
+
+        .wleg i {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 2px;
+            margin-right: 6px;
+            vertical-align: middle
+        }
+
+        /* tables */
+        .tscroll {
+            overflow-x: auto;
+            margin-top: 18px;
+            border: 1px solid var(--line);
+            border-radius: 10px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .84rem;
+            min-width: 520px
+        }
+
+        th,
+        td {
+            padding: 11px 14px;
+            text-align: left;
+            border-top: 1px solid var(--line);
+            vertical-align: top
+        }
+
+        th {
+            font-family: var(--mono);
+            font-size: .57rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--faint);
+            background: var(--panel);
+            white-space: nowrap
+        }
+
+        td {
+            color: var(--muted)
+        }
+
+        td b {
+            color: var(--bone);
+            font-weight: 600
+        }
+
+        td.j {
+            color: var(--jade)
+        }
+
+        td.g {
+            color: var(--gold)
+        }
+
+        td.s {
+            color: var(--slate)
+        }
+
+        td.r {
+            color: var(--rose)
+        }
+
+        tr:hover td {
+            background: var(--panel2)
+        }
+
+        td.colhi {
+            background: var(--jade-deep) !important;
+            color: var(--jade);
+            font-weight: 600
+        }
+
+        th.colhi {
+            background: var(--jade-deep);
+            color: var(--jade)
+        }
+
+        .badge {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: .58rem;
+            letter-spacing: .06em;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase
+        }
+
+        .badge.v1 {
+            background: var(--jade-deep);
+            color: var(--jade);
+            border: 1px solid var(--jade-dim)
+        }
+
+        .badge.v2 {
+            background: #1a160c;
+            color: var(--gold);
+            border: 1px solid #4a3c1c
+        }
+
+        /* tier scrubber */
+        .scrub {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 16px 0 4px
+        }
+
+        .scrub button {
+            font-family: var(--mono);
+            font-size: .72rem;
+            letter-spacing: .06em;
+            color: var(--muted);
+            background: var(--panel);
+            border: 1px solid var(--line2);
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: .2s
+        }
+
+        .scrub button:hover {
+            border-color: var(--jade);
+            color: var(--jade)
+        }
+
+        .scrub button.on {
+            background: var(--jade);
+            color: var(--ink);
+            border-color: var(--jade);
+            font-weight: 700
+        }
+
+        /* attack timeline */
+        .atk {
+            position: relative;
+            margin-top: 18px;
+            padding-left: 28px
+        }
+
+        .atk::before {
+            content: "";
+            position: absolute;
+            left: 6px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(var(--rose), var(--jade-dim))
+        }
+
+        .atk .step {
+            position: relative;
+            padding: 10px 0 12px
+        }
+
+        .atk .step::before {
+            content: "";
+            position: absolute;
+            left: -28px;
+            top: 16px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--ink);
+            border: 2px solid var(--rose);
+            box-shadow: 0 0 0 4px var(--ink)
+        }
+
+        .atk .step.fix::before {
+            border-color: var(--jade)
+        }
+
+        .atk .step .h {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: 1rem
+        }
+
+        .atk .step .h .r {
+            color: var(--rose)
+        }
+
+        .atk .step .h .j {
+            color: var(--jade)
+        }
+
+        .atk .step .d {
+            font-size: .88rem;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        .atk .step .d code {
+            font-family: var(--mono);
+            color: var(--jade);
+            background: var(--jade-deep);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: .82em
+        }
+
+        /* pipeline */
+        .pipe {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            margin-top: 20px;
+            counter-reset: pp
+        }
+
+        .pipe .ps {
+            flex: 1;
+            min-width: 150px;
+            position: relative;
+            padding: 14px 16px 14px 0;
+            border-top: 2px solid var(--line);
+            transition: .25s
+        }
+
+        .pipe .ps:hover {
+            border-top-color: var(--jade)
+        }
+
+        .pipe .ps::before {
+            counter-increment: pp;
+            content: counter(pp, decimal-leading-zero);
+            position: absolute;
+            top: -12px;
+            left: 0;
+            font-family: var(--mono);
+            font-size: .62rem;
+            color: var(--jade);
+            background: var(--ink);
+            padding: 0 6px
+        }
+
+        .pipe .ps .h {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: .98rem;
+            margin-top: 6px
+        }
+
+        .pipe .ps .d {
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--muted);
+            margin-top: 4px;
+            line-height: 1.5
+        }
+
+        .pull {
+            margin: 34px 0;
+            padding: 24px 0 24px 24px;
+            border-left: 3px solid var(--jade);
+            font-family: var(--disp);
+            font-weight: 600;
+            font-size: clamp(1.3rem, 3.8vw, 1.9rem);
+            line-height: 1.28;
+            color: var(--bone)
+        }
+
+        .pull .by {
+            display: block;
+            margin-top: 11px;
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .14em;
+            color: var(--faint);
+            text-transform: uppercase;
+            font-weight: 400
+        }
+
+        .note {
+            margin-top: 16px;
+            font-family: var(--mono);
+            font-size: .74rem;
+            color: var(--muted);
+            line-height: 1.7;
+            border: 1px dashed var(--line2);
+            border-radius: 8px;
+            padding: 15px
+        }
+
+        .note b {
+            color: var(--gold)
+        }
+
+        .foot {
+            padding: 36px 0 80px;
+            border-top: 1px solid var(--line);
+            margin-top: 36px
+        }
+
+        .foot h4 {
+            font-family: var(--mono);
+            font-size: .58rem;
+            letter-spacing: .22em;
+            color: var(--faint);
+            text-transform: uppercase;
+            margin-bottom: 12px
+        }
+
+        .foot a {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--muted);
+            text-decoration: none;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--line);
+            transition: .18s
+        }
+
+        .foot a:hover {
+            color: var(--jade);
+            padding-left: 6px
+        }
+
+        .foot a .lab {
+            color: var(--bone)
+        }
+
+        .foot .closer {
+            margin-top: 24px;
+            text-align: center;
+            font-family: var(--disp);
+            font-weight: 800;
+            font-size: 1.3rem;
+            letter-spacing: .04em;
+            text-transform: uppercase
+        }
+
+        .foot .closer em {
+            font-style: normal;
+            color: var(--jade)
+        }
+
+        .foot .meta {
+            text-align: center;
+            font-family: var(--mono);
+            font-size: .64rem;
+            color: var(--faint);
+            line-height: 2;
+            margin-top: 10px
+        }
+
+        .foot .meta a {
+            display: inline;
+            border: none;
+            padding: 0
+        }
+
+        .foot .meta a:hover {
+            padding-left: 0
+        }
+
+        /* reveal */
+        .js .rv {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity .7s cubic-bezier(.2, .7, .2, 1), transform .7s cubic-bezier(.2, .7, .2, 1)
+        }
+
+        .js .rv.in {
+            opacity: 1;
+            transform: none
+        }
+
+        @media (prefers-reduced-motion:reduce) {
+
+            .gridbg::after,
+            .scan,
+            .dot,
+            .ticker .track,
+            .rail .kick .p,
+            .flow {
+                animation: none !important
+            }
+
+            .js .rv {
+                opacity: 1 !important;
+                transform: none !important
+            }
+        }
+
+        @media print {
+
+            .grain,
+            .gridbg,
+            .scan,
+            .dot,
+            .ticker,
+            .prog {
+                display: none !important
+            }
+
+            body {
+                background: #0a0e0c;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact
+            }
+
+            .js .rv {
+                opacity: 1 !important;
+                transform: none !important
+            }
+
+            .sec,
+            .card,
+            .open,
+            .detail {
+                break-inside: avoid
+            }
+
+            .wrap {
+                padding: 0 16px
+            }
+        }
+
+        @media(max-width:920px) {
+            .rail {
+                container-type: normal;
+                overflow: visible
+            }
+        }
+    </style>
+  <link rel="icon" type="image/png" href="assets/proven-icon.png" />
+</head>
+
+<body>
+
+<style>
+    .proven-nav {
+        position: sticky;
+        top: 0;
+        z-index: 10000;
+        background: #070c14;
+        border-bottom: 1px solid var(--jade, #6fe3b0);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+    }
+    .proven-nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .proven-nav-logo {
+        width: 32px;
+        height: 32px;
+    }
+    .proven-nav-title {
+        font-family: var(--disp, 'Syne', sans-serif);
+        font-weight: 800;
+        font-size: 22px;
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        letter-spacing: 1px;
+    }
+    .proven-nav-tag {
+        font-size: 13px;
+        color: var(--jade, #6fe3b0);
+        margin-left: 4px;
+        opacity: 0.9;
+    }
+    .proven-nav-right {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+    .proven-nav-link {
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .proven-nav-link:hover {
+        color: var(--jade, #6fe3b0);
+    }
+    .proven-footer {
+        text-align: center;
+        padding: 40px 20px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+        font-size: 14px;
+        color: var(--muted, #8aa396);
+        border-top: 1px solid var(--line, #223029);
+        background: var(--bg, #0a0e0c);
+        margin-top: auto;
+    }
+</style>
+
+<nav class="proven-nav">
+    <div class="proven-nav-left">
+        <img src="assets/proven-icon.png" alt="Proven Icon" class="proven-nav-logo" />
+        <a href="index.html" class="proven-nav-title">PROVEN</a>
+        <span class="proven-nav-tag">the trust layer for GIWA</span>
+    </div>
+    <div class="proven-nav-right">
+        <a href="index.html" class="proven-nav-link">App</a>
+        <a href="doc-score-v2.html" class="proven-nav-link">Score V2</a>
+        <a href="api-quickstart.html" class="proven-nav-link">Docs</a>
+        <a href="architecture.html" class="proven-nav-link">Architecture</a>
+        <a href="story.html" class="proven-nav-link">Story</a>
+        <a href="deck.html" class="proven-nav-link">Deck</a>
+    </div>
+</nav>
+
+    <div class="gridbg"></div>
+    <div class="scan"></div>
+    <div class="grain"></div>
+    <div class="dot" style="top:14%;left:6%;animation-delay:0s"></div>
+    <div class="dot" style="top:66%;left:93%;animation-delay:3s"></div>
+    <div class="dot" style="top:82%;left:20%;animation-delay:6s"></div>
+    <div class="dot" style="top:34%;left:72%;animation-delay:9s"></div>
+    <div class="prog" id="prog"></div>
+
+    <div class="ticker">
+        <div class="track">
+            <span><b>●</b> PROVEN · ARCHITECTURE</span><span>GIWA Sepolia · OP Stack ·
+                <i>91342</i></span><span>DojangScore <i>0xefE4…d48f</i></span><span>WonVault
+                <i>0xEE4E…69F5</i></span><span>GIWASwap <i>0x8813…0059</i></span><span>reads DojangScroll
+                <i>0xd507…17B9</i> + EAS <i>0x4200…0021</i></span><span>attester <b>Upbit Korea</b></span><span>solidity
+                <i>0.8.28</i> · OZ <i>v5</i></span>
+            <span><b>●</b> PROVEN · ARCHITECTURE</span><span>GIWA Sepolia · OP Stack ·
+                <i>91342</i></span><span>DojangScore <i>0xefE4…d48f</i></span><span>WonVault
+                <i>0xEE4E…69F5</i></span><span>GIWASwap <i>0x8813…0059</i></span><span>reads DojangScroll
+                <i>0xd507…17B9</i> + EAS <i>0x4200…0021</i></span><span>attester <b>Upbit Korea</b></span><span>solidity
+                <i>0.8.28</i> · OZ <i>v5</i></span>
+        </div>
+    </div>
+
+    <div class="wrap">
+
+        <!-- OPENER -->
+        <header class="open">
+            <div class="rail rv">
+                <div class="kick"><span class="p"></span>PRODUCT ARCHITECTURE · TECHNICAL EXECUTION</div>
+                <h1 class="wm">PRO<em>V</em>EN</h1>
+                <div class="rule"></div>
+                <p class="thesis">One trust source, read once, priced everywhere. The diagram at right <b>is</b> the
+                    architecture — click any node to read the contract behind it.</p>
+                <div class="doc"><b>doc</b> · architecture one-pager<br><b>chain</b> · GIWA Sepolia ·
+                    91342<br><b>build</b> · Hardhat 2.29 · OZ v5<br><b>status</b> · deployed · on-chain</div>
+            </div>
+
+            <div class="diagram rv">
+                <span class="dtag">live data-flow · click a node</span>
+                <span class="dlegend"><span><i style="background:var(--jade)"></i>signal</span><span><i
+                            style="background:var(--line2)"></i>read</span></span>
+                <svg viewBox="0 0 960 540" role="img" aria-label="Proven architecture data flow">
+                    <defs>
+                        <path id="e1" class="edge" d="M160,96 C160,176 480,182 480,250" />
+                        <path id="e2" class="edge" d="M480,96 L480,250" />
+                        <path id="e3" class="edge" d="M800,96 C800,176 480,182 480,250" />
+                        <path id="e4" class="edge" d="M404,322 C404,392 290,392 290,452" />
+                        <path id="e5" class="edge" d="M556,322 C556,392 680,392 680,452" />
+                    </defs>
+                    <text class="tierlab" x="20" y="40">TIER A · TRUSTED SOURCES</text>
+                    <text class="tierlab" x="20" y="232">TIER B · TRUST ENGINE</text>
+                    <text class="tierlab" x="20" y="436">TIER C · CONSUMERS</text>
+
+                    <circle class="flow" r="3.4">
+                        <animateMotion dur="3.2s" repeatCount="indefinite" begin="0s">
+                            <mpath href="#e1" />
+                        </animateMotion>
+                    </circle>
+                    <circle class="flow" r="3.4">
+                        <animateMotion dur="2.6s" repeatCount="indefinite" begin=".6s">
+                            <mpath href="#e2" />
+                        </animateMotion>
+                    </circle>
+                    <circle class="flow" r="3.4">
+                        <animateMotion dur="3.2s" repeatCount="indefinite" begin="1.2s">
+                            <mpath href="#e3" />
+                        </animateMotion>
+                    </circle>
+                    <circle class="flow" r="3.4">
+                        <animateMotion dur="2.8s" repeatCount="indefinite" begin=".3s">
+                            <mpath href="#e4" />
+                        </animateMotion>
+                    </circle>
+                    <circle class="flow" r="3.4">
+                        <animateMotion dur="2.8s" repeatCount="indefinite" begin="1s">
+                            <mpath href="#e5" />
+                        </animateMotion>
+                    </circle>
+
+                    <g class="nd up" data-key="upbit">
+                        <rect x="62" y="48" width="196" height="48" rx="8" /><text class="nm" x="160" y="70"
+                            text-anchor="middle">Upbit Korea</text><text class="rl" x="160" y="84"
+                            text-anchor="middle">ATTESTER · KYC ROOT</text>
+                    </g>
+                    <g class="nd up" data-key="scroll">
+                        <rect x="372" y="48" width="216" height="48" rx="8" /><text class="nm" x="480" y="70"
+                            text-anchor="middle">DojangScroll</text><text class="rl" x="480" y="84"
+                            text-anchor="middle">ATTESTATION INDEX</text>
+                    </g>
+                    <g class="nd up" data-key="eas">
+                        <rect x="712" y="48" width="176" height="48" rx="8" /><text class="nm" x="800" y="70"
+                            text-anchor="middle">EAS predeploy</text><text class="rl" x="800" y="84"
+                            text-anchor="middle">getAttestation(uid)</text>
+                    </g>
+
+                    <g class="nd engine" data-key="score">
+                        <rect x="318" y="250" width="324" height="72" rx="10" /><text class="nm" x="480" y="280"
+                            text-anchor="middle">DojangScore</text><text class="rl" x="480" y="298"
+                            text-anchor="middle">score() · tierOf() · 0–1000</text>
+                    </g>
+
+                    <g class="nd cons" data-key="vault">
+                        <rect x="162" y="452" width="256" height="64" rx="9" /><text class="nm" x="290" y="478"
+                            text-anchor="middle">WonVault</text><text class="rl" x="290" y="494"
+                            text-anchor="middle">ERC-4626 · ENTRY FEE BY TIER</text>
+                    </g>
+                    <g class="nd cons" data-key="swap">
+                        <rect x="552" y="452" width="256" height="64" rx="9" /><text class="nm" x="680" y="478"
+                            text-anchor="middle">GIWASwap</text><text class="rl" x="680" y="494"
+                            text-anchor="middle">x·y=k · SWAP FEE BY TIER</text>
+                    </g>
+                </svg>
+
+                <div class="detail" id="detail" aria-live="polite"></div>
+            </div>
+        </header>
+
+        <!-- §01 STACK AT A GLANCE -->
+        <section class="sec rv">
+            <div class="num">01</div>
+            <div class="ey">The stack at a glance</div>
+            <h2>Six contracts. <span class="j">One chain.</span></h2>
+            <p class="sub">Everything Proven owns is deployed and verifiable on GIWA Sepolia. The two upstream contracts
+                are GIWA's — we read them, we never rebuild them.</p>
+            <div class="statrow">
+                <div class="stat">
+                    <div class="k">Chain / stack</div>
+                    <div class="v j">91342</div>
+                    <div class="n">GIWA Sepolia · OP Stack</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Compiler</div>
+                    <div class="v">0.8.28</div>
+                    <div class="n">optimizer on · evm paris</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Our contracts</div>
+                    <div class="v g">4</div>
+                    <div class="n">score · vault · factory · pool</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Attestations read</div>
+                    <div class="v s">4</div>
+                    <div class="n">addr · balance · age · code</div>
+                </div>
+            </div>
+            <div class="statrow">
+                <div class="stat">
+                    <div class="k">Libraries</div>
+                    <div class="v">OZ v5</div>
+                    <div class="n">ERC-4626 · ERC-20 · Math</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Toolchain</div>
+                    <div class="v">HH 2.29</div>
+                    <div class="n">deploy · redeploy · verify</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Frontend</div>
+                    <div class="v j">vanilla</div>
+                    <div class="n">ethers v6 · zero build step</div>
+                </div>
+                <div class="stat">
+                    <div class="k">PII on-chain</div>
+                    <div class="v s">0</div>
+                    <div class="n">signed booleans only</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- §02 DOJANGSCORE -->
+        <section class="sec rv">
+            <div class="num">02</div>
+            <div class="ey">Tier B · the trust engine</div>
+            <h2>Dojang<span class="j">Score</span></h2>
+            <p class="sub">A pure read layer: it composes four Dojang attestations into one number and four tiers. No
+                state of its own about users — only a cache of owner-set manual scores for bootstrapping.</p>
+            <div class="grid2">
+                <div class="card">
+                    <div class="tag">Composite · exact</div>
+                    <h3>How the 0–1000 is built</h3>
+                    <div class="formula"><span class="fn">score</span>(w) = <span class="fn">min</span>(<span
+                            class="op">1000</span>, manual[w] <span class="op">||</span> Σ active_weights)<br><span
+                            class="cm">// each attestation read is try/catch-wrapped —</span><br><span class="cm">// a
+                            missing / revoked proof degrades, never reverts</span></div>
+                    <div class="wbar">
+                        <div class="seg s1">400</div>
+                        <div class="seg s2">300</div>
+                        <div class="seg s3">200</div>
+                        <div class="seg s4">100</div>
+                    </div>
+                    <div class="wleg"><span><i style="background:var(--jade)"></i>Verified Address · 400</span><span><i
+                                style="background:var(--gold)"></i>Verified Balance · 300</span><span><i
+                                style="background:var(--slate)"></i>Account Age &gt;90d · 200</span><span><i
+                                style="background:#c79bd6"></i>Verified Code · 100</span></div>
+                </div>
+                <div class="card">
+                    <div class="tag">Tiers · downstream effect</div>
+                    <h3>One number, many gates</h3>
+                    <ul class="feat">
+                        <li><b>Unverified</b> &lt;200 · <b>Silver</b> 200–499 · <b>Gold</b> 500–799 · <b>Platinum</b>
+                            800–1000.</li>
+                        <li><code>tierOf()</code> / <code>tierName()</code> are the only calls consumers need.</li>
+                        <li>Account age is read from <b>EAS</b> <code>getAttestation(uid).time</code> — rewards wallets
+                            that aren't fresh/Sybil.</li>
+                        <li><b>Graceful reads</b>: every upstream call is wrapped, so a flaky attester degrades a score
+                            instead of bricking a query.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card" style="margin-top:16px">
+                <div class="tag">Extensibility · v2 design</div>
+                <h3>Adding on-chain actions without redeploying the engine</h3>
+                <ul class="feat">
+                    <li><b>Pluggable signal registry:</b> a <code>recordSignal(id, wallet, value)</code> gated to a
+                        whitelist of <code>signalReporter</code> contracts (each protocol registers itself), each signal
+                        carrying a governance-set weight + decay half-life.</li>
+                    <li>Composite becomes <code>min(1000, baseAttestation + Σ decayed_signal_contributions)</code> — so
+                        a wallet that swaps 5× and provides LP accrues "activity trust" that <b>decays if it goes
+                            idle</b>, resisting one-time farming.</li>
+                    <li>Trust assumption added: reporters must be honest — mitigated by whitelist + per-signal caps +
+                        the attestation floor that already exists.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- §03 WONVAULT -->
+        <section class="sec rv">
+            <div class="num">03</div>
+            <div class="ey">Tier C · the yield engine</div>
+            <h2>Won<span class="j">Vault</span></h2>
+            <p class="sub">A standard ERC-4626 tokenized vault — which is the whole point: any wallet, aggregator or
+                router integrates with zero custom code, and the accounting is audited library code, not hand-rolled.
+            </p>
+            <div class="grid2">
+                <div class="card">
+                    <div class="tag">Share-price engine</div>
+                    <h3>Yield = the price rising</h3>
+                    <div class="formula"><span class="fn">sharePrice</span> = (assets + virtualAssets) <span
+                            class="op">/</span> (shares + virtualShares)<br><span class="cm">// yield enters as assets
+                            growing while shares stay flat</span><br><span class="cm">// → every existing share redeems
+                            for more</span></div>
+                    <ul class="feat">
+                        <li><code>_decimalsOffset() = 18</code> injects virtual shares + assets — the inflation /
+                            first-depositor protection (Morpho · Euler v2 · OZ).</li>
+                        <li><code>deposit()</code> skims the tiered entry fee to treasury, then hands the net to
+                            <code>super.deposit()</code> so the share math is the library's, verbatim.
+                        </li>
+                        <li>Testnet yield is <b>simulated</b> (open <code>mint()</code> into the vault) so the engine is
+                            visible on camera; mainnet removes the open mint and gates value through a role-controlled
+                            <code>harvest()</code>.
+                        </li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="tag">The scar we ship with</div>
+                    <h3>The 1e21, told in three steps</h3>
+                    <div class="atk">
+                        <div class="step">
+                            <div class="h"><span class="r">① deposit minted 0 shares</span></div>
+                            <div class="d">With the offset off, an empty vault took the assets and issued no receipt —
+                                money in the box, ownerless.</div>
+                        </div>
+                        <div class="step">
+                            <div class="h"><span class="r">② price → 1.09e+21</span></div>
+                            <div class="d">Trapped assets ÷ ~0 shares = astronomical. The "any shareholders?" guard saw
+                                supply 0 and refused, while 1194 TKRW sat inside.</div>
+                        </div>
+                        <div class="step fix">
+                            <div class="h"><span class="j">③ redeploy + reader clamp</span></div>
+                            <div class="d"><code>_decimalsOffset()=18</code> closes the rounding attack; the dashboard
+                                refuses to render an out-of-band price (<code>—</code> / "degraded") — defense-in-depth
+                                that caught it before real money.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- §04 GIWASWAP -->
+        <section class="sec rv">
+            <div class="num">04</div>
+            <div class="ey">Tier C · the trading floor</div>
+            <h2>GIWA<span class="j">Swap</span></h2>
+            <p class="sub">Factory + Pool, constant-product, with the one feature no other chain can offer: the swap fee
+                is a function of the swapper's trust tier.</p>
+            <div class="grid2">
+                <div class="card">
+                    <div class="tag">Pricing · exact</div>
+                    <h3>x · y = k, trust-discounted</h3>
+                    <div class="formula">afterFee = amountIn <span class="op">*</span> (10000 − feeBps) <span
+                            class="op">/</span> 10000<br><span class="fn">amountOut</span> = afterFee <span
+                            class="op">*</span> rOut <span class="op">/</span> (rIn + afterFee)<br><span class="cm">//
+                            require(amountOut &gt;= amountOutMin) → slippage guard</span></div>
+                    <ul class="feat">
+                        <li><b>Factory</b> enforces <code>A≠B</code>, non-zero, no duplicate pair; canonical ordering
+                            <code>token0 &lt; token1</code>.
+                        </li>
+                        <li><b>Pool</b> is itself the LP token (<code>GLP</code>); first mint locks
+                            <code>sqrt(a·b) − 1000</code> permanently.
+                        </li>
+                        <li>Reserves recompute from balances on every action — they cannot drift.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="tag">Why it can't be ported</div>
+                    <h3>The moat is the attester</h3>
+                    <ul class="feat">
+                        <li><code>feeBpsFor(swapper)</code> reads DojangScore — needs Dojang + Upbit, which exist
+                            <b>only on GIWA</b>.
+                        </li>
+                        <li>GIWA's ~200ms <b>Flashblocks</b> make the swap feel instant — a real UX edge on top of the
+                            fee edge.</li>
+                        <li>The DEX's strategic role is foundational liquidity + price discovery + a verification
+                            flywheel, not just fee P&amp;L.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- §05 FEE MATRIX -->
+        <section class="sec rv">
+            <div class="num">05</div>
+            <div class="ey">The single source of truth</div>
+            <h2>One verification, <span class="j">three discounts.</span></h2>
+            <p class="sub">Every fee in the suite is a pure function of the same tier. Pick a tier — the column lights
+                up across all three protocols.</p>
+            <div class="scrub" id="scrub">
+                <button data-c="1">Standard</button>
+                <button data-c="2">Silver</button>
+                <button data-c="3">Gold</button>
+                <button data-c="4" class="on">Platinum</button>
+            </div>
+            <div class="tscroll">
+                <table id="fees">
+                    <tr>
+                        <th>Signal / protocol</th>
+                        <th data-c="1">Standard</th>
+                        <th data-c="2">Silver</th>
+                        <th data-c="3">Gold</th>
+                        <th data-c="4">Platinum</th>
+                    </tr>
+                    <tr>
+                        <td><b>DojangScore</b> range</td>
+                        <td data-c="1">0–199</td>
+                        <td data-c="2">200–499</td>
+                        <td data-c="3">500–799</td>
+                        <td data-c="4">800–1000</td>
+                    </tr>
+                    <tr>
+                        <td><b>WonVault</b> entry fee</td>
+                        <td data-c="1">2.00%</td>
+                        <td data-c="2">1.50%</td>
+                        <td data-c="3">1.00%</td>
+                        <td data-c="4">0.50%</td>
+                    </tr>
+                    <tr>
+                        <td><b>WonVault</b> kept at work</td>
+                        <td data-c="1">98.00%</td>
+                        <td data-c="2">98.50%</td>
+                        <td data-c="3">99.00%</td>
+                        <td data-c="4">99.50%</td>
+                    </tr>
+                    <tr>
+                        <td><b>GIWASwap</b> fee</td>
+                        <td data-c="1">0.30%</td>
+                        <td data-c="2">0.20%</td>
+                        <td data-c="3">0.15%</td>
+                        <td data-c="4">0.10%</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="note"><b>Read it as a flywheel:</b> the discount is the incentive to verify; verifying raises
+                the chain's own verified-user KPI and Sybil resistance; a cleaner chain makes the next user more willing
+                to verify. The fee schedule <i>is</i> the growth model.</div>
+        </section>
+
+        <!-- §06 EXECUTION -->
+        <section class="sec rv">
+            <div class="num">06</div>
+            <div class="ey">How it shipped</div>
+            <h2>Execution <span class="j">pipeline.</span></h2>
+            <p class="sub">Reproducible from a clean clone. The deployer key lives only in a git-ignored
+                <code>.env</code>; nothing secret ever reaches the repo or the host.
+            </p>
+            <div class="pipe">
+                <div class="ps">
+                    <div class="h">Write</div>
+                    <div class="d">Solidity 0.8.28 · OZ v5 imports</div>
+                </div>
+                <div class="ps">
+                    <div class="h">Compile</div>
+                    <div class="d">hardhat compile · optimizer 200</div>
+                </div>
+                <div class="ps">
+                    <div class="h">Deploy</div>
+                    <div class="d">deploy.js → 6 contracts + LP seed</div>
+                </div>
+                <div class="ps">
+                    <div class="h">Patch</div>
+                    <div class="d">redeploy-vault.js → offset fix</div>
+                </div>
+                <div class="ps">
+                    <div class="h">Verify</div>
+                    <div class="d">verify-all.js → source on explorer</div>
+                </div>
+                <div class="ps">
+                    <div class="h">Serve</div>
+                    <div class="d">frontend/ → Vercel · HTTPS</div>
+                </div>
+            </div>
+            <div class="grid3" style="margin-top:18px">
+                <div class="card">
+                    <div class="tag">Secret hygiene</div>
+                    <h3>Never in git</h3>
+                    <ul class="feat">
+                        <li><code>.env</code> git-ignored; <code>.env.example</code> is the committed twin.</li>
+                        <li>Vercel deploys <b>only</b> <code>frontend/</code> — the root (and the key) never ships.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="tag">Frontend</div>
+                    <h3>Zero build</h3>
+                    <ul class="feat">
+                        <li>Single-file pages · ethers v6 via CDN · no bundler to misconfigure.</li>
+                        <li>Live reads + writes; copy-to-clipboard on every address.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="tag">Reproducibility</div>
+                    <h3>From clone to chain</h3>
+                    <ul class="feat">
+                        <li><code>npm i</code> → <code>compile</code> → <code>deploy --network giwa</code>.</li>
+                        <li><code>deployed-addresses.json</code> records every output.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- §07 SECURITY -->
+        <section class="sec rv">
+            <div class="num">07</div>
+            <div class="ey">Threat model</div>
+            <h2>Shipped vs. <span class="j">roadmap.</span></h2>
+            <p class="sub">The honest split: what protects real money today, and what mainnet adds before a single won
+                is at risk.</p>
+            <div class="tscroll">
+                <table>
+                    <tr>
+                        <th>Risk / attack</th>
+                        <th>Mitigation</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td><b>ERC-4626 inflation / first-depositor</b></td>
+                        <td><code>_decimalsOffset()=18</code> virtual shares+assets; reader refuses out-of-band price
+                        </td>
+                        <td><span class="badge v1">shipped v1</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Open mint = donation surface</b></td>
+                        <td>Remove on mainnet; value via role-gated <code>harvest()</code> only</td>
+                        <td><span class="badge v2">roadmap</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Attester / oracle manipulation</b></td>
+                        <td>TWAP / Chainlink / Pyth, never spot; 90-day attestation expiry + refresh</td>
+                        <td><span class="badge v2">roadmap</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Strategy bleed (Euler v1 class)</b></td>
+                        <td>Per-strategy isolation + debt caps + auto-quarantine loss cap</td>
+                        <td><span class="badge v2">roadmap</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Owner key compromise</b></td>
+                        <td>Owner-gated params today; Safe multisig + guardian emergency brake</td>
+                        <td><span class="badge v2">roadmap</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Malicious ERC-20 in pools</b></td>
+                        <td>Reserves from balances; roadmap allowlist + safe-transfer checks</td>
+                        <td><span class="badge v2">roadmap</span></td>
+                    </tr>
+                    <tr>
+                        <td><b>Upstream read failure</b></td>
+                        <td>Every Dojang/EAS call <code>try/catch</code>-wrapped → graceful degradation</td>
+                        <td><span class="badge v1">shipped v1</span></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="pull">The dashboard is not decoration. It is the instrument that caught a real accounting
+                exploit before real money was at stake — and the same discipline now gates what we promise on
+                mainnet.<span class="by">the Proven engineering principle</span></div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="foot rv">
+            <h4>On-chain evidence · GIWA Sepolia</h4>
+            <a target="_blank" rel="noopener"
+                href="https://sepolia-explorer.giwa.io/address/0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f"><span
+                    class="lab">DojangScore</span><span>0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f</span></a>
+            <a target="_blank" rel="noopener"
+                href="https://sepolia-explorer.giwa.io/address/0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5"><span
+                    class="lab">WonVault</span><span>0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5</span></a>
+            <a target="_blank" rel="noopener"
+                href="https://sepolia-explorer.giwa.io/address/0x8813361aA6FFdC1B5926FA95d756b7390C680059"><span
+                    class="lab">GIWASwap Pool</span><span>0x8813361aA6FFdC1B5926FA95d756b7390C680059</span></a>
+            <a target="_blank" rel="noopener"
+                href="https://sepolia-explorer.giwa.io/address/0x7c7825AEF6b8b590dcF48d8C5059F3594B84a99F"><span
+                    class="lab">GIWASwap Factory</span><span>0x7c7825AEF6b8b590dcF48d8C5059F3594B84a99F</span></a>
+            <a target="_blank" rel="noopener"
+                href="https://sepolia-explorer.giwa.io/address/0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9"><span
+                    class="lab">DojangScroll
+                    (upstream)</span><span>0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9</span></a>
+            <a target="_blank" rel="noopener"
+                href="https://sepolia-explorer.giwa.io/address/0x4200000000000000000000000000000000000021"><span
+                    class="lab">EAS predeploy
+                    (upstream)</span><span>0x4200000000000000000000000000000000000021</span></a>
+            <div class="closer">PRO<em>V</em>EN — verified, not claimed.</div>
+            <div class="meta">GIWA Sepolia · OP Stack · chain 91342 · GASOK 2026 · <a target="_blank" rel="noopener"
+                    href="https://giwa-defi-suite.vercel.app">live demo</a> · <a target="_blank" rel="noopener"
+                    href="https://github.com/thedivine1/giwa-defi-suite">repo</a></div>
+        </footer>
+
+    </div>
+
+    <script>
+        var NODES = {
+            upbit: {
+                n: "Upbit Korea", role: "Trusted attester · KYC root", addr: "—", link: "",
+                fns: ["issues attestations", "KYC confirmation"],
+                inv: "The trust root. If its signing key is compromised, attestations — and therefore scores — are wrong. Mitigated by 90-day attestation expiry + refresh, and a roadmap multi-attester quorum."
+            },
+            scroll: {
+                n: "DojangScroll", role: "Upstream · attestation index", addr: "0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9", link: "https://sepolia-explorer.giwa.io/address/0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9",
+                fns: ["isVerified()", "getVerifiedBalance()", "isVerifiedCode()", "getVerifiedAddressAttestationUid()"],
+                inv: "GIWA's index of Dojang attestations. We read it; we never write to it. The attester id is keccak256(\"dojang.dojangattesterids.upbitkorea\")."
+            },
+            eas: {
+                n: "EAS predeploy", role: "Upstream · attestation store", addr: "0x4200000000000000000000000000000000000021", link: "https://sepolia-explorer.giwa.io/address/0x4200000000000000000000000000000000000021",
+                fns: ["getAttestation(uid)"],
+                inv: "Source of attestation timestamps — used to compute account age (>90 days) and reward wallets that aren't fresh."
+            },
+            score: {
+                n: "DojangScore", role: "Tier B · the trust engine", addr: "0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f", link: "https://sepolia-explorer.giwa.io/address/0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f",
+                fns: ["score(w)", "tierOf(w)", "tierName(w)", "setManualScore()", "setWeights()"],
+                inv: "Pure read layer. score = min(1000, Σ active weights) over 4 try/catch-wrapped attestation reads (400/300/200/100). A missing proof degrades the score; it never reverts the call."
+            },
+            vault: {
+                n: "WonVault", role: "Tier C · ERC-4626 yield vault", addr: "0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5", link: "https://sepolia-explorer.giwa.io/address/0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5",
+                fns: ["deposit()", "redeem()", "feeTierOf()", "convertToAssets()", "_decimalsOffset()=18"],
+                inv: "Standard ERC-4626, so any router integrates for free. _decimalsOffset()=18 is the inflation protection that closed the 1e21 attack; entry fee (2.00%→0.50%) is read from DojangScore and skimmed before super.deposit(net)."
+            },
+            swap: {
+                n: "GIWASwap", role: "Tier C · constant-product AMM", addr: "0x8813361aA6FFdC1B5926FA95d756b7390C680059", link: "https://sepolia-explorer.giwa.io/address/0x8813361aA6FFdC1B5926FA95d756b7390C680059",
+                fns: ["swap()", "getAmountOut()", "mint()", "burn()", "feeBpsFor()"],
+                inv: "x·y=k with feeBpsFor(swapper) read from DojangScore (0.30%→0.10%). amountOutMin enforces slippage; reserves recompute from balances every action so they can't drift."
+            }
+        };
+        function renderDetail(k) {
+            var d = NODES[k]; if (!d) return;
+            var fns = d.fns.map(function (f) { return '<li>' + f + '</li>'; }).join('');
+            var addr = d.addr && d.addr !== '—'
+                ? '<a target="_blank" rel="noopener" href="' + d.link + '">' + d.addr + '</a><button class="cp" data-copy="' + d.addr + '">copy</button>'
+                : '<span style="color:var(--faint)">off-chain signer · no contract address</span>';
+            document.getElementById('detail').innerHTML =
+                '<div class="dh"><span class="dn">' + d.n + '</span><span class="drole">' + d.role + '</span></div>' +
+                '<div class="daddr">' + addr + '</div>' +
+                '<ul class="dfns">' + fns + '</ul>' +
+                '<div class="dinv"><b>Enforces / assumes:</b> ' + d.inv + '</div>';
+            var cb = document.querySelector('#detail .cp');
+            if (cb) cb.addEventListener('click', function () { copyText(d.addr, cb); });
+            document.querySelectorAll('.nd').forEach(function (g) { g.classList.toggle('active', g.getAttribute('data-key') === k); });
+        }
+        function copyText(t, btn) {
+            var done = function () { var o = btn.textContent; btn.textContent = 'copied'; btn.classList.add('ok'); setTimeout(function () { btn.textContent = o; btn.classList.remove('ok'); }, 1000); };
+            if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t).then(done).catch(done); } else { done(); }
+        }
+        document.querySelectorAll('.nd').forEach(function (g) {
+            g.addEventListener('click', function () { renderDetail(g.getAttribute('data-key')); });
+        });
+        renderDetail('score');
+
+        /* fee matrix scrubber */
+        function setCol(c) {
+            document.querySelectorAll('#scrub button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-c') === c); });
+            document.querySelectorAll('#fees [data-c]').forEach(function (el) { el.classList.toggle('colhi', el.getAttribute('data-c') === c); });
+        }
+        document.querySelectorAll('#scrub button').forEach(function (b) {
+            b.addEventListener('click', function () { setCol(b.getAttribute('data-c')); });
+        });
+        setCol('4');
+
+        /* scroll reveal + progress */
+        try {
+            var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .1 });
+            document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); });
+            var p = document.getElementById('prog');
+            addEventListener('scroll', function () { var h = document.documentElement.scrollHeight - innerHeight; p.style.width = (h > 0 ? (scrollY / h * 100) : 0) + '%'; }, { passive: true });
+        } catch (e) { }
+    </script>
+
+<footer class="proven-footer">
+    Proven &mdash; verified, secure, decentralized. Built on GIWA Sepolia (chain 91342).
+</footer>
+
+</body>
+
+</html>

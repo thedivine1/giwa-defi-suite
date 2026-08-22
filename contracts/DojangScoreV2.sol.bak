@@ -1,0 +1,292 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.28;
+
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+/*
+ *  DojangScore V2 — provenance-ceiling trust engine (GIWA Sepolia, OP Stack 91342)
+ *  -----------------------------------------------------------------------------
+ *  score(w) = min( ceiling(w),  Σ capped_category_contributions(w) )
+ *
+ *  Four provenance-bearing sources, one rule: the STRONGEST provenance class a
+ *  wallet holds sets a HARD ceiling on its score. A self-submitted (consented)
+ *  proof can therefore never reach Platinum — only a regulated attester root
+ *  (read live from DojangScroll) can. That is the anti-farm / anti-forgery core.
+ *
+ *  Sources:
+ *    ATTESTER   (ceil 1000) : live read of DojangScroll + EAS  (try/catch wrapped)
+ *    CONSENTED  (ceil  799) : submitProof() — wallet vouches for ITSELF (capped)
+ *    BEHAVIORAL (ceil  499) : reporter-set aggregate (off-chain indexer watches
+ *                             pool/vault Swap/Mint/Deposit logs and writes the
+ *                             DERIVED number; the contract never scans logs)
+ *    STATE      (ceil  499) : TRUSTLESS live lookups — pool.balanceOf / vault.balanceOf
+ *
+ *  Category caps (MUST match frontend doc-score-v2.html):
+ *    ATTESTATION 1000 · BEHAVIORAL 250 · CONSENTED 250 · STATE 100
+ *
+ *  NOTE on EAS: getAttestation() is decoded into the canonical OP-EAS struct.
+ *  If the layout ever diverged, the try/catch degrades the age signal to 0
+ *  rather than reverting — graceful degradation is the design, not a fallback.
+ */
+
+interface IDojangScroll {
+    function isVerified(address wallet, bytes32 attesterId) external view returns (bool);
+    function getVerifiedBalance(address wallet, bytes32 attesterId) external view returns (uint256);
+    function isVerifiedCode(address wallet, bytes32 attesterId) external view returns (bool);
+    function getVerifiedAddressAttestationUid(address wallet, bytes32 attesterId) external view returns (bytes32);
+}
+
+interface IEAS {
+    struct Attestation {
+        bytes32 uid;
+        bytes32 schema;
+        uint64  time;
+        uint64  expirationTime;
+        uint64  revocationTime;
+        bytes32 refUID;
+        address recipient;
+        address attester;
+        bool    revocable;
+        bytes   data;
+    }
+    function getAttestation(bytes32 uid) external view returns (Attestation memory);
+}
+
+contract DojangScoreV2 is AccessControl {
+    bytes32 public constant REPORTER_ROLE = keccak256("REPORTER_ROLE");
+
+    // provenance classes (ceiling setters)
+    uint8 public constant PROV_NONE      = 0;
+    uint8 public constant PROV_BEHAVIORAL= 1;
+    uint8 public constant PROV_CONSENTED = 2;
+    uint8 public constant PROV_ATTESTER  = 3;
+
+    // category contribution caps
+    uint16 public constant CAP_ATTEST = 1000;
+    uint16 public constant CAP_BEHAV  = 250;
+    uint16 public constant CAP_CONSENT= 250;
+    uint16 public constant CAP_STATE  = 100;
+
+    // ceilings per provenance class
+    uint16 public constant CEIL_BEHAV  = 499;
+    uint16 public constant CEIL_CONSENT= 799;
+    uint16 public constant CEIL_ATTEST = 1000;
+
+    // base attestation weights
+    uint16 public constant W_ADDR = 400;
+    uint16 public constant W_BAL  = 300;
+    uint16 public constant W_AGE  = 200;
+    uint16 public constant W_CODE = 100;
+    uint64 public constant AGE_THRESHOLD = 90 days;
+
+    // trustless on-chain state weights
+    uint16 public constant W_LP    = 50;
+    uint16 public constant W_VAULT = 50;
+
+    uint8  public constant PROOF_COUNT = 4;     // renew, noRevoke, ens, passport
+    uint16 private constant _DEFAULT_W = 70;    // placeholder, set in ctor per type
+
+    bytes32 public immutable UPBIT;
+    IDojangScroll public immutable SCROLL;
+    IEAS        public immutable EAS;
+    IERC20      public immutable POOL;
+    IERC20      public immutable VAULT;
+    address     public immutable TREASURY;
+
+    // reporter-attested behavioral aggregate (off-chain indexer / manual kick)
+    mapping(address => uint128) public behavioral;
+    // self-submitted consented proofs: one bit per proof type
+    mapping(address => uint8)   public proofMask;
+    // governance-set weight per consented proof type
+    mapping(uint8 => uint16)    public proofWeight;
+    // owner's testnet stand-in for the attester (manual override)
+    mapping(address => uint16)  public manual;
+
+    event BehavioralAdded(address indexed wallet, uint128 delta, uint128 total);
+    event ProofSubmitted(address indexed wallet, uint8 proofType, bytes32 proofHash);
+    event ProofRevoked(address indexed wallet, uint8 proofType);
+    event ManualSet(address indexed wallet, uint16 value);
+    event ProofWeightSet(uint8 proofType, uint16 weight);
+
+    struct Breakdown {
+        uint16 baseAttestation;   // capped attester-rooted contribution
+        uint16 trustlessState;    // capped on-chain state contribution
+        uint16 reporterActivity;  // capped behavioral contribution
+        uint16 consentedProofs;   // capped consented contribution
+        uint16 rawSum;            // sum of capped categories
+        uint16 ceiling;           // hard cap set by strongest provenance
+        uint8  ceilingProvenance; // PROV_* class that set the ceiling
+        uint16 finalScore;        // min(rawSum, ceiling)
+        uint8  tier;              // 0 Unverified .. 3 Platinum
+        bool   holdsLP;
+        bool   holdsVault;
+    }
+
+    constructor(
+        address dojangScroll,
+        address eas,
+        address pool,
+        address vault,
+        address treasury
+    ) {
+        SCROLL    = IDojangScroll(dojangScroll);
+        EAS       = IEAS(eas);
+        POOL      = IERC20(pool);
+        VAULT     = IERC20(vault);
+        TREASURY  = treasury;
+        UPBIT     = keccak256(bytes("dojang.dojangattesterids.upbitkorea"));
+
+        // default consented proof weights: 0 renew, 1 noRevoke, 2 ens, 3 passport
+        proofWeight[0] = 70;
+        proofWeight[1] = 20;
+        proofWeight[2] = 60;
+        proofWeight[3] = 50;
+
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(REPORTER_ROLE, msg.sender);   // deployer = default reporter (testnet)
+    }
+
+    // ---------------------------------------------------------------- views
+
+    function reporterRole() external pure returns (bytes32) { return REPORTER_ROLE; }
+
+    function tierOf(uint16 s) public pure returns (uint8) {
+        if (s < 200) return 0;
+        if (s < 500) return 1;
+        if (s < 800) return 2;
+        return 3;
+    }
+
+    function tierName(uint8 t) public pure returns (string memory) {
+        if (t == 0) return "Unverified";
+        if (t == 1) return "Silver";
+        if (t == 2) return "Gold";
+        return "Platinum";
+    }
+
+    function score(address w) external view returns (uint16) {
+        return scoreBreakdown(w).finalScore;
+    }
+
+    function tierOfWallet(address w) external view returns (uint8) {
+        return scoreBreakdown(w).tier;
+    }
+
+    /// @notice Full, per-category breakdown with provenance + active ceiling.
+    function scoreBreakdown(address w) public view returns (Breakdown memory b) {
+        // owner stand-in short-circuits (testnet = "me standing in for Upbit")
+        if (manual[w] > 0) {
+            b.baseAttestation  = manual[w] > CAP_ATTEST ? CAP_ATTEST : manual[w];
+            b.rawSum           = b.baseAttestation;
+            b.ceiling          = CEIL_ATTEST;
+            b.ceilingProvenance= PROV_ATTESTER;
+            b.finalScore       = manual[w];
+            b.tier             = tierOf(manual[w]);
+            return b;
+        }
+
+        // 1) ATTESTER-rooted (live, try/catch → graceful degradation)
+        uint16 att;
+        if (_verifiedAddr(w)) att += W_ADDR;
+        if (_verifiedBal(w))  att += W_BAL;
+        if (_accountAgeOk(w)) att += W_AGE;
+        if (_verifiedCode(w)) att += W_CODE;
+        b.baseAttestation = att > CAP_ATTEST ? CAP_ATTEST : att;
+
+        // 2) TRUSTLESS on-chain state (live balanceOf — no logs, no trust)
+        b.holdsLP    = _holds(POOL, w);
+        b.holdsVault = _holds(VAULT, w);
+        uint16 st = (b.holdsLP ? W_LP : 0) + (b.holdsVault ? W_VAULT : 0);
+        b.trustlessState = st > CAP_STATE ? CAP_STATE : st;
+
+        // 3) BEHAVIORAL (reporter aggregate)
+        uint128 bv = behavioral[w];
+        b.reporterActivity = bv > CAP_BEHAV ? CAP_BEHAV : uint16(bv);
+
+        // 4) CONSENTED (recomputed from mask → no drift possible)
+        uint16 cs;
+        for (uint8 i = 0; i < PROOF_COUNT; i++) {
+            if (proofMask[w] & (1 << i) != 0) cs += proofWeight[i];
+        }
+        b.consentedProofs = cs > CAP_CONSENT ? CAP_CONSENT : cs;
+
+        b.rawSum = b.baseAttestation + b.trustlessState + b.reporterActivity + b.consentedProofs;
+
+        // ceiling = strongest provenance class present
+        if (b.baseAttestation > 0)        { b.ceiling = CEIL_ATTEST;  b.ceilingProvenance = PROV_ATTESTER; }
+        else if (b.consentedProofs > 0)   { b.ceiling = CEIL_CONSENT; b.ceilingProvenance = PROV_CONSENTED; }
+        else if (b.reporterActivity > 0 || b.holdsLP || b.holdsVault)
+                                          { b.ceiling = CEIL_BEHAV;   b.ceilingProvenance = PROV_BEHAVIORAL; }
+        else                              { b.ceiling = 0;            b.ceilingProvenance = PROV_NONE; }
+
+        b.finalScore = b.rawSum < b.ceiling ? b.rawSum : b.ceiling;
+        b.tier       = tierOf(b.finalScore);
+    }
+
+    // --------------------------------------------------------- write paths
+
+    /// @notice Reporter (indexer / manual kick) records derived behavioral activity.
+    function addBehavioral(address wallet, uint128 delta) external onlyRole(REPORTER_ROLE) {
+        uint128 t = behavioral[wallet] + delta;
+        behavioral[wallet] = t;
+        emit BehavioralAdded(wallet, delta, t);
+    }
+
+    /// @notice Wallet vouches for ITSELF. Capped at Gold by the ceiling rule.
+    function submitProof(uint8 proofType, bytes32 proofHash) external {
+        require(proofType < PROOF_COUNT, "V2: bad proof type");
+        uint8 bit = uint8(1 << proofType);
+        require(proofMask[msg.sender] & bit == 0, "V2: already submitted");
+        proofMask[msg.sender] |= bit;
+        emit ProofSubmitted(msg.sender, proofType, proofHash);
+    }
+
+    function revokeProof(uint8 proofType) external {
+        require(proofType < PROOF_COUNT, "V2: bad proof type");
+        uint8 bit = uint8(1 << proofType);
+        require(proofMask[msg.sender] & bit != 0, "V2: not submitted");
+        proofMask[msg.sender] &= ~bit;
+        emit ProofRevoked(msg.sender, proofType);
+    }
+
+    /// @notice Owner stand-in for the attester on testnet (Platinum-class override).
+    function setManualScore(address wallet, uint16 value) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        manual[wallet] = value;
+        emit ManualSet(wallet, value);
+    }
+
+    function setProofWeight(uint8 proofType, uint16 weight) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(proofType < PROOF_COUNT, "V2: bad proof type");
+        proofWeight[proofType] = weight;
+        emit ProofWeightSet(proofType, weight);
+    }
+
+    function supportsInterface(bytes4 id) public view override(AccessControl) returns (bool) {
+        return super.supportsInterface(id);
+    }
+
+    // ----------------------------------------------------------- internals
+
+    function _holds(IERC20 token, address w) internal view returns (bool) {
+        try token.balanceOf(w) returns (uint256 bal) { return bal > 0; }
+        catch { return false; }
+    }
+    function _verifiedAddr(address w) internal view returns (bool) {
+        try SCROLL.isVerified(w, UPBIT) returns (bool v) { return v; } catch { return false; }
+    }
+    function _verifiedBal(address w) internal view returns (bool) {
+        try SCROLL.getVerifiedBalance(w, UPBIT) returns (uint256 b) { return b > 0; } catch { return false; }
+    }
+    function _verifiedCode(address w) internal view returns (bool) {
+        try SCROLL.isVerifiedCode(w, UPBIT) returns (bool v) { return v; } catch { return false; }
+    }
+    function _accountAgeOk(address w) internal view returns (bool) {
+        try SCROLL.getVerifiedAddressAttestationUid(w, UPBIT) returns (bytes32 uid) {
+            if (uid == bytes32(0)) return false;
+            try EAS.getAttestation(uid) returns (IEAS.Attestation memory a) {
+                return a.time != 0 && (block.timestamp - a.time) >= AGE_THRESHOLD;
+            } catch { return false; }
+        } catch { return false; }
+    }
+}

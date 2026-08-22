@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GIWASwap — Technical Specification</title>
+    <title>Proven — The trust layer for GIWA</title>
     <meta name="description" content="GIWASwap constant-product AMM technical one-pager: tiered swap fees by DojangScore trust, pricing math, LP mechanics, and security model on GIWA Sepolia." />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -227,8 +227,89 @@
             * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
+  <link rel="icon" type="image/png" href="assets/proven-icon.png" />
 </head>
 <body>
+
+<style>
+    .proven-nav {
+        position: sticky;
+        top: 0;
+        z-index: 10000;
+        background: #070c14;
+        border-bottom: 1px solid var(--jade, #6fe3b0);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+    }
+    .proven-nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .proven-nav-logo {
+        width: 32px;
+        height: 32px;
+    }
+    .proven-nav-title {
+        font-family: var(--disp, 'Syne', sans-serif);
+        font-weight: 800;
+        font-size: 22px;
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        letter-spacing: 1px;
+    }
+    .proven-nav-tag {
+        font-size: 13px;
+        color: var(--jade, #6fe3b0);
+        margin-left: 4px;
+        opacity: 0.9;
+    }
+    .proven-nav-right {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+    .proven-nav-link {
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .proven-nav-link:hover {
+        color: var(--jade, #6fe3b0);
+    }
+    .proven-footer {
+        text-align: center;
+        padding: 40px 20px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+        font-size: 14px;
+        color: var(--muted, #8aa396);
+        border-top: 1px solid var(--line, #223029);
+        background: var(--bg, #0a0e0c);
+        margin-top: auto;
+    }
+</style>
+
+<nav class="proven-nav">
+    <div class="proven-nav-left">
+        <img src="assets/proven-icon.png" alt="Proven Icon" class="proven-nav-logo" />
+        <a href="index.html" class="proven-nav-title">PROVEN</a>
+        <span class="proven-nav-tag">the trust layer for GIWA</span>
+    </div>
+    <div class="proven-nav-right">
+        <a href="index.html" class="proven-nav-link">App</a>
+        <a href="doc-score-v2.html" class="proven-nav-link">Score V2</a>
+        <a href="api-quickstart.html" class="proven-nav-link">Docs</a>
+        <a href="architecture.html" class="proven-nav-link">Architecture</a>
+        <a href="story.html" class="proven-nav-link">Story</a>
+        <a href="deck.html" class="proven-nav-link">Deck</a>
+    </div>
+</nav>
+
 <div class="gridbg"></div>
 <div class="scan"></div>
 
@@ -589,5 +670,10 @@
 
     window.addEventListener("DOMContentLoaded", calcSwap);
 </script>
+
+<footer class="proven-footer">
+    Proven &mdash; verified, secure, decentralized. Built on GIWA Sepolia (chain 91342).
+</footer>
+
 </body>
 </html>

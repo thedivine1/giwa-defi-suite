@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proven — The trust layer for GIWA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e0c;
+            --panel: #0f1512;
+            --panel2: #131b16;
+            --line: #223029;
+            --line2: #2d4036;
+            --text: #eaf2ec;
+            --muted: #8aa396;
+            --faint: #5d7568;
+            --jade: #6fe3b0;
+            --jade-dim: #2f6f54;
+            --jade-deep: #0e2a20;
+            --gold: #e7c277;
+            --slate: #86b6cb;
+            --rose: #e0918f;
+            --disp: 'Syne', sans-serif;
+            --body: 'IBM Plex Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--body);
+            font-size: 16px;
+            line-height: 1.62;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden
+        }
+
+        ::selection {
+            background: var(--jade);
+            color: var(--ink)
+        }
+
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(120% 80% at 8% -5%, #13241c 0%, transparent 55%), radial-gradient(90% 70% at 100% 110%, #1a160c 0%, transparent 50%), var(--bg)
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 2;
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 54px 28px 80px
+        }
+
+        @media(max-width:680px) {
+            .wrap {
+                padding: 30px 16px 60px
+            }
+        }
+
+        .kick {
+            font-family: var(--mono);
+            font-size: .64rem;
+            letter-spacing: .3em;
+            color: var(--jade);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap
+        }
+
+        .kick .pip {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--jade);
+            box-shadow: 0 0 0 0 rgba(95, 224, 168, .6);
+            animation: pulse 2.4s infinite
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(95, 224, 168, .5)
+            }
+
+            70% {
+                box-shadow: 0 0 0 9px rgba(95, 224, 168, 0)
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(95, 224, 168, 0)
+            }
+        }
+
+        .title {
+            font-family: var(--disp);
+            font-weight: 800;
+            line-height: .86;
+            letter-spacing: -.03em;
+            text-transform: uppercase;
+            font-size: clamp(2.4rem, 8vw, 5rem);
+            margin: 16px 0 0
+        }
+
+        .title em {
+            font-style: normal;
+            color: var(--jade)
+        }
+
+        .title .g {
+            color: var(--gold)
+        }
+
+        .lede {
+            max-width: 60ch;
+            margin-top: 18px;
+            font-size: 1.18rem;
+            line-height: 1.45;
+            color: var(--muted)
+        }
+
+        .lede b {
+            color: var(--text);
+            font-weight: 600
+        }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            margin-top: 26px;
+            border-top: 1px solid var(--line);
+            border-bottom: 1px solid var(--line)
+        }
+
+        .meta div {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 15px;
+            border-right: 1px solid var(--line);
+            font-family: var(--mono);
+            font-size: .7rem
+        }
+
+        .meta div:last-child {
+            border-right: none
+        }
+
+        .meta .k {
+            color: var(--faint);
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            font-size: .56rem;
+            display: block;
+            margin-bottom: 4px
+        }
+
+        .meta .v {
+            color: var(--bone)
+        }
+
+        .meta .v.j {
+            color: var(--jade)
+        }
+
+        .meta .v.g {
+            color: var(--gold)
+        }
+
+        .sec {
+            padding: 48px 0 6px;
+            border-top: 1px solid var(--line);
+            margin-top: 34px
+        }
+
+        .sec .ey {
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .26em;
+            color: var(--gold);
+            text-transform: uppercase
+        }
+
+        .sec h2 {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: clamp(1.6rem, 5vw, 2.6rem);
+            line-height: .98;
+            letter-spacing: -.02em;
+            margin: 7px 0 0;
+            max-width: 20ch
+        }
+
+        .sec h2 .j {
+            color: var(--jade)
+        }
+
+        .sec .sub {
+            color: var(--muted);
+            max-width: 64ch;
+            margin-top: 12px;
+            font-size: 1.02rem
+        }
+
+        .card {
+            background: linear-gradient(180deg, var(--panel2), var(--panel));
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 22px;
+            margin-top: 18px
+        }
+
+        .card .tag {
+            font-family: var(--mono);
+            font-size: .56rem;
+            letter-spacing: .2em;
+            color: var(--faint);
+            text-transform: uppercase
+        }
+
+        .card h3 {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: 1.18rem;
+            margin: 5px 0 11px
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px
+        }
+
+        @media(max-width:760px) {
+            .grid2 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .feat {
+            list-style: none
+        }
+
+        .feat li {
+            position: relative;
+            padding: 8px 0 8px 24px;
+            border-top: 1px solid var(--line);
+            font-size: .94rem;
+            color: var(--muted)
+        }
+
+        .feat li:first-child {
+            border-top: none
+        }
+
+        .feat li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 15px;
+            width: 11px;
+            height: 2px;
+            background: var(--jade)
+        }
+
+        .feat li b {
+            color: var(--text);
+            font-weight: 600
+        }
+
+        .feat li code {
+            font-family: var(--mono);
+            font-size: .82em;
+            color: var(--jade);
+            background: var(--jade-deep);
+            padding: 1px 6px;
+            border-radius: 4px
+        }
+
+        .principle {
+            border-left: 3px solid var(--gold);
+            background: var(--panel);
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin-top: 12px
+        }
+
+        .principle .n {
+            font-family: var(--mono);
+            font-size: .6rem;
+            letter-spacing: .2em;
+            color: var(--gold);
+            text-transform: uppercase
+        }
+
+        .principle .t {
+            font-family: var(--disp);
+            font-weight: 600;
+            font-size: 1.04rem;
+            margin: 4px 0 5px
+        }
+
+        .principle .d {
+            font-size: .92rem;
+            color: var(--muted)
+        }
+
+        .principle.zero {
+            border-left-color: var(--rose)
+        }
+
+        .principle.zero .n {
+            color: var(--rose)
+        }
+
+        .tscroll {
+            overflow-x: auto;
+            margin-top: 16px;
+            border: 1px solid var(--line);
+            border-radius: 10px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .86rem;
+            min-width: 560px
+        }
+
+        th,
+        td {
+            padding: 11px 14px;
+            text-align: left;
+            border-top: 1px solid var(--line);
+            vertical-align: top
+        }
+
+        th {
+            font-family: var(--mono);
+            font-size: .58rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--faint);
+            background: var(--panel);
+            white-space: nowrap
+        }
+
+        td {
+            color: var(--muted)
+        }
+
+        td b {
+            color: var(--text);
+            font-weight: 600
+        }
+
+        td .j {
+            color: var(--jade)
+        }
+
+        td .g {
+            color: var(--gold)
+        }
+
+        td .r {
+            color: var(--rose)
+        }
+
+        td .s {
+            color: var(--slate)
+        }
+
+        td.num {
+            font-family: var(--mono);
+            white-space: nowrap
+        }
+
+        tr.tot td {
+            background: var(--panel2);
+            color: var(--text);
+            font-weight: 600;
+            border-top: 2px solid var(--line2)
+        }
+
+        .badge {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: .58rem;
+            letter-spacing: .06em;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase
+        }
+
+        .badge.com {
+            background: var(--jade-deep);
+            color: var(--jade);
+            border: 1px solid var(--jade-dim)
+        }
+
+        .badge.app {
+            background: #10202a;
+            color: var(--slate);
+            border: 1px solid #234a5c
+        }
+
+        .badge.pipe {
+            background: #1a160c;
+            color: var(--gold);
+            border: 1px solid #4a3c1c
+        }
+
+        .badge.self {
+            background: #1c1320;
+            color: #c79bd6;
+            border: 1px solid #4a2f57
+        }
+
+        .statrow {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 18px
+        }
+
+        @media(max-width:760px) {
+            .statrow {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+
+        .stat {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 15px
+        }
+
+        .stat .k {
+            font-family: var(--mono);
+            font-size: .55rem;
+            letter-spacing: .16em;
+            color: var(--faint);
+            text-transform: uppercase
+        }
+
+        .stat .v {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-top: 5px
+        }
+
+        .stat .v.j {
+            color: var(--jade)
+        }
+
+        .stat .v.g {
+            color: var(--gold)
+        }
+
+        .stat .v.s {
+            color: var(--slate)
+        }
+
+        .stat .n {
+            font-size: .72rem;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .gate {
+            position: relative;
+            margin-top: 20px;
+            padding-left: 30px
+        }
+
+        .gate::before {
+            content: "";
+            position: absolute;
+            left: 6px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(var(--jade-dim), var(--line))
+        }
+
+        .g {
+            position: relative;
+            padding: 14px 0 14px 0
+        }
+
+        .g::before {
+            content: "";
+            position: absolute;
+            left: -30px;
+            top: 20px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--ink);
+            border: 2px solid var(--jade);
+            box-shadow: 0 0 0 4px var(--ink)
+        }
+
+        .g.kpi::before {
+            border-color: var(--gold)
+        }
+
+        .g .when {
+            font-family: var(--mono);
+            font-size: .6rem;
+            letter-spacing: .18em;
+            color: var(--faint);
+            text-transform: uppercase
+        }
+
+        .g .h {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: 1.08rem;
+            margin: 3px 0 6px
+        }
+
+        .g .h .j {
+            color: var(--jade)
+        }
+
+        .g .h .g {
+            color: var(--gold)
+        }
+
+        .g .d {
+            font-size: .92rem;
+            color: var(--muted)
+        }
+
+        .g .d b {
+            color: var(--text)
+        }
+
+        .g .alloc {
+            font-family: var(--mono);
+            font-size: .74rem;
+            color: var(--jade);
+            margin-top: 6px
+        }
+
+        .pull {
+            margin: 26px 0;
+            padding: 22px 0 22px 24px;
+            border-left: 3px solid var(--jade);
+            font-family: var(--disp);
+            font-weight: 600;
+            font-size: clamp(1.2rem, 3.6vw, 1.7rem);
+            line-height: 1.3;
+            color: var(--text)
+        }
+
+        .pull.g {
+            border-left-color: var(--gold)
+        }
+
+        .pull .by {
+            display: block;
+            margin-top: 10px;
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .14em;
+            color: var(--faint);
+            text-transform: uppercase;
+            font-weight: 400
+        }
+
+        .note {
+            margin-top: 16px;
+            font-family: var(--mono);
+            font-size: .74rem;
+            color: var(--muted);
+            line-height: 1.7;
+            border: 1px dashed var(--line2);
+            border-radius: 8px;
+            padding: 15px
+        }
+
+        .note b {
+            color: var(--gold)
+        }
+
+        .foot {
+            margin-top: 46px;
+            padding-top: 24px;
+            border-top: 1px solid var(--line);
+            font-family: var(--mono);
+            font-size: .66rem;
+            color: var(--faint);
+            line-height: 1.9;
+            text-align: center
+        }
+
+        .foot a {
+            color: var(--muted);
+            text-decoration: none
+        }
+
+        .foot a:hover {
+            color: var(--jade)
+        }
+
+        .js .rv {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity .7s cubic-bezier(.2, .7, .2, 1), transform .7s cubic-bezier(.2, .7, .2, 1)
+        }
+
+        .js .rv.in {
+            opacity: 1;
+            transform: none
+        }
+
+        @media print {
+            .bg {
+                display: none
+            }
+
+            body {
+                background: #0a0e0c;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact
+            }
+
+            .js .rv {
+                opacity: 1 !important;
+                transform: none !important
+            }
+
+            .sec,
+            .card,
+            .g {
+                break-inside: avoid
+            }
+
+            .wrap {
+                padding: 24px
+            }
+        }
+    </style>
+  <link rel="icon" type="image/png" href="assets/proven-icon.png" />
+</head>
+
+<body>
+
+<style>
+    .proven-nav {
+        position: sticky;
+        top: 0;
+        z-index: 10000;
+        background: #070c14;
+        border-bottom: 1px solid var(--jade, #6fe3b0);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+    }
+    .proven-nav-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .proven-nav-logo {
+        width: 32px;
+        height: 32px;
+    }
+    .proven-nav-title {
+        font-family: var(--disp, 'Syne', sans-serif);
+        font-weight: 800;
+        font-size: 22px;
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        letter-spacing: 1px;
+    }
+    .proven-nav-tag {
+        font-size: 13px;
+        color: var(--jade, #6fe3b0);
+        margin-left: 4px;
+        opacity: 0.9;
+    }
+    .proven-nav-right {
+        display: flex;
+        gap: 24px;
+        align-items: center;
+    }
+    .proven-nav-link {
+        color: var(--text, #eaf2ec);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    .proven-nav-link:hover {
+        color: var(--jade, #6fe3b0);
+    }
+    .proven-footer {
+        text-align: center;
+        padding: 40px 20px;
+        font-family: var(--body, 'IBM Plex Sans', sans-serif);
+        font-size: 14px;
+        color: var(--muted, #8aa396);
+        border-top: 1px solid var(--line, #223029);
+        background: var(--bg, #0a0e0c);
+        margin-top: auto;
+    }
+</style>
+
+<nav class="proven-nav">
+    <div class="proven-nav-left">
+        <img src="assets/proven-icon.png" alt="Proven Icon" class="proven-nav-logo" />
+        <a href="index.html" class="proven-nav-title">PROVEN</a>
+        <span class="proven-nav-tag">the trust layer for GIWA</span>
+    </div>
+    <div class="proven-nav-right">
+        <a href="index.html" class="proven-nav-link">App</a>
+        <a href="doc-score-v2.html" class="proven-nav-link">Score V2</a>
+        <a href="api-quickstart.html" class="proven-nav-link">Docs</a>
+        <a href="architecture.html" class="proven-nav-link">Architecture</a>
+        <a href="story.html" class="proven-nav-link">Story</a>
+        <a href="deck.html" class="proven-nav-link">Deck</a>
+    </div>
+</nav>
+
+    <div class="bg"></div>
+    <div class="wrap">
+
+        <header class="rv">
+            <div class="kick"><span class="pip"></span>CAPITAL PLAN · USE OF FUNDS · SEQUENCING · GASOK 2026</div>
+            <h1 class="title">Every dollar <em>mapped.</em><br>In <span class="g">order.</span></h1>
+            <p class="lede">This document answers one question a funder actually asks: <b>do you know exactly what our
+                    money buys, and why it must be spent in this sequence?</b> It is a capital-allocation plan, not a
+                pitch. Every line item is tied to a milestone, every milestone to a tranche gate, every tranche to a
+                dependency that forces the order. Figures are <b>models with stated assumptions</b> — ranges, not
+                promises — and the official program terms govern where they differ.</p>
+            <div class="meta">
+                <div><span class="k">Initial grant (as published)</span><span class="v j">~$20,000</span></div>
+                <div><span class="k">KPI bonus (contingent)</span><span class="v g">up to ~$80,000</span></div>
+                <div><span class="k">Lean cash burn</span><span class="v">~$3–7k / mo</span></div>
+                <div><span class="k">$20k bridges</span><span class="v s">~4–6 months</span></div>
+                <div><span class="k">Equity given up</span><span class="v j">0%</span></div>
+            </div>
+        </header>
+
+        <!-- 0 · WHAT WE BUILT (cold-read preamble) -->
+        <section class="sec rv">
+            <div class="ey">§0 · For a reader who hasn't seen the demo</div>
+            <h2>What exists, <span class="j">on-chain, today.</span></h2>
+            <p class="sub">GIWA shipped a trust layer — <b>Dojang</b> (verified address / balance / code, attested by
+                Upbit Korea) — with zero applications on top. We built the first three things that consume it. All
+                deployed and verifiable on GIWA Sepolia (OP Stack, chain 91342).</p>
+            <div class="tscroll">
+                <table>
+                    <tr>
+                        <th>Protocol</th>
+                        <th>Address</th>
+                        <th>What it does</th>
+                        <th>The moat</th>
+                    </tr>
+                    <tr>
+                        <td><b>DojangScore</b></td>
+                        <td class="num">0xefE4…d48f</td>
+                        <td>Reads 4 Dojang attestations → one trust score 0–1000, four tiers. The primitive every other
+                            protocol gates on.</td>
+                        <td class="j">Impossible off GIWA — the attester lives only here.</td>
+                    </tr>
+                    <tr>
+                        <td><b>WonVault</b></td>
+                        <td class="num">0xEE4E…69F5</td>
+                        <td>ERC-4626 KRW yield vault; trust tier sets the <b>entry fee</b> (2.00% → 0.50%), not the
+                            yield.</td>
+                        <td class="j">Verification = a price tag you keep.</td>
+                    </tr>
+                    <tr>
+                        <td><b>GIWASwap</b></td>
+                        <td class="num">0x8813…0059</td>
+                        <td>First DEX on GIWA; constant-product AMM; verified wallets pay a lower swap fee (0.30% →
+                            0.10%).</td>
+                        <td class="j">Trust-discounted fee needs Dojang + Upbit.</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="card">
+                <div class="tag">Proof of execution &amp; of judgement</div>
+                <h3>We caught a real exploit before a judge could.</h3>
+                <ul class="feat">
+                    <li>Our first WonVault hit OpenZeppelin's <b>ERC-4626 inflation footgun</b>: a deposit minted
+                        <b>zero shares</b> and the share price spiked to <code>1.09e+21</code>. We did not find it in a
+                        unit test — we found it because we built a live readout that refuses to render a corrupted
+                        number.</li>
+                    <li>We redeployed with the <code>_decimalsOffset()=18</code> mitigation (the Morpho / Euler v2 /
+                        OpenZeppelin recommendation) and delegated share math back to the audited library path. The
+                        dashboard is not decoration — it is the instrument that caught a real bug before real money was
+                        at stake.</li>
+                    <li>That episode is the throughline of this capital plan: <b>we do not paint numbers, on a dashboard
+                            or in a forecast.</b> Every figure below is a model you can re-run with your own
+                        assumptions.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 1 · PRINCIPLES -->
+        <section class="sec rv">
+            <div class="ey">§1 · The rules of the money</div>
+            <h2>Six principles <span class="j">that fix the order.</span></h2>
+            <p class="sub">The sequence in §4 is not a preference — it is forced by these rules. State them up front so
+                the order reads as discipline, not opinion.</p>
+
+            <div class="principle zero">
+                <div class="n">Principle 0 · written policy</div>
+                <div class="t">Restricted capital is never deployed to speculative yield.</div>
+                <div class="d">Grant funds are contractually earmarked for the project. Diverting them to a liquidity
+                    pool or farm to "earn while idle" is misuse of restricted funds — and the yields advertised there
+                    (0.5–1%/day) are not real cash flow, they fail the same frozen-deposit litmus we print on the vault.
+                    <b>Policy:</b> idle project treasury sits in capital-preservation instruments only (regulated stable
+                    lending / tokenized T-bills at single-digit annual yield), disclosed, and never as personal
+                    investment. This is the failure mode we refuse, in writing.</div>
+            </div>
+            <div class="principle">
+                <div class="n">Principle 1</div>
+                <div class="t">Non-dilutive capital first, in a stack.</div>
+                <div class="d">Take grant + ecosystem money before any equity. The grant is a catalyst and a credential,
+                    not the whole budget — so we co-fund each big rock from its natural source (the audit from the audit
+                    grant, runway from the initial, the hire from the KPI bonus).</div>
+            </div>
+            <div class="principle">
+                <div class="n">Principle 2</div>
+                <div class="t">Hire against proof, not hope.</div>
+                <div class="d">The first engineering hire is triggered by a KPI tranche landing — i.e. the ecosystem
+                    pays for the headcount once we've proven traction — not by the initial grant, which is too small to
+                    carry a salary and a build at once.</div>
+            </div>
+            <div class="principle">
+                <div class="n">Principle 3</div>
+                <div class="t">The audit is funded by the audit grant, not operating runway.</div>
+                <div class="d">A real audit ($20–80k+) would consume the entire initial grant. So the initial grant
+                    carries only a co-pay / contest-bounty seed; the bulk comes from the Optimism Audit Grant (GIWA is
+                    OP Stack, so we qualify). Operating runway stays runway.</div>
+            </div>
+            <div class="principle">
+                <div class="n">Principle 4</div>
+                <div class="t">Legal / RWA review is ring-fenced and non-negotiable.</div>
+                <div class="d">The headline mainnet yield strategy is a KRW-treasury RWA product. It touches securities
+                    law across jurisdictions. We do not ship it without a signed legal review — so that cost is reserved
+                    on day one, not discovered later.</div>
+            </div>
+            <div class="principle">
+                <div class="n">Principle 5</div>
+                <div class="t">Tranches are gated by KPIs we can actually hit.</div>
+                <div class="d">We set milestones to our real confidence, never over-promised. A missed KPI tranche is
+                    the #1 first-timer failure; an achievable-then-beaten KPI is the credibility compounding machine.
+                </div>
+            </div>
+        </section>
+
+        <!-- 2 · THE STACK -->
+        <section class="sec rv">
+            <div class="ey">§2 · The capital stack (sources)</div>
+            <h2>Where the money <span class="j">comes from.</span></h2>
+            <p class="sub">All sources below are <b>non-dilutive</b>. Status is honest: committed / applied / pipeline /
+                self-generated. Confirm exact figures on the official program pages.</p>
+            <div class="tscroll">
+                <table>
+                    <tr>
+                        <th>Source</th>
+                        <th>Amount (model)</th>
+                        <th>Status</th>
+                        <th>What it's for</th>
+                        <th>Dilutive?</th>
+                    </tr>
+                    <tr>
+                        <td><b>GASOK initial grant</b></td>
+                        <td class="num">~$20,000</td>
+                        <td><span class="badge app">applied</span></td>
+                        <td>Bridge runway + legal ring-fence + B2B-API build + audit co-pay (see §3).</td>
+                        <td class="j">No</td>
+                    </tr>
+                    <tr>
+                        <td><b>GASOK KPI bonus</b></td>
+                        <td class="num">up to ~$80,000</td>
+                        <td><span class="badge pipe">pipeline</span></td>
+                        <td>First hire + RWA legal completion + runway extension — released against §4 gates.</td>
+                        <td class="j">No</td>
+                    </tr>
+                    <tr>
+                        <td><b>Optimism Audit Grant</b></td>
+                        <td class="num">audit cost</td>
+                        <td><span class="badge app">apply T0+30d</span></td>
+                        <td>The mainnet security audit (the single largest pre-mainnet rock).</td>
+                        <td class="j">No</td>
+                    </tr>
+                    <tr>
+                        <td><b>Optimism Retro Funding</b></td>
+                        <td class="num">impact-based</td>
+                        <td><span class="badge pipe">pipeline</span></td>
+                        <td>Post-impact reward; on-chain KPIs become the evidence.</td>
+                        <td class="j">No</td>
+                    </tr>
+                    <tr>
+                        <td><b>Early B2B SaaS</b> (DojangScore API)</td>
+                        <td class="num">$30–60k / yr ramp</td>
+                        <td><span class="badge self">self-gen</span></td>
+                        <td>First paying customers in parallel with the build — the earliest real revenue, fully under
+                            our control.</td>
+                        <td class="j">No</td>
+                    </tr>
+                    <tr>
+                        <td><b>Founder's own capital</b> (product revenue / personal)</td>
+                        <td class="num">gap cover</td>
+                        <td><span class="badge com">committed</span></td>
+                        <td>Pre-grant gap (infra, gas) so the build never stalls waiting on a tranche.</td>
+                        <td class="j">No</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="note"><b>Read this stack the way a funder will:</b> no single source carries the whole plan. The
+                initial grant bridges the gap to the first external cash; the audit grant removes the biggest rock from
+                operating runway; the KPI bonus funds the hire only after proof; B2B revenue de-risks the gap from the
+                operator's side. That redundancy is the point.</div>
+        </section>
+
+        <!-- 3 · WHAT THE $20k BUYS -->
+        <section class="sec rv">
+            <div class="ey">§3 · The initial grant, line by line</div>
+            <h2>What their <span class="g">$20,000</span> buys.</h2>
+            <p class="sub">The literal answer to "do you know what our money buys." Each line: amount, share, the
+                rationale, and the month it's drawn. The audit's <b>bulk is deliberately not here</b> — it's carried by
+                the Optimism Audit Grant (§2), so this pot stays runway.</p>
+            <div class="tscroll">
+                <table>
+                    <tr>
+                        <th>Line item</th>
+                        <th>Amount</th>
+                        <th>Share</th>
+                        <th>Drawn</th>
+                        <th>Rationale / dependency</th>
+                    </tr>
+                    <tr>
+                        <td><b>Legal &amp; RWA / securities review</b> (ring-fenced)</td>
+                        <td class="num j">$4,000</td>
+                        <td class="num">20%</td>
+                        <td class="num">M1</td>
+                        <td>Reserves the non-negotiable review for the KRW-treasury RWA strategy (Principle 4). Spent
+                            early so it's never a late surprise.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Security: audit co-pay / contest-bounty / Immunefi seed</b></td>
+                        <td class="num j">$3,000</td>
+                        <td class="num">15%</td>
+                        <td class="num">M1–3</td>
+                        <td>Seeds the audit process; the audit's bulk is the Optimism Audit Grant (Principle 3). A
+                            contest + a capped bounty is cheaper than a single big firm quote and surfaces more eyes.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>DojangScore off-chain API + indexer build</b></td>
+                        <td class="num j">$4,000</td>
+                        <td class="num">20%</td>
+                        <td class="num">M1–2</td>
+                        <td>The B2B revenue unlock: indexer (Ponder/Envio/Goldsky) + Postgres + REST/GraphQL +
+                            auth/rate-limits + AI-assisted eng time. This line <i>creates</i> the earliest
+                            self-generated income.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Mainnet infra &amp; ops runway</b> (RPC, keeper VPS+gas, oracle, monitoring, multisig,
+                            status page) — ~3 mo lean</td>
+                        <td class="num j">$3,500</td>
+                        <td class="num">17.5%</td>
+                        <td class="num">M1–4</td>
+                        <td>The keep-the-lights-on cost of a real on-chain product. Lean by design until the KPI bonus
+                            funds scale.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Founder stipend</b> (disclosed)</td>
+                        <td class="num j">$3,000</td>
+                        <td class="num">15%</td>
+                        <td class="num">M1–2</td>
+                        <td>~2 months at a modest, disclosed rate. The legitimate way the operator eats; budgeted,
+                            named, never skimmed.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Contingency / FX / tax set-aside / misc</b></td>
+                        <td class="num j">$2,500</td>
+                        <td class="num">12.5%</td>
+                        <td class="num">held</td>
+                        <td>Cross-border grant → India has real tax/FX implications; reserve for the accountant and the
+                            unexpected. Untouched unless a named risk fires.</td>
+                    </tr>
+                    <tr class="tot">
+                        <td>TOTAL</td>
+                        <td class="num">$20,000</td>
+                        <td class="num">100%</td>
+                        <td></td>
+                        <td>Every dollar assigned; nothing unallocated; nothing double-counted.</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="statrow">
+                <div class="stat">
+                    <div class="k">Lean cash burn</div>
+                    <div class="v j">~$3–7k</div>
+                    <div class="n">per month, solo</div>
+                </div>
+                <div class="stat">
+                    <div class="k">$20k runway</div>
+                    <div class="v s">~4–6 mo</div>
+                    <div class="n">to first external cash</div>
+                </div>
+                <div class="stat">
+                    <div class="k">First external cash</div>
+                    <div class="v g">B2B + KPI-1</div>
+                    <div class="n">the gap this bridges</div>
+                </div>
+                <div class="stat">
+                    <div class="k">Audit funded by</div>
+                    <div class="v">OP grant</div>
+                    <div class="n">not this pot</div>
+                </div>
+            </div>
+            <div class="note"><b>The arithmetic a funder will do:</b> at ~$3–4k/mo of <i>cash</i> burn from this pot
+                (legal, audit-seed and API-build are lumpy upfront, not monthly), $20k stretches ~4–6 months — exactly
+                the window to (a) ship the audited mainnet v1, (b) sign the first paying API customer, and (c) clear KPI
+                gate 1. That is the gap this grant is sized to bridge. It is not sized to carry a team — and we do not
+                pretend it is.</div>
+        </section>
+
+        <!-- 4 · SEQUENCING -->
+        <section class="sec rv">
+            <div class="ey">§4 · Order of operations (the tranche sequence)</div>
+            <h2>In what order, <span class="j">and why the order is forced.</span></h2>
+            <p class="sub">Time runs top to bottom. <span class="j">Green nodes</span> are actions we take; <span
+                    class="g">gold nodes</span> are KPI gates that release the next tranche. Each step names what it
+                spends and the dependency that makes it non-negotiable.</p>
+
+            <div class="gate">
+                <div class="g">
+                    <div class="when">T0 · selection</div>
+                    <div class="h">Receive initial grant; <span class="j">lock the policy.</span></div>
+                    <div class="d">Set up the <b>Safe multisig</b> + treasury policy (Principle 0 in writing).
+                        Ring-fence the $4k legal deposit. Pay month-1 infra. Begin the <b>DojangScore off-chain API
+                            MVP</b> — the line that creates the first self-generated revenue.</div>
+                    <div class="alloc">spends: legal ring-fence $4k · infra M1 · stipend M1 · API-build start</div>
+                </div>
+                <div class="g">
+                    <div class="when">T0 + ~30 days</div>
+                    <div class="h">Apply the <span class="j">Optimism Audit Grant</span>; sign first B2B pilot.</div>
+                    <div class="d">Submit the testnet contracts + the security note (the caught exploit) as evidence —
+                        that note is <i>proof of security maturity</i>, not a confession. In parallel, close the first
+                        <b>DojangScore API pilot</b> → first dollar of self-generated income. The dependency: the audit
+                        application needs shipped contracts, which is why deploy came before apply.</div>
+                    <div class="alloc">spends: audit-seed $3k · API-build continues</div>
+                </div>
+                <div class="g kpi">
+                    <div class="when">Gate 1 · KPI tranche slice</div>
+                    <div class="h"><span class="g">Mainnet-ready audited v1</span> + API live + ≥1 signed pilot + ≥500
+                        verified testnet wallets.</div>
+                    <div class="d">Illustrative — set to the program's rubric and our real confidence (Principle 5).
+                        Clearing it releases the first KPI slice and, critically, <b>proves</b> the
+                        build-to-audit-to-deploy chain works.</div>
+                </div>
+                <div class="g">
+                    <div class="when">T0 + ~60–90 days</div>
+                    <div class="h">Mainnet deploy of <span class="j">audited v1.</span></div>
+                    <div class="d">Keeper + oracle (Chainlink/Pyth TWAP, never spot) go live; <b>remove the open
+                            <code>mint()</code></b> so yield enters only through a gated strategy harvest;
+                        emergency-brake guardian roles active. The dependency: mainnet waits on the audit, which waits
+                        on the audit grant — the chain that keeps operating runway from being eaten.</div>
+                    <div class="alloc">spends: infra M2–4 · keeper gas/VPS · oracle</div>
+                </div>
+                <div class="g kpi">
+                    <div class="when">Gate 2 · KPI tranche slice</div>
+                    <div class="h"><span class="g">Mainnet live</span> + ≥$50k TVL <i>or</i> ≥1,000 verified wallets +
+                        ≥1 paying API customer.</div>
+                    <div class="d">This gate's clearance is the explicit trigger for the <b>first hire</b> (senior
+                        contract engineer) — Principle 2: the ecosystem pays for the headcount once traction is proven,
+                        not before.</div>
+                </div>
+                <div class="g">
+                    <div class="when">T0 + ~120 days +</div>
+                    <div class="h">WonVault <span class="j">real yield</span> (RWA), gated on legal sign-off.</div>
+                    <div class="d">The KRW-treasury strategy switches on <b>only after</b> the ring-fenced legal review
+                        clears (Principle 4). In parallel: white-label / treasury-as-a-service pilots (see §6). The
+                        dependency: real yield waits on legal, which we reserved on day one precisely so it wouldn't
+                        block here.</div>
+                </div>
+                <div class="g kpi">
+                    <div class="when">Gate 3 · retro-funding eligibility</div>
+                    <div class="h"><span class="g">≥$250k TVL <i>or</i> ≥5,000 verified</span> + measurable swap volume.
+                    </div>
+                    <div class="d">On-chain impact becomes the evidence for Optimism Retro Funding — getting paid again
+                        for value already created. Non-dilutive, post-hoc, and the natural reward for the KPIs we were
+                        already hitting.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5 · BURN & RUNWAY -->
+        <section class="sec rv">
+            <div class="ey">§5 · Monthly burn &amp; runway</div>
+            <h2>What it costs <span class="j">to keep the lights on.</span></h2>
+            <p class="sub">Two scenarios. The plan runs on <b>Lean Solo</b> until Gate 2; the team scenario is what the
+                KPI bonus funds, not the initial grant.</p>
+            <div class="tscroll">
+                <table>
+                    <tr>
+                        <th>Line item (monthly)</th>
+                        <th>Lean solo</th>
+                        <th>+ 1 sr eng + pt FE/DevOps</th>
+                    </tr>
+                    <tr>
+                        <td>Frontend / hosting (Vercel Pro)</td>
+                        <td class="num">$20</td>
+                        <td class="num">$20</td>
+                    </tr>
+                    <tr>
+                        <td>RPC / node provider (redundant)</td>
+                        <td class="num">$50–250</td>
+                        <td class="num">$250–600</td>
+                    </tr>
+                    <tr>
+                        <td>Indexer service (Goldsky / Envio / Graph)</td>
+                        <td class="num">$0–300</td>
+                        <td class="num">$200–600</td>
+                    </tr>
+                    <tr>
+                        <td>Managed Postgres (Supabase / Neon)</td>
+                        <td class="num">$0–100</td>
+                        <td class="num">$50–250</td>
+                    </tr>
+                    <tr>
+                        <td>Keeper bot VPS + gas budget</td>
+                        <td class="num">$70–350</td>
+                        <td class="num">$150–500</td>
+                    </tr>
+                    <tr>
+                        <td>Observability (Sentry / uptime / on-call)</td>
+                        <td class="num">$0–120</td>
+                        <td class="num">$50–200</td>
+                    </tr>
+                    <tr>
+                        <td>Embedded-wallet provider (by MAU)</td>
+                        <td class="num">$0–200</td>
+                        <td class="num">$100–800</td>
+                    </tr>
+                    <tr>
+                        <td>Legal / compliance retainer</td>
+                        <td class="num">$500–1,500</td>
+                        <td class="num">$1,000–2,500</td>
+                    </tr>
+                    <tr>
+                        <td>Misc (domain, Safe, status page, email)</td>
+                        <td class="num">$20</td>
+                        <td class="num">$50</td>
+                    </tr>
+                    <tr>
+                        <td><b>Subtotal infra + ops + legal</b></td>
+                        <td class="num j"><b>~$660–2,840</b></td>
+                        <td class="num j"><b>~$1,820–5,520</b></td>
+                    </tr>
+                    <tr>
+                        <td>Founder stipend (disclosed grant line)</td>
+                        <td class="num">$2,000–4,000</td>
+                        <td class="num">$2,000–4,000</td>
+                    </tr>
+                    <tr>
+                        <td>Senior contract engineer</td>
+                        <td class="num">—</td>
+                        <td class="num">$6,000–12,000</td>
+                    </tr>
+                    <tr>
+                        <td>Part-time FE / DevOps</td>
+                        <td class="num">—</td>
+                        <td class="num">$2,000–5,000</td>
+                    </tr>
+                    <tr class="tot">
+                        <td>TOTAL monthly burn</td>
+                        <td class="num">~$2.7–6.8k</td>
+                        <td class="num">~$10–18.5k</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="note"><b>Honesty on the senior engineer:</b> a non-coder founder shipping a vault that holds
+                <i>real user funds</i> should have a senior Solidity engineer own the production contract surface. That
+                is not a knock on the testnet build — it is de-risking other people's money, which is the entire ethic
+                of this plan. It is the single highest-ROI hire, and it is funded by Gate 2, not by hope.</div>
+        </section>
+
+        <!-- 6 · EARNINGS MODEL -->
+        <section class="sec rv">
+            <div class="ey">§6 · How the suite earns (the model)</div>
+            <h2>Revenue, <span class="j">by driver and by cohort.</span></h2>
+            <p class="sub">Three different engines — a B2B SaaS line (high margin, near-term, fully in our control), an
+                AUM engine (the vault), and a volume engine (the DEX, thin early, a moat more than a paycheck). Plus
+                additional methods in §7. All figures are the locked canonical model.</p>
+
+            <div class="card">
+                <div class="tag">Per 1,000 onboarded users · year one</div>
+                <h3>The cohort math, shown</h3>
+                <ul class="feat">
+                    <li><b>WonVault:</b> 25% deposit × $300 avg = $75k AUM → entry fee (1.0% blended) ≈ <b>$750
+                            one-time</b> + management (1%/yr) ≈ $62/mo + performance (15% of 5% yield) ≈ $47/mo.</li>
+                    <li><b>GIWASwap:</b> 20% swap × $400/mo volume = $80k/mo → protocol fee (0.08%) ≈ <b>$64/mo</b>.
+                    </li>
+                    <li><b>DojangScore:</b> 40% verify × $0.25 completion bounty ≈ <b>$100 one-time</b> (the on-chain
+                        per-query fee is fractions of a cent — not the real money).</li>
+                    <li><b>Cohort total ≈ ~$1.8–2k of value in year one</b>, of which ~$1k/yr is recurring while the
+                        cohort stays. Apply ~50% time-weighted 12-month retention.</li>
+                </ul>
+            </div>
+
+            <div class="tscroll">
+                <table>
+                    <tr>
+                        <th>Cumulative onboarded</th>
+                        <th>User-side recurring / yr</th>
+                        <th>Entry-fee flow / yr</th>
+                        <th>B2B SaaS + gating / yr</th>
+                        <th>Blended annual (model)</th>
+                    </tr>
+                    <tr>
+                        <td><b>1,000</b></td>
+                        <td class="num">~$1.0k</td>
+                        <td class="num">~$0.9k</td>
+                        <td class="num">$0–30k (ramp)</td>
+                        <td class="num j">~$2–33k</td>
+                    </tr>
+                    <tr>
+                        <td><b>10,000</b></td>
+                        <td class="num">~$10k</td>
+                        <td class="num">~$8.5k</td>
+                        <td class="num">$30–80k</td>
+                        <td class="num j">~$50–100k</td>
+                    </tr>
+                    <tr>
+                        <td><b>50,000</b></td>
+                        <td class="num">~$52k</td>
+                        <td class="num">~$42k</td>
+                        <td class="num">$120–250k</td>
+                        <td class="num j">~$210–340k</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="pull g">The user-side fees scale linearly and slowly; the B2B line is the one we <i>actively
+                    sell</i> — and selling is the operator's wheelhouse. So the earliest real revenue is not "wait for
+                retail"; it's "close a DojangScore API customer," which needs no users at all.<span class="by">why the
+                    build order leads with the API, not the marketing</span></div>
+
+            <div class="note"><b>When does it pay a salary?</b> Protocol fees alone become salary-relevant around <b>10k
+                    active with real AUM</b> and a real business around <b>50k</b>. Before that, the operator is paid by
+                the disclosed stipend + B2B SaaS + the grant stack — which is exactly why the plan sequences B2B-first
+                and keeps burn lean. The 50k-user path is the consumer/wallet-embed funnel (Naver Pay's ~34M users),
+                which we are positioned for but cannot fully control — so we model it as upside, not as the base case.
+            </div>
+        </section>
+
+        <!-- 7 · ADDITIONAL METHODS -->
+        <section class="sec rv">
+            <div class="ey">§7 · Additional income methods</div>
+            <h2>Beyond the three <span class="j">core fees.</span></h2>
+            <p class="sub">Ordered by how soon each is real. The first three are near-term and sales-led — i.e. in our
+                control.</p>
+            <div class="grid2">
+                <ul class="feat card">
+                    <li><b>White-label / embedded-wallet licensing</b> — license the trust-tiered vault + swap widgets
+                        to other apps/wallets for a SaaS fee + rev-share on the flow. The Naver-Pay thesis as a product
+                        line. <span class="j">Near-term, high margin.</span></li>
+                    <li><b>Treasury-as-a-service</b> — park a DAO/protocol's stablecoins in the RWA vault; earn
+                        management + performance on institutional AUM. One $5M treasury dwarfs thousands of retail
+                        users. <span class="j">Near-term, sales-led.</span></li>
+                    <li><b>Compliance / credit rail (B2B)</b> — DojangScore as a KYC/Sybil/credit gate other protocols
+                        integrate (the premium API scaled into a compliance product). <span class="j">Near-term.</span>
+                    </li>
+                </ul>
+                <ul class="feat card">
+                    <li><b>Curator fees (MetaMorpho-style)</b> — run curated, isolated vaults for institutions; take a
+                        curator cut. <span class="s">Mid-term.</span></li>
+                    <li><b>FX / on-off-ramp rev-share</b> — when the KRW stablecoin flows through the vault/swap, take a
+                        slice of the ramp provider's fee via partnership. <span class="s">Mid-term,
+                            partnership-led.</span></li>
+                    <li><b>Anonymized aggregate data</b> — trust-tier distribution / flow analytics to market-makers /
+                        exchanges / compliance firms; privacy-respecting only. <span class="s">Later.</span></li>
+                    <li><b>Retro Funding + future ecosystem grants</b> — non-dilutive cash that funds the company
+                        without dilution; budgeted as a line, not a hope. <span class="g">Ongoing.</span></li>
+                </ul>
+            </div>
+            <div class="note"><b>What we deliberately skip:</b> NFT membership tiers, pay-to-list on the DEX, and any
+                rent-seeking that erodes the trust brand. The edge is being the honest, regulated, institutional-grade
+                yield layer; monetization that smells like extraction undercuts the thesis.</div>
+        </section>
+
+        <!-- 8 · FEE-SPLIT POLICY -->
+        <section class="sec rv">
+            <div class="ey">§8 · Operator vs. protocol (written down)</div>
+            <h2>Who keeps <span class="j">which fee.</span></h2>
+            <p class="sub">Today the deployer controls the treasury/owner address, so the split is a design decision. We
+                make it in the open, because a partner who shares the upside gets more distribution than one who pockets
+                everything.</p>
+            <div class="tscroll">
+                <table>
+                    <tr>
+                        <th>Fee</th>
+                        <th>Policy</th>
+                        <th>Why</th>
+                    </tr>
+                    <tr>
+                        <td><b>Performance fee</b> (vault)</td>
+                        <td class="j">Operator carry</td>
+                        <td>Earned only when users earn — perfectly aligned; the uncapped upside for building it.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Entry + management fee</b> (vault)</td>
+                        <td class="s">Shared with ecosystem (e.g. 50/50)</td>
+                        <td>Gives GIWA a recurring stake in our success → they push distribution at us.</td>
+                    </tr>
+                    <tr>
+                        <td><b>On-chain query fee</b> (DojangScore)</td>
+                        <td class="s">Split operator / protocol</td>
+                        <td>Volume-dependent; the protocol benefits from a trusted credit rail.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Premium API / white-label / TaaS</b></td>
+                        <td class="j">Operator</td>
+                        <td>Off-chain services we build and host; rev-share where a partner's flow is involved.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Swap protocol fee</b></td>
+                        <td class="s">Expect a protocol/chain cut</td>
+                        <td>On many chains this is the chain's fee; we plan for it, not against it.</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- 9 · RISK / CONTINGENCY -->
+        <section class="sec rv">
+            <div class="ey">§9 · Risk register &amp; contingencies</div>
+            <h2>What if a tranche <span class="j">doesn't land.</span></h2>
+            <p class="sub">A plan with no plan B is a hope. Each risk below has a named fallback.</p>
+            <div class="tscroll">
+                <table>
+                    <tr>
+                        <th>Risk</th>
+                        <th>Impact</th>
+                        <th>Contingency</th>
+                    </tr>
+                    <tr>
+                        <td>Initial grant smaller than ~$20k</td>
+                        <td class="r">Runway shrinks</td>
+                        <td>Cut stipend months first (operator absorbs); keep legal ring-fence + API-build intact (they
+                            create the escape velocity). Founder's own capital covers the infra floor.</td>
+                    </tr>
+                    <tr>
+                        <td>KPI tranche slips / missed</td>
+                        <td class="r">Hire delayed</td>
+                        <td>Stay lean; the hire was gated on proof anyway (Principle 2). Re-scope the KPI to the
+                            achievable-then-beat band; lean on B2B revenue to hold the line.</td>
+                    </tr>
+                    <tr>
+                        <td>Optimism Audit Grant denied</td>
+                        <td class="r">Audit unfunded</td>
+                        <td>Fallback ladder: a competitive contest (Code4rena/Sherlock) → a smaller/cheaper auditor for
+                            v1 → a phased audit (core vault first, periphery later). Never ship real-money unaudited.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>GIWA mainnet / KRW stablecoin delayed</td>
+                        <td class="r">Consumer funnel late</td>
+                        <td>The crypto-native base + B2B SaaS do not depend on it; model the consumer funnel as upside,
+                            not base case. Ship the RWA strategy to whatever regulated stable asset is available first.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Legal review blocks the RWA strategy</td>
+                        <td class="r">Headline yield late</td>
+                        <td>Launch WonVault on a non-securities lending/fee strategy first; the RWA vault follows legal
+                            clearance. The ring-fence means the cost is already paid either way.</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <!-- 10 · CLOSE -->
+        <section class="sec rv">
+            <div class="ey">§10 · The capital-efficiency loop</div>
+            <h2>Non-dilutive in, <span class="j">milestones out, repeat.</span></h2>
+            <div class="pull">$ of non-dilutive capital → months of lean runway → shipped, audited milestones → the next
+                non-dilutive source (KPI bonus / audit grant / retro funding / B2B revenue) → repeat — until the
+                product's own fees self-fund the company. Equity is touched last, from strength, or not at all.<span
+                    class="by">the whole plan in one sentence</span></div>
+            <p class="sub" style="margin-top:14px">The $20,000 is not the budget. It is the <b>first move</b> in a
+                sequence of non-dilutive moves that buys time to build credibility and metrics without giving up the
+                company — and it is spent, line by line, in the order the dependencies force. That is the answer to "do
+                you know what our money buys and in what order." Yes: every dollar, every month, every gate — and the
+                written policy that keeps us from ever gambling it.</p>
+        </section>
+
+        <footer class="foot rv">
+            GIWA DeFi Suite · Capital Plan &amp; Use of Funds · GASOK 2026<br>
+            <a target="_blank"
+                href="https://sepolia-explorer.giwa.io/address/0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f">DojangScore</a>
+            · <a target="_blank"
+                href="https://sepolia-explorer.giwa.io/address/0x8813361aA6FFdC1B5926FA95d756b7390C680059">GIWASwap</a>
+            · WonVault 0xEE4E…69F5 (full in repo) · <a target="_blank" href="https://giwa-defi-suite.vercel.app">live
+                demo</a> · <a target="_blank" href="https://github.com/thedivine1/giwa-defi-suite">repo</a><br>
+            Built honest. Numbers are models, not promises. Official program terms govern.
+        </footer>
+
+    </div>
+    <script>try { var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .1 }); document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); }); } catch (e) { }</script>
+
+<footer class="proven-footer">
+    Proven &mdash; verified, secure, decentralized. Built on GIWA Sepolia (chain 91342).
+</footer>
+
+</body>
+
+</html>

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GIWA DeFi Suite — Demo &amp; Business Pitch Script</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e0c;
+            --panel: #0f1512;
+            --panel2: #131b16;
+            --line: #223029;
+            --line2: #2d4036;
+            --text: #eaf2ec;
+            --muted: #8aa396;
+            --faint: #5d7568;
+            --jade: #6fe3b0;
+            --jade-dim: #2f6f54;
+            --jade-deep: #0e2a20;
+            --gold: #e7c277;
+            --slate: #86b6cb;
+            --rose: #e0918f;
+            --disp: 'Syne', sans-serif;
+            --body: 'IBM Plex Sans', sans-serif;
+            --mono: 'JetBrains Mono', monospace
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--body);
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden
+        }
+
+        ::selection {
+            background: var(--gold);
+            color: var(--ink)
+        }
+
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: radial-gradient(120% 80% at 8% -5%, #13241c 0%, transparent 55%), radial-gradient(90% 70% at 100% 110%, #1a160c 0%, transparent 50%), var(--bg)
+        }
+
+        .wrap {
+            position: relative;
+            z-index: 2;
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 50px 26px 80px
+        }
+
+        @media(max-width:680px) {
+            .wrap {
+                padding: 28px 15px 60px
+            }
+        }
+
+        .kick {
+            font-family: var(--mono);
+            font-size: .62rem;
+            letter-spacing: .3em;
+            color: var(--jade);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap
+        }
+
+        .kick .pip {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--jade);
+            animation: pulse 2.4s infinite
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(95, 224, 168, .5)
+            }
+
+            70% {
+                box-shadow: 0 0 0 9px rgba(95, 224, 168, 0)
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(95, 224, 168, 0)
+            }
+        }
+
+        .title {
+            font-family: var(--disp);
+            font-weight: 800;
+            line-height: .88;
+            letter-spacing: -.03em;
+            text-transform: uppercase;
+            font-size: clamp(2rem, 7vw, 4rem);
+            margin: 14px 0 0
+        }
+
+        .title em {
+            font-style: normal;
+            color: var(--jade)
+        }
+
+        .title .g {
+            color: var(--gold)
+        }
+
+        .lede {
+            max-width: 58ch;
+            margin-top: 16px;
+            font-size: 1.08rem;
+            line-height: 1.5;
+            color: var(--muted)
+        }
+
+        .lede b {
+            color: var(--text)
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 20px;
+            font-family: var(--mono);
+            font-size: .66rem;
+            color: var(--faint)
+        }
+
+        .legend span {
+            display: flex;
+            align-items: center;
+            gap: 7px
+        }
+
+        .legend i {
+            width: 11px;
+            height: 11px;
+            border-radius: 3px;
+            display: inline-block
+        }
+
+        .act {
+            margin-top: 40px;
+            padding: 18px 20px;
+            border: 1px solid var(--line2);
+            border-radius: 10px;
+            background: linear-gradient(180deg, var(--panel2), var(--panel))
+        }
+
+        .act .n {
+            font-family: var(--mono);
+            font-size: .6rem;
+            letter-spacing: .24em;
+            color: var(--gold);
+            text-transform: uppercase
+        }
+
+        .act .h {
+            font-family: var(--disp);
+            font-weight: 700;
+            font-size: clamp(1.3rem, 4vw, 1.9rem);
+            margin: 5px 0 4px
+        }
+
+        .act .h .j {
+            color: var(--jade)
+        }
+
+        .act .d {
+            font-size: .92rem;
+            color: var(--muted)
+        }
+
+        .beat {
+            display: grid;
+            grid-template-columns: 74px 1fr;
+            gap: 0 16px;
+            border-top: 1px solid var(--line);
+            margin-top: 14px;
+            padding-top: 14px
+        }
+
+        .beat:first-of-type {
+            border-top: none;
+            margin-top: 10px
+        }
+
+        .when {
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--jade);
+            padding-top: 3px;
+            white-space: nowrap
+        }
+
+        .screen {
+            font-family: var(--mono);
+            font-size: .74rem;
+            color: var(--slate);
+            background: #0a0d0c;
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--slate);
+            border-radius: 0 6px 6px 0;
+            padding: 8px 12px;
+            margin-bottom: 9px
+        }
+
+        .screen b {
+            color: var(--text)
+        }
+
+        .say {
+            font-size: 1.06rem;
+            line-height: 1.55;
+            color: var(--text);
+            border-left: 3px solid var(--jade);
+            padding: 2px 0 2px 14px;
+            margin-bottom: 9px
+        }
+
+        .say .em {
+            color: var(--gold);
+            font-style: italic
+        }
+
+        .say .num {
+            font-family: var(--mono);
+            color: var(--jade)
+        }
+
+        .aside {
+            font-family: var(--mono);
+            font-size: .7rem;
+            color: var(--faint);
+            line-height: 1.6;
+            padding-left: 14px;
+            border-left: 3px solid var(--line2)
+        }
+
+        .aside b {
+            color: var(--muted)
+        }
+
+        .overlay {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--ink);
+            background: var(--jade);
+            border-radius: 5px;
+            padding: 3px 9px;
+            margin: 2px 4px 2px 0
+        }
+
+        .pull {
+            margin: 24px 0;
+            padding: 18px 0 18px 22px;
+            border-left: 3px solid var(--gold);
+            font-family: var(--disp);
+            font-weight: 600;
+            font-size: clamp(1.1rem, 3.4vw, 1.5rem);
+            line-height: 1.3;
+            color: var(--text)
+        }
+
+        .pull .by {
+            display: block;
+            margin-top: 9px;
+            font-family: var(--mono);
+            font-size: .6rem;
+            letter-spacing: .14em;
+            color: var(--faint);
+            text-transform: uppercase;
+            font-weight: 400
+        }
+
+        .note {
+            margin-top: 14px;
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: var(--muted);
+            line-height: 1.7;
+            border: 1px dashed var(--line2);
+            border-radius: 8px;
+            padding: 14px
+        }
+
+        .note b {
+            color: var(--gold)
+        }
+
+        .foot {
+            margin-top: 40px;
+            padding-top: 22px;
+            border-top: 1px solid var(--line);
+            font-family: var(--mono);
+            font-size: .64rem;
+            color: var(--faint);
+            line-height: 1.9;
+            text-align: center
+        }
+
+        .foot a {
+            color: var(--muted);
+            text-decoration: none
+        }
+
+        .js .rv {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity .6s ease, transform .6s ease
+        }
+
+        .js .rv.in {
+            opacity: 1;
+            transform: none
+        }
+
+        @media print {
+            .bg {
+                display: none
+            }
+
+            body {
+                background: #0a0e0c;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact
+            }
+
+            .js .rv {
+                opacity: 1 !important;
+                transform: none !important
+            }
+
+            .act,
+            .beat {
+                break-inside: avoid
+            }
+
+            .wrap {
+                padding: 20px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg"></div>
+    <div class="wrap">
+
+        <header class="rv">
+            <div class="kick"><span class="pip"></span>DEMO + BUSINESS PITCH · 2 ACTS · ~4:30 · READ WHILE RECORDING
+            </div>
+            <h1 class="title">Show the <em>product.</em><br>Then prove the <span class="g">business.</span></h1>
+            <p class="lede">A script, not an essay. <b>Act 1</b> demos the live app on <code
+                    style="color:var(--jade)">giwa-defi-suite.vercel.app</code>; <b>Act 2</b> is the operator talking
+                numbers — burn, earnings, the grant stack, the other methods. Read the green <b>SAY</b> lines verbatim;
+                the blue <b>ON SCREEN</b> lines are what you click; the grey <i>why</i> lines are for you, not the mic.
+                Pause after every number lands.</p>
+            <div class="legend"><span><i style="background:var(--jade)"></i>SAY (speak)</span><span><i
+                        style="background:var(--slate)"></i>ON SCREEN (click)</span><span><i
+                        style="background:var(--line2)"></i>why (don't speak)</span><span><i
+                        style="background:var(--gold)"></i>emphasis</span></div>
+            <div class="note"><b>Pre-flight (do before REC):</b> open the Vercel URL in its own window; Rabby on GIWA
+                Sepolia with a little gas; pre-mint test tokens; pre-load <span class="num">991</span> in the score box;
+                DND on; mic check; read the whole script once cold. Record the browser tab only — read this script off a
+                second screen or your phone. One clean take beats five perfect ones.</div>
+        </header>
+
+        <!-- ACT 0 -->
+        <div class="act rv">
+            <div class="n">Act 0 · Cold open · 0:00–0:12</div>
+            <div class="h">Camera on, <span class="j">face.</span></div>
+            <div class="beat">
+                <div class="when">0:00</div>
+                <div>
+                    <div class="screen">Camera bubble on; no screen yet.</div>
+                    <div class="say">"GIWA built a trust layer called Dojang — verified identity, verified balance, an
+                        Upbit attester — and shipped it with <span class="em">zero</span> applications on top. We built
+                        the first three reasons to trust someone. And because I'd rather lose a grant than fudge a
+                        number, I'm going to show you the product <span class="em">and</span> the business — the burn,
+                        the earnings, all of it. Two minutes on the app, two on the numbers. Let's go."</div>
+                    <div class="aside"><b>why:</b> the honesty line in the first twelve seconds is the differentiator.
+                        You've just told a room full of inflated decks that you won't be one.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACT 1 -->
+        <div class="act rv">
+            <div class="n">Act 1 · The product · 0:12–2:10</div>
+            <div class="h">Share screen → <span class="j">the live app.</span></div>
+
+            <div class="beat">
+                <div class="when">0:12</div>
+                <div>
+                    <div class="screen">Land on the masthead. <b>Connect Wallet</b> → approve in Rabby. Sidebar shows
+                        your address + a ticking block number.</div>
+                    <div class="say">"This is live on GIWA Sepolia — chain 91342. The block number on the left is
+                        ticking: real chain, not a simulator. One trust layer, three protocols that all read it — a
+                        credit score, a yield vault, a DEX. Verify once through Upbit, pay less and earn more
+                        everywhere. That loop is the product, and it's <span class="em">impossible</span> on any other
+                        chain, because Dojang and the Upbit attester only exist here."</div>
+                </div>
+            </div>
+
+            <div class="beat">
+                <div class="when">0:40</div>
+                <div>
+                    <div class="screen"><b>Score</b> tab → <b>Check</b>. It reads 0 / Unverified / 0.30%. Then type
+                        <span class="num">991</span> → <b>Write</b> → sign. → <b>Check</b> again; watch the count-up.
+                    </div>
+                    <div class="say">"Trust today has no number. Watch — zero, unverified, full fees. Now I write an
+                        attestation on-chain; this simulates Upbit verifying me through Dojang. That transaction just
+                        mined. Read it back — <span class="num">991</span>, Platinum, and my swap fee just dropped to
+                        <span class="num">0.10%</span>. Trust finally has a price tag — and that price is what you
+                        keep."
+                    </div>
+                    <div class="aside"><b>why:</b> pause two full seconds on 991 / Platinum / 0.10%. That trio is the
+                        whole thesis in three numbers.</div>
+                </div>
+            </div>
+
+            <div class="beat">
+                <div class="when">1:05</div>
+                <div>
+                    <div class="screen"><b>Swap</b> tab → swap 100 TKRW → approve → confirm.</div>
+                    <div class="say">"GIWASwap — the first DEX on GIWA. I swap at the Platinum rate, <span
+                            class="num">0.10%</span>. An unverified bot wallet pays <span class="num">0.30%</span> —
+                        three times more — for the exact same trade. Paying more to stay anonymous is the cheapest
+                        Sybil-resistance marketing a chain will ever run."</div>
+                </div>
+            </div>
+
+            <div class="beat">
+                <div class="when">1:25</div>
+                <div>
+                    <div class="screen"><b>Vault</b> tab → deposit 1000 → sign. Message line names the 0.50% fee. Then
+                        <b>▶ Run strategy tick</b> → sign. Watch the share price flash + the delta chip + P&amp;L turn
+                        green.
+                    </div>
+                    <div class="say">"And the vault — the one I'm proudest of, because it's where we got honest. I
+                        deposit 1000; the contract names my entry fee, half a percent because I'm Platinum, and invests
+                        995. Now — is this a Ponzi? Here's the test we print on the product: freeze new deposits today,
+                        do holders still earn? <span class="em">Yes</span> — because the yield is external, never the
+                        next depositor's principal. Watch — I run a strategy tick, the share price flashes, the delta
+                        ticks up, my P&amp;L turns green. Real ERC-4626 accrual. On testnet the source is simulated so
+                        you can see the engine; on mainnet it's lending, trading fees, staking, and KRW treasuries. The
+                        engine is real — only the fuel is simulated."</div>
+                    <div class="aside"><b>why:</b> this is the money shot. Let the green P&amp;L sit on screen while you
+                        say the next line.</div>
+                </div>
+            </div>
+
+            <div class="beat">
+                <div class="when">1:52</div>
+                <div>
+                    <div class="screen">Keep the vault on screen; the share price + <span class="overlay">healthy</span>
+                        state visible.</div>
+                    <div class="say">"And full transparency — our first vault build hit a real ERC-4626 inflation
+                        attack. A deposit minted zero shares and the price spiked to <span class="num">1e21</span>. We
+                        didn't find it in a test; we found it because we built a dashboard that refuses to lie about a
+                        number — then we patched it. That readout isn't decoration. It caught a real bug before real
+                        money was at stake. That instinct is the whole reason you can trust the numbers I'm about to
+                        give you."</div>
+                    <div class="aside"><b>why:</b> the exploit story is the bridge into Act 2. It earns you the right to
+                        talk forecasts.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACT 2 -->
+        <div class="act rv">
+            <div class="n">Act 2 · The business · 2:10–4:10</div>
+            <div class="h">Camera back on, or hold the dashboard; <span class="g">talk numbers.</span></div>
+            <div class="note"><b>On-screen stat cards (optional):</b> if you can drop a one-line overlay, use these
+                exact figures as you say them — they match the capital plan, so a funder cross-checking finds agreement:
+                <span class="overlay">lean burn ~$3–7k/mo</span> <span class="overlay">$20k ≈ 4–6 mo bridge</span> <span
+                    class="overlay">per 1k users ≈ $1.8–2k yr-1</span> <span class="overlay">B2B SaaS $30–60k/yr
+                    ramp</span> <span class="overlay">0% equity given</span>
+            </div>
+
+            <div class="beat">
+                <div class="when">2:10</div>
+                <div>
+                    <div class="say">"So the product works and it's honest. Now the business — and I'm going to give you
+                        ranges, not a fantasy, because a forecast you can't re-run isn't a forecast. Three engines. One:
+                        a <span class="em">B2B SaaS line</span> — the DojangScore API, where other protocols pay us
+                        monthly to gate on trust. Two: an <span class="em">AUM engine</span> — the vault's fees. Three:
+                        a <span class="em">volume engine</span> — the DEX, thin early, a moat more than a paycheck."
+                    </div>
+                </div>
+            </div>
+
+            <div class="beat">
+                <div class="when">2:32</div>
+                <div>
+                    <div class="say">"Here's the part most founders get backwards: the earliest real money is <span
+                            class="em">not</span> 'wait for retail users.' It's 'close a DojangScore API customer' —
+                        which needs <span class="em">zero</span> users. That's a sales motion, and sales is what I've
+                        done for seventeen years in industrial automation. So we model the B2B line ramping from two to
+                        five paying customers over year one — roughly <span class="num">$30–60k a year</span> — plus
+                        lumpy airdrop-gating campaigns on top. That's the revenue that de-risks the gap, and it's fully
+                        in our control."</div>
+                    <div class="aside"><b>why:</b> this is your founder-market-fit line disguised as unit economics.
+                        Land it.</div>
+                </div>
+            </div>
+
+            <div class="beat">
+                <div class="when">2:58</div>
+                <div>
+                    <div class="say">"The user side compounds underneath. Per <span class="num">1,000 onboarded</span>
+                        users, roughly <span class="num">$1.8–2k</span> of value in year one — about a thousand a year
+                        recurring while they stay, plus the one-time entry fee. At <span class="num">10,000</span>
+                        onboarded, blended with B2B, we're modeling <span class="num">$50–100k a year</span>; at <span
+                            class="num">50,000</span>, <span class="num">$210–340k</span>. And the 50k path isn't
+                        organic degen growth — it's the consumer funnel, the wallet embed, Naver Pay's thirty-four
+                        million users. We're positioned for it; we model it as upside, not as the base case, because we
+                        don't control their launch date."</div>
+                </div>
+            </div>
+
+            <div class="beat">
+                <div class="when">3:24</div>
+                <div>
+                    <div class="say">"Now the burn — because a funder's real question is 'how long does my money last.'
+                        Lean, solo, the whole on-chain product runs at roughly <span class="num">$3–7k a month</span>.
+                        Add a senior contract engineer and part-time front-end — which I want, because a non-coder
+                        founder shouldn't be the one holding real user funds in production — and that's <span
+                            class="num">$10–18k a month</span>. So the <span class="num">$20,000</span> initial grant,
+                        with the audit funded separately by the Optimism audit grant, bridges about <span
+                            class="num">four to six months</span> — exactly the window to ship the audited mainnet, sign
+                        the first API customer, and clear the first KPI gate. It is not sized to carry a team, and I
+                        will not pretend it is."</div>
+                    <div class="aside"><b>why:</b> "I will not pretend it is" is the line that makes the whole forecast
+                        credible. Say it plainly.</div>
+                </div>
+            </div>
+
+            <div class="beat">
+                <div class="when">3:50</div>
+                <div>
+                    <div class="say">"That's the sequencing, and the order is forced, not chosen. The initial grant
+                        bridges the gap. The audit grant removes the biggest rock from operating runway. The KPI bonus
+                        funds the first hire <span class="em">only after</span> we've proven traction — I hire against
+                        proof, not hope. And the legal review for the KRW-treasury RWA strategy is ring-fenced on day
+                        one, so it never blocks us later. Non-dilutive in, milestones out, repeat — until the product's
+                        own fees pay for the company. Equity is touched last, from strength, or not at all."</div>
+                </div>
+            </div>
+
+            <div class="beat">
+                <div class="when">4:08</div>
+                <div>
+                    <div class="say">"And beyond the three core fees, the methods stack: white-label the vault and swap
+                        as embedded widgets for a SaaS fee plus rev-share; run treasury-as-a-service for DAOs — one
+                        five-million-dollar treasury dwarfs thousands of retail users; sell the credit rail as a
+                        compliance product; later, curator fees, FX rev-share, and retro-funding for the impact we've
+                        already created. The point isn't any one line — it's that we're not dependent on one."</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CLOSE -->
+        <div class="act rv">
+            <div class="n">Close · 4:10–4:30</div>
+            <div class="h">Camera on, <span class="j">smile.</span></div>
+            <div class="beat">
+                <div class="when">4:10</div>
+                <div>
+                    <div class="say">"One last thing, and it's the honest one. We will never deploy restricted capital
+                        to a farm to 'earn while idle' — the yields advertised there aren't real, and it's misuse of
+                        money that isn't ours to risk. That's a written policy, not a vibe. I've spent seventeen years
+                        in industrial-automation go-to-market and been in crypto since 2011; a year ago I started
+                        building the problems I kept seeing — two products shipped. This is my first on-chain build, in
+                        72 hours, on one principle: ship, get feedback, improve, ship again. GIWA built the trust layer.
+                        We built the reason to trust — and we built it honest. Thank you."</div>
+                    <div class="aside"><b>why:</b> the written-policy line closes the loop on the LP lesson and reads as
+                        governance maturity. The smile on "thank you" is the handshake. Hold two seconds, then stop.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pull rv">If you froze every new deposit today, holders would still earn. If you froze every new user
+            today, the B2B line would still pay. If you froze every tranche today, the lean burn still ships. That
+            redundancy — product, revenue, and runway each able to stand for a while without the others — is the
+            business.<span class="by">the line to remember if you go off-script</span></div>
+
+        <div class="note rv"><b>If you run long:</b> cut the 3:50 sequencing beat to one sentence ("the order is forced:
+            bridge, then audit-funded audit, then hire against proof") and trim the §7 methods list to the first three —
+            you'll land near 3:50 and lose nothing load-bearing. <b>If a transaction stalls on camera:</b> don't panic
+            or apologize — say "testnet RPC being testnet" and keep talking over it; judges know testnets hiccup and
+            they respect a founder who doesn't flinch.</div>
+
+        <footer class="foot rv">
+            Demo + Business Pitch Script · GIWA DeFi Suite · GASOK 2026<br>
+            Record against <a target="_blank" href="https://giwa-defi-suite.vercel.app">giwa-defi-suite.vercel.app</a> ·
+            numbers locked to <code>capital-plan.html</code> · built honest<br>
+            Spoken figures are models with stated assumptions, not promises.
+        </footer>
+
+    </div>
+    <script>try { var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { threshold: .12 }); document.querySelectorAll('.rv').forEach(function (el) { io.observe(el); }); } catch (e) { }</script>
+</body>
+
+</html>
