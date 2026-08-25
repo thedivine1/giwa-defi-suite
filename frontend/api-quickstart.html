@@ -375,9 +375,27 @@ if d["ceilingProvenance"] == "ATTESTER": ...</pre>
 </section>
 
 <section id="ep-batch" class="rv">
-  <div class="ep"><span class="m post">POST</span><span class="path">/api/score/batch</span><span class="pill">pilot access</span></div>
-  <p>Score up to N addresses in one call for airdrop / allowlist sweeps. <b>Pilot access only</b> — request it with your key. Returns an array of score objects plus a per-address <code>error</code> field for malformed entries so one bad address never fails the batch.</p>
-  <div class="note"><b>Status:</b> batch is being rolled out to pilot keys. The schema is stable; treat field order as unordered JSON.</div>
+  <div class="ep"><span class="m post">POST</span><span class="path">/api/score/batch</span><span class="pill">auth</span><span class="pill">cached 45s</span></div>
+  <p>Score up to N addresses in one call for airdrop / allowlist sweeps.</p>
+  <div class="tbl"><table>
+    <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+    <tr><td><code>addresses</code></td><td>array</td><td>Array of 0x-prefixed, 40-hex EVM addresses (max 500).</td></tr>
+  </table></div>
+  <p>Returns <code>{ results, count, failed }</code>. Malformed entries or lookup failures come back as <code>{ address, error }</code> without failing the overall batch. Each valid address counts as one call toward your quota.</p>
+  <div class="codewrap">
+    <div class="tabs"><button class="on" data-lang="curl">cURL</button><button data-lang="js">JavaScript</button><button class="copy" data-copy="bch">copy</button></div>
+    <pre data-lang="curl" id="bch-curl">curl -X POST -H "x-proven-key: $PROVEN_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"addresses":["0xADDRESS1","0xADDRESS2"]}' \
+  .../api/score/batch</pre>
+    <pre data-lang="js" id="bch-js" hidden>const res = await fetch(URL, {
+  method: "POST",
+  headers: { "x-proven-key": KEY, "Content-Type": "application/json" },
+  body: JSON.stringify({ addresses: ["0xADD1", "0xADD2"] })
+});
+const { results, count, failed } = await res.json();
+console.log(`Scored ${count - failed} addresses`);</pre>
+  </div>
 </section>
 
 <!-- ============ ERRORS ============ -->
@@ -474,7 +492,7 @@ limit = DAILY[s.tierName];</pre></div>
   <div class="tbl"><table>
     <tr><th>Item</th><th>Status</th></tr>
     <tr><td>score / tier / health + caching + pilot keys</td><td>live (testnet)</td></tr>
-    <tr><td>batch scoring</td><td>pilot rollout</td></tr>
+    <tr><td>batch scoring</td><td>live (testnet)</td></tr>
     <tr><td>webhooks on tier change</td><td>planned</td></tr>
     <tr><td>mainnet deployment</td><td>planned</td></tr>
     <tr><td>multi-attester quorum scoring</td><td>planned</td></tr>

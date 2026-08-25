@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/score/batch.js": {
+      "maxDuration": 30
+    }
+  }
+}
