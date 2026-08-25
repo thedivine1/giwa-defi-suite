@@ -109,6 +109,22 @@ td .req{color:var(--rose);font-size:.66rem}
 .js .rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
 .js .rv.in{opacity:1;transform:none}
 .foot{margin-top:70px;border-top:1px solid var(--line);padding-top:24px;font-family:var(--mono);font-size:.68rem;color:var(--faint);line-height:2;text-align:center}
+/* trust */
+.trust-grid{display:grid;grid-template-columns:1fr 1.6fr;gap:40px;margin-top:16px}
+@media(max-width:760px){.trust-grid{grid-template-columns:1fr}}
+.trust-left{position:sticky;top:90px;align-self:start}
+.trust-left .eyebrow{font-family:var(--mono);font-size:.65rem;color:var(--jade);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:block}
+.trust-left h2{margin:0 0 12px;font-size:clamp(1.6rem,4vw,2.4rem)}
+.trust-left .thesis{font-size:1.1rem;color:var(--bone)}
+.trust-ledger{display:flex;flex-direction:column}
+.trust-entry{border-top:1px solid var(--line);padding:24px 0;transition:transform .3s ease}
+.trust-entry:last-child{border-bottom:1px solid var(--line)}
+@media(hover:hover){.trust-entry:hover{transform:translateX(4px)}.trust-entry:hover .idx{color:var(--jade)}}
+.trust-entry .idx{font-family:var(--mono);font-size:.75rem;color:var(--muted);margin-bottom:10px;display:block;transition:color .3s ease}
+.trust-entry h3{margin:0 0 10px;font-size:1.2rem}
+.trust-entry p{margin:0 0 12px}
+.trust-entry .contrast{font-family:var(--mono);font-size:.75rem;color:var(--muted);display:block}
+.trust-entry .contrast span{color:var(--jade);margin-right:6px}
 @media print{.bg,.scan,.sidenav,.top{display:none}body{background:#fff;color:#111}.js .rv{opacity:1;transform:none}}
 </style>
 </head>
@@ -128,6 +144,7 @@ td .req{color:var(--rose);font-size:.66rem}
   <div class="h">Start</div>
   <a href="#overview" class="on">Overview</a>
   <a href="#quickstart">Quickstart</a>
+  <a href="#trust">Why Proven</a>
   <a href="#auth">Authentication</a>
   <div class="h">Learn</div>
   <a href="#concepts">Core concepts</a>
@@ -208,6 +225,37 @@ print(r.json()["tierName"], r.json()["score"])</pre>
   </div>
   <h3>3 · Read the response</h3>
   <p><code>score</code> is the clamped 0–1000 value, <code>tierName</code> the band, <code>ceilingProvenance</code> the strongest proof class, and <code>fees</code> the on-chain discounts the tier unlocks. Full schema under <a href="#ep-score">GET /score</a>.</p>
+</section>
+
+<!-- ============ TRUST ============ -->
+<section id="trust" class="rv">
+  <div class="trust-grid">
+    <div class="trust-left">
+      <span class="eyebrow">WHY PROVEN?</span>
+      <h2>The Trust Layer</h2>
+      <div class="thesis">Activity can be faked. Identity can't.</div>
+    </div>
+    <div class="trust-ledger">
+      <div class="trust-entry rv">
+        <span class="idx">01</span>
+        <h3>Identity, not just activity.</h3>
+        <p>Volume is cheap — bots can fake a million swaps. Proven scores who you are, not just what you do: we read Dojang attestations (Upbit KYC, verified balance, account age, verified code) via EAS and compress them into one 0–1000 trust score. Activity can raise your score; it can never substitute for proof.</p>
+        <span class="contrast"><span>—</span>Activity-only scorers (e.g. Hanok) reward wash-trading. Proven rewards being a provable human.</span>
+      </div>
+      <div class="trust-entry rv">
+        <span class="idx">02</span>
+        <h3>The Provenance Ceiling.</h3>
+        <p>Our unique cryptographic guarantee: a score can never exceed the strength of its strongest underlying proof. Behavioral points grind you to Silver; consented proofs open Gold; only a regulated attester root unlocks Platinum. A farm with infinite volume still caps at Silver — the ceiling is enforced on-chain, not by policy.</p>
+        <span class="contrast"><span>—</span>No other scoring system on GIWA — including Hanok — has a ceiling. Ours is math.</span>
+      </div>
+      <div class="trust-entry rv">
+        <span class="idx">03</span>
+        <h3>Regulatory ready.</h3>
+        <p>Because Proven integrates with Dojang and Upbit KYC, the Platinum tier is compliant-ready for B2B and institutional flows. Remittance limits, tiered fees, gated allocations — every gate inherits a KYC-backed attestation, not a heuristic.</p>
+        <span class="contrast"><span>—</span>Institutions don't buy heuristics. They buy attestations.</span>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ============ AUTH ============ -->
