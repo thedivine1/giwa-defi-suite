@@ -1280,13 +1280,14 @@
     .proven-nav {
         position: sticky;
         top: 0;
-        z-index: 10000;
-        background: #070c14;
-        border-bottom: 1px solid var(--jade, #6fe3b0);
+        z-index: 50;
+        background: rgba(7,12,20,0.9);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--line);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 12px 24px;
+        padding: 12px 22px;
         font-family: var(--body, 'IBM Plex Sans', sans-serif);
     }
     .proven-nav-left {
@@ -1340,10 +1341,17 @@
 </style>
 
 <nav class="proven-nav">
-    <div class="proven-nav-left">
-        <img src="assets/provendefi_logo.jpg" alt="Proven Logo" class="proven-nav-logo" />
-        <a href="index.html" class="proven-nav-title">PROVEN</a>
-        <span class="proven-nav-tag">the trust layer for GIWA</span>
+    <div style="display:flex;align-items:center;gap:12px">
+        <div style="color:var(--jade)">
+            <svg width="28" height="32" viewBox="0 0 34 38" aria-label="Proven">
+                <path d="M17 1 32 9.5v19L17 37 2 28.5v-19z" fill="none" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 26V12h6a5 5 0 0 1 0 10h-3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+            </svg>
+        </div>
+        <div>
+            <div style="font-family:var(--disp);font-weight:800;color:var(--bone);font-size:1.1rem;letter-spacing:.02em">PROVEN</div>
+            <div style="font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em">the trust layer for GIWA</div>
+        </div>
     </div>
     <div class="proven-nav-right">
         <a href="index.html" class="proven-nav-link">App</a>
@@ -1367,12 +1375,12 @@
     <div class="ticker">
         <div class="track">
             <span><b>●</b> PROVEN · ARCHITECTURE</span><span>GIWA Sepolia · OP Stack ·
-                <i>91342</i></span><span>DojangScore <i>0xefE4…d48f</i></span><span>WonVault
+                <i>91342</i></span><span>DojangScore V2 <i>0xDe9D…492a</i></span><span>WonVault
                 <i>0xEE4E…69F5</i></span><span>GIWASwap <i>0x8813…0059</i></span><span>reads DojangScroll
                 <i>0xd507…17B9</i> + EAS <i>0x4200…0021</i></span><span>attester <b>Upbit Korea</b></span><span>solidity
                 <i>0.8.28</i> · OZ <i>v5</i></span>
             <span><b>●</b> PROVEN · ARCHITECTURE</span><span>GIWA Sepolia · OP Stack ·
-                <i>91342</i></span><span>DojangScore <i>0xefE4…d48f</i></span><span>WonVault
+                <i>91342</i></span><span>DojangScore V2 <i>0xDe9D…492a</i></span><span>WonVault
                 <i>0xEE4E…69F5</i></span><span>GIWASwap <i>0x8813…0059</i></span><span>reads DojangScroll
                 <i>0xd507…17B9</i> + EAS <i>0x4200…0021</i></span><span>attester <b>Upbit Korea</b></span><span>solidity
                 <i>0.8.28</i> · OZ <i>v5</i></span>
@@ -1856,8 +1864,8 @@
         <footer class="foot rv">
             <h4>On-chain evidence · GIWA Sepolia</h4>
             <a target="_blank" rel="noopener"
-                href="https://sepolia-explorer.giwa.io/address/0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f"><span
-                    class="lab">DojangScore</span><span>0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f</span></a>
+                href="https://sepolia-explorer.giwa.io/address/0xDe9De6f3d4a50BF414927EF6D523aFa65355492a"><span
+                    class="lab">DojangScore</span><span>0xDe9De6f3d4a50BF414927EF6D523aFa65355492a</span></a>
             <a target="_blank" rel="noopener"
                 href="https://sepolia-explorer.giwa.io/address/0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5"><span
                     class="lab">WonVault</span><span>0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5</span></a>
@@ -1901,7 +1909,7 @@
                 inv: "Source of attestation timestamps — used to compute account age (>90 days) and reward wallets that aren't fresh."
             },
             score: {
-                n: "DojangScore", role: "Tier B · the trust engine", addr: "0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f", link: "https://sepolia-explorer.giwa.io/address/0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f",
+                n: "DojangScore", role: "Tier B · the trust engine", addr: "0xDe9De6f3d4a50BF414927EF6D523aFa65355492a", link: "https://sepolia-explorer.giwa.io/address/0xDe9De6f3d4a50BF414927EF6D523aFa65355492a",
                 fns: ["score(w)", "tierOf(w)", "tierName(w)", "setManualScore()", "setWeights()"],
                 inv: "Pure read layer. score = min(1000, Σ active weights) over 4 try/catch-wrapped attestation reads (400/300/200/100). A missing proof degrades the score; it never reverts the call."
             },
