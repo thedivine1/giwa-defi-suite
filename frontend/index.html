@@ -1242,8 +1242,6 @@
         <a href="doc-score-v2.html" class="proven-nav-link">Score V2</a>
         <a href="api-quickstart.html" class="proven-nav-link">Docs</a>
         <a href="architecture.html" class="proven-nav-link">Architecture</a>
-        <a href="story.html" class="proven-nav-link">Story</a>
-        <a href="deck.html" class="proven-nav-link">Deck</a>
     </div>
 </nav>
 
@@ -1417,11 +1415,11 @@
 
             <div class="foot">
                 DojangScore · WonVault · GIWASwap — deployed on GIWA Sepolia (OP Stack, chain 91342)<br>
-                Reads <a target="_blank" rel="noopener" title="view on explorer"
-                    href="https://sepolia-explorer.giwa.io/address/0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9">0xd5077b67dcb56caC8b270C7788FC3E6ee03F17B9</a>
-                &amp; <a target="_blank" rel="noopener" title="view on explorer"
-                    href="https://sepolia-explorer.giwa.io/address/0x4200000000000000000000000000000000000021">0x4200000000000000000000000000000000000021</a>
-                attestations · attester: Upbit Korea
+                DojangScore V2:
+                <a target="_blank" rel="noopener" title="view on explorer" href="https://sepolia-explorer.giwa.io/address/0xDe9De6f3d4a50BF414927EF6D523aFa65355492a" style="font-family:var(--mono);font-size:.78rem">0xDe9De6f3d4a50BF414927EF6D523aFa65355492a</a>
+                <span style="background:#0e2a20;color:#6fe3b0;border:1px solid #2f6f54;border-radius:20px;padding:2px 8px;font-size:.62rem;font-family:var(--mono);margin:0 4px">v2 · Current</span>
+                <button onclick="navigator.clipboard.writeText('0xDe9De6f3d4a50BF414927EF6D523aFa65355492a').then(()=>{this.textContent='copied';setTimeout(()=>this.textContent='copy',900)})" style="font-family:var(--mono);font-size:.62rem;color:#8fa1b8;background:none;border:1px solid #1d2a3d;border-radius:4px;padding:2px 7px;cursor:pointer">copy</button>
+                <span style="font-family:var(--mono);font-size:.62rem;color:#5d7089">v1 · Deprecated</span>
             </div>
         </main>
     </div>
@@ -1432,7 +1430,7 @@
             chainId: 91342, rpc: "https://sepolia-rpc.giwa.io", explorer: "https://sepolia-explorer.giwa.io",
             TKRW: "0x11DF7b38DA5F496F2B02bb6E51eAcDFEfcAB4f40",
             TUSD: "0x84D986ac1B5913253a417a1AB68F94CD77e59a80",
-            DojangScore: "0xefE43F0258f9Ea8d05b2bf65D1A3d92afbB5d48f",
+            DojangScore: "0xDe9De6f3d4a50BF414927EF6D523aFa65355492a",
             WonVault: "0xEE4E6829EB6A7B79f826AD99E06d8Fb5629169F5",
             GIWASwapFactory: "0x7c7825AEF6b8b590dcF48d8C5059F3594B84a99F",
             Pool: "0x8813361aA6FFdC1B5926FA95d756b7390C680059"
@@ -1706,8 +1704,49 @@
         }
     </script>
 
+<style>
+#contactMessage:focus {
+    border-color: var(--jade) !important;
+    box-shadow: 0 0 0 3px var(--jade-deep) !important;
+}
+</style>
+<section class="panel" id="p-contact" style="margin-top: 60px; margin-bottom: 40px; display: block;">
+    <div class="card" style="max-width: 600px; margin: 0 auto;">
+        <h2>Contact Us</h2>
+        <div class="sub">For API partnerships, pilot keys, or technical inquiries, reach out below. We read every message.</div>
+        <form id="contactForm" onsubmit="submitContactForm(event)" style="margin-top: 24px;">
+            <div class="field">
+                <input id="contactName" type="text" placeholder="Name" required />
+            </div>
+            <div class="field">
+                <input id="contactEmail" type="email" placeholder="Email" required />
+            </div>
+            <div class="field" style="height: auto;">
+                <textarea id="contactMessage" placeholder="Message" required style="width: 100%; background: var(--panel); border: 1px solid var(--line2); border-radius: 6px; color: var(--text); padding: 12px 14px; font-family: var(--mono); font-size: .85rem; transition: .18s; outline: none; min-height: 120px; resize: vertical;"></textarea>
+            </div>
+            <div style="text-align: right; margin-top: 16px;">
+                <button type="submit" class="btn">Send Message</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script>
+function submitContactForm(event) {
+    event.preventDefault();
+    const name = document.getElementById("contactName").value;
+    const email = document.getElementById("contactEmail").value;
+    const message = document.getElementById("contactMessage").value;
+    
+    const getSecureEmail = () => "moc.liamg@ifed.nevorp".split("").reverse().join("");
+    const subject = encodeURIComponent(`Proven Inquiry from ${name}`);
+    const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`);
+    window.location.href = `mailto:${getSecureEmail()}?subject=${subject}&body=${body}`;
+}
+</script>
+
 <footer class="proven-footer">
-    Proven &mdash; verified, secure, decentralized. Built on GIWA Sepolia (chain 91342).
+    Proven &mdash; verified, secure, decentralized. Built on GIWA Sepolia (chain 91342). &middot; <a href="mailto:proven.defi@gmail.com" style="color:#8fa1b8">proven.defi@gmail.com</a>
 </footer>
 
 </body>
