@@ -43,7 +43,8 @@ async function withFailover(fn) {
 
 // ─── Upstash KV Helpers ────────────────────────────────────────────────────────
 function kvBase() {
-    const { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: tok } = process.env;
+    let { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: tok } = process.env;
+    if (url && url.endsWith('/')) url = url.slice(0, -1);
     return { url, tok };
 }
 
@@ -59,7 +60,10 @@ async function kvGet(k) {
         const r = await fetch(`${url}/get/${encodeURIComponent(k)}`, {
             headers: { Authorization: `Bearer ${tok}` }
         });
-        if (!r.ok) return null;
+        if (!r.ok) {
+            console.error("kvGet HTTP error:", r.status, await r.text());
+            return null;
+        }
         const j = await r.json();
         if (j.result == null) return null;
         try { return JSON.parse(j.result); } catch { return j.result; }
@@ -74,11 +78,12 @@ async function kvSet(k, v, ttlSec) {
     if (!url || !tok) return;
     try {
         const qs = ttlSec ? `?EX=${ttlSec}` : "";
-        await fetch(`${url}/set/${encodeURIComponent(k)}${qs}`, {
+        const r = await fetch(`${url}/set/${encodeURIComponent(k)}${qs}`, {
             method: "POST",
             headers: { Authorization: `Bearer ${tok}` },
             body: JSON.stringify(v)
         });
+        if (!r.ok) console.error("kvSet HTTP error:", r.status, await r.text());
     } catch (e) {
         console.error("kvSet err:", e);
     }
