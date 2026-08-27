@@ -1,4 +1,4 @@
-const { getContract, authenticate, validateAddress, ONCHAIN_FEES } = require('../utils');
+const { withFailover, authenticate, validateAddress, ONCHAIN_FEES, TIER_NAMES } = require('../utils');
 
 export default async function handler(req, res) {
     const auth = authenticate(req, res);
@@ -10,9 +10,10 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { contract } = getContract();
-        const tier = Number(await contract.tierOfWallet(address));
-        const tierName = await contract.tierName(tier);
+        const tier = await withFailover(async ({ contract }) => {
+            return Number(await contract.tierOfWallet(address));
+        });
+        const tierName = TIER_NAMES[tier];
 
         res.status(200).json({
             address,
@@ -23,6 +24,10 @@ export default async function handler(req, res) {
         });
     } catch (error) {
         console.error(error);
+        if (error.code === "RPC_DOWN") {
+            res.setHeader("Retry-After", "5");
+            return res.status(503).json({ error: "upstream RPC unavailable", code: "RPC_DOWN" });
+        }
         res.status(500).json({ error: "Internal server error" });
     }
 }
