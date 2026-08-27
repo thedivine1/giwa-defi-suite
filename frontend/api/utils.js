@@ -48,6 +48,9 @@ function kvBase() {
         url = url.replace(/^["']|["']$/g, '');
         if (url.endsWith('/')) url = url.slice(0, -1);
     }
+    if (tok) {
+        tok = tok.replace(/^["']|["']$/g, '');
+    }
     return { url, tok };
 }
 
