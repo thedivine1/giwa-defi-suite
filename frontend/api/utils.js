@@ -75,17 +75,16 @@ async function kvGet(k) {
 
 async function kvSet(k, v, ttlSec) {
     const { url, tok } = kvBase();
-    if (!url || !tok) return;
-    try {
-        const qs = ttlSec ? `?EX=${ttlSec}` : "";
-        const r = await fetch(`${url}/set/${encodeURIComponent(k)}${qs}`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${tok}` },
-            body: JSON.stringify(v)
-        });
-        if (!r.ok) console.error("kvSet HTTP error:", r.status, await r.text());
-    } catch (e) {
-        console.error("kvSet err:", e);
+    if (!url || !tok) throw new Error("KV_NOT_CONFIGURED");
+    const qs = ttlSec ? `?EX=${ttlSec}` : "";
+    const r = await fetch(`${url}/set/${encodeURIComponent(k)}${qs}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${tok}` },
+        body: JSON.stringify(v)
+    });
+    if (!r.ok) {
+        const text = await r.text();
+        throw new Error(`Upstash kvSet error: ${r.status} ${text}`);
     }
 }
 

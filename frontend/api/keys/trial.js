@@ -45,7 +45,12 @@ module.exports = async function handler(req, res) {
         createdAt: new Date().toISOString()
     };
 
-    await kvSet("key:" + token, record, 2592000); // 30 days
+    try {
+        await kvSet("key:" + token, record, 2592000); // 30 days
+    } catch (e) {
+        console.error("kvSet failed in trial.js:", e.message);
+        return res.status(500).json({ error: "Failed to persist trial key.", details: e.message });
+    }
 
     return res.status(200).json({
         key: token,
