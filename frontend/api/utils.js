@@ -14,7 +14,15 @@ const TIER_NAMES = ["Standard","Silver","Gold","Platinum"];
 const PROV_NAMES = {0:"NONE",1:"BEHAVIORAL",2:"CONSENTED",3:"ATTESTER"};
 const ONCHAIN_FEES = {0:{swap:"0.30%",vault:"2.00%"},1:{swap:"0.20%",vault:"1.50%"},2:{swap:"0.15%",vault:"1.00%"},3:{swap:"0.10%",vault:"0.50%"}};
 
-const RPCS = [process.env.GIWA_RPC || "https://sepolia-rpc.giwa.io", "https://sepolia-rpc-flashblocks.giwa.io"];
+function env(k) {
+    let v = process.env[k];
+    if (!v) return v;
+    v = v.trim().replace(/^["']|["']$/g, '');
+    if (v.startsWith('http') && v.endsWith('/')) v = v.slice(0, -1);
+    return v;
+}
+
+const RPCS = [env("GIWA_RPC") || "https://sepolia-rpc.giwa.io", "https://sepolia-rpc-flashblocks.giwa.io"];
 
 // ─── RPC Failover ──────────────────────────────────────────────────────────────
 async function withFailover(fn) {
@@ -43,14 +51,8 @@ async function withFailover(fn) {
 
 // ─── Upstash KV Helpers ────────────────────────────────────────────────────────
 function kvBase() {
-    let { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: tok } = process.env;
-    if (url) {
-        url = url.replace(/^["']|["']$/g, '');
-        if (url.endsWith('/')) url = url.slice(0, -1);
-    }
-    if (tok) {
-        tok = tok.replace(/^["']|["']$/g, '');
-    }
+    const url = env("UPSTASH_REDIS_REST_URL");
+    const tok = env("UPSTASH_REDIS_REST_TOKEN");
     return { url, tok };
 }
 
@@ -128,7 +130,7 @@ async function authKey(req) {
 
     // 1) Manual pilot keys (env PROVEN_KEYS always wins)
     let envKeys = [];
-    try { envKeys = JSON.parse(process.env.PROVEN_KEYS || "[]"); } catch {}
+    try { envKeys = JSON.parse(env("PROVEN_KEYS") || "[]"); } catch {}
     const envMatch = envKeys.find(k => k.key === token);
     if (envMatch) {
         return { name: envMatch.name || "pilot", tier: "pilot", cap: envMatch.cap || 1000000, burst: 300, _token: token, _env: true };
