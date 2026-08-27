@@ -1,7 +1,9 @@
-const { withFailover, authenticate, CHAIN_ID } = require('./utils');
+"use strict";
+const { withFailover, authKey, kvConfigured, CHAIN_ID, CONTRACT_ADDRESS } = require('./utils');
 
-export default async function handler(req, res) {
-    if (!authenticate(req, res)) return;
+module.exports = async function handler(req, res) {
+    const record = await authKey(req);
+    if (!record) return res.status(401).json({ error: "Missing or invalid x-proven-key" });
 
     try {
         let ms = 0;
@@ -12,14 +14,14 @@ export default async function handler(req, res) {
             return b;
         });
 
-        const l2 = !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+        const l2 = kvConfigured();
 
-        res.status(200).json({ 
-            ok: true, 
-            chain: "giwa-sepolia", 
-            chainId: CHAIN_ID, 
+        res.status(200).json({
+            ok: true,
+            chain: "giwa-sepolia",
+            chainId: CHAIN_ID,
             block,
-            contract: "0xDe9De6f3d4a50BF414927EF6D523aFa65355492a",
+            contract: CONTRACT_ADDRESS,
             cache: { l1: true, l2 },
             rpc: { ok: true, ms }
         });
@@ -31,4 +33,4 @@ export default async function handler(req, res) {
         }
         res.status(500).json({ error: "Internal server error" });
     }
-}
+};

@@ -204,8 +204,15 @@ td .req{color:var(--rose);font-size:.66rem}
 <section id="quickstart" class="rv">
   <h2><span class="n">02</span>Quickstart</h2>
   <p>Three steps to a live score.</p>
-  <h3>1 · Get a key</h3>
-  <p>Request a pilot key (see <a href="#getkey">Get a key</a>). Keys are issued per project and carry a monthly quota.</p>
+  <h3>1 · Get a key (instant)</h3>
+  <p>Issue a free trial key instantly — no email, no wait:</p>
+  <div class="codewrap" style="margin-bottom:1rem">
+    <div class="tabs"><button class="on" data-lang="curl">cURL</button><button class="copy" data-copy="getkey">copy</button></div>
+    <pre data-lang="curl" id="getkey-curl">curl -X POST https://giwa-defi-suite.vercel.app/api/keys/trial \
+  -H "content-type: application/json" \
+  -d '{"project":"my-launchpad"}'</pre>
+  </div>
+  <p>Returns a <code>key</code> — 1,000 free testnet calls · 60 req/min · upgrade nudge at 900. Keep the key server-side. Subscribe for more at <a href="mailto:proven.defi@gmail.com">proven.defi@gmail.com</a>.</p>
   <h3>2 · Make your first request</h3>
   <div class="codewrap">
     <div class="tabs"><button class="on" data-lang="curl">cURL</button><button data-lang="js">JavaScript</button><button data-lang="py">Python</button><button class="copy" data-copy="qs">copy</button></div>
@@ -418,7 +425,7 @@ console.log(`Scored ${count - failed} addresses`);</pre>
   <h2><span class="n">06</span>Rate limits &amp; caching</h2>
   <div class="tbl"><table>
     <tr><th>Key tier</th><th>Burst</th><th>Monthly</th><th>Notes</th></tr>
-    <tr><td>Pilot</td><td>60 req/min</td><td>1,000</td><td>Free during testnet.</td></tr>
+    <tr><td>Trial (instant)</td><td>60 req/min</td><td>1,000 calls/mo</td><td>Free on testnet. Instant via <code>POST /api/keys/trial</code>. Upgrade nudge at 900 calls. Subscribe via <a href="mailto:proven.defi@gmail.com">proven.defi@gmail.com</a>.</td></tr>
     <tr><td>Builder</td><td>300 req/min</td><td>50,000</td><td>Paid.</td></tr>
     <tr><td>Scale</td><td>custom</td><td>custom</td><td>Talk to us.</td></tr>
   </table></div>
@@ -502,8 +509,29 @@ limit = DAILY[s.tierName];</pre></div>
 <!-- ============ GET KEY ============ -->
 <section id="getkey" class="rv">
   <h2><span class="n">11</span>Get a key</h2>
-  <p>Pilot keys are free during testnet and issued per project. Tell us what you're building (launchpad, airdrop, payments, quests) and we'll issue a key sized to your sweep. Reach out via the Proven X profile or the GASOK cohort channel — the same humans who built the contracts answer.</p>
-  <div class="good"><b>Why builders adopt it:</b> one header replaces your own sybil heuristics, and the ceiling means you inherit an anti-fraud guarantee you didn't have to design.</div>
+  <h3>Instant trial (recommended)</h3>
+  <p>Issue yourself a key in seconds — no signup, no email. One command:</p>
+  <div class="codewrap">
+    <div class="tabs"><button class="on" data-lang="curl">cURL</button><button class="copy" data-copy="getkey2">copy</button></div>
+    <pre data-lang="curl" id="getkey2-curl">curl -X POST https://giwa-defi-suite.vercel.app/api/keys/trial \
+  -H "content-type: application/json" \
+  -d '{"project":"my-launchpad"}'</pre>
+  </div>
+  <p>You'll receive:</p>
+  <div class="tbl"><table>
+    <tr><th>Field</th><th>Value</th></tr>
+    <tr><td>cap</td><td>1,000 calls / 30 days</td></tr>
+    <tr><td>burstPerMin</td><td>60 req/min</td></tr>
+    <tr><td>nudge</td><td>Notice appended to responses after call 900</td></tr>
+    <tr><td>upgrade</td><td><a href="mailto:proven.defi@gmail.com">proven.defi@gmail.com</a></td></tr>
+  </table></div>
+  <p>Check your usage at any time:</p>
+  <div class="codewrap">
+    <div class="tabs"><button class="on" data-lang="curl">cURL</button><button class="copy" data-copy="usage">copy</button></div>
+    <pre data-lang="curl" id="usage-curl">curl -H "x-proven-key: YOUR_KEY" \
+  https://giwa-defi-suite.vercel.app/api/keys/usage</pre>
+  </div>
+  <div class="good"><b>Why builders adopt it:</b> one header replaces your own sybil heuristics, and the provenance ceiling means you inherit an anti-fraud guarantee you didn't have to design.</div>
 </section>
 
 <footer class="foot">
