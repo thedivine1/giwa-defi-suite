@@ -44,7 +44,10 @@ async function withFailover(fn) {
 // ─── Upstash KV Helpers ────────────────────────────────────────────────────────
 function kvBase() {
     let { UPSTASH_REDIS_REST_URL: url, UPSTASH_REDIS_REST_TOKEN: tok } = process.env;
-    if (url && url.endsWith('/')) url = url.slice(0, -1);
+    if (url) {
+        url = url.replace(/^["']|["']$/g, '');
+        if (url.endsWith('/')) url = url.slice(0, -1);
+    }
     return { url, tok };
 }
 
