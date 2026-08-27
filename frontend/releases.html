@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Releases · Proven DojangScore</title>
+<meta name="description" content="Proven DojangScore API release history, current version, and roadmap."/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#070c14;--panel:#0d1420;--panel2:#111a29;--line:#1d2a3d;--line2:#2a3b52;--bone:#e8edf4;--text:#dfe7f0;--muted:#8fa1b8;--faint:#5d7089;--jade:#6fe3b0;--jade-dim:#2f6f54;--jade-deep:#0e2a20;--gold:#e7c277;--slate:#86b6cb;--rose:#e0918f;--vio:#c79bd6;--disp:'Syne',sans-serif;--body:'IBM Plex Sans',sans-serif;--mono:'JetBrains Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--text);font-family:var(--body);font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.bg{position:fixed;inset:0;z-index:-2;background:radial-gradient(120% 80% at 8% -5%,#0e1a2b 0%,transparent 55%),radial-gradient(90% 70% at 100% 110%,#101322 0%,transparent 50%),var(--ink)}
+.bg.grid{z-index:-1;opacity:.4;background-image:radial-gradient(var(--line) 1px,transparent 1.4px);background-size:32px 32px;animation:pan 60s linear infinite}
+@keyframes pan{to{background-position:32px 64px}}
+a{color:var(--jade);text-decoration:none}a:hover{text-decoration:underline}
+.top{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:18px;padding:12px 22px;background:rgba(7,12,20,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .logo{font-family:var(--disp);font-weight:800;letter-spacing:.02em;color:var(--bone);font-size:1.05rem}
+.top .logo em{font-style:normal;color:var(--jade)}
+.top .spacer{flex:1}
+.top nav{display:flex;gap:16px;align-items:center}
+.top nav a{font-size:.82rem;color:var(--muted);transition:color .15s}
+.top nav a:hover{color:var(--bone);text-decoration:none}
+.wrap{max-width:820px;margin:0 auto;padding:48px 24px 96px}
+h1{font-family:var(--disp);font-weight:800;font-size:clamp(2rem,5vw,3rem);color:var(--bone);margin-bottom:8px}
+.tagline{color:var(--muted);margin-bottom:48px;font-size:.95rem}
+.section-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:12px;margin-top:48px}
+.release-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px 28px;margin-bottom:20px}
+.release-card .tag{display:inline-block;font-family:var(--mono);font-size:.68rem;border-radius:20px;padding:3px 10px;margin-bottom:10px}
+.release-card .tag.current{background:var(--jade-deep);border:1px solid var(--jade-dim);color:var(--jade)}
+.release-card .tag.roadmap{background:#1a1230;border:1px solid #5c3f8f;color:var(--vio)}
+.release-card .tag.shipped{background:var(--panel2);border:1px solid var(--line2);color:var(--muted)}
+.release-card h2{font-family:var(--disp);font-size:1.3rem;color:var(--bone);margin-bottom:4px}
+.release-card .date{font-family:var(--mono);font-size:.72rem;color:var(--faint);margin-bottom:14px}
+.release-card ul{padding-left:18px;color:var(--muted);font-size:.9rem}
+.release-card ul li{margin-bottom:5px}
+.release-card ul li strong{color:var(--text)}
+.contracts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{font-family:var(--mono);font-size:.68rem;background:var(--panel2);border:1px solid var(--line2);border-radius:6px;padding:4px 10px;color:var(--muted)}
+footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);color:var(--faint);font-family:var(--mono);font-size:.72rem}
+footer a{color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="bg grid"></div>
+
+<header class="top">
+  <div class="logo"><em>P</em>ROVEN</div>
+  <div class="spacer"></div>
+  <nav>
+    <a href="index.html">App</a>
+    <a href="doc-score-v2.html">Score V2</a>
+    <a href="api-quickstart.html">Docs</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="releases.html" style="color:var(--jade)">Releases</a>
+  </nav>
+</header>
+
+<div class="wrap">
+  <h1>Releases</h1>
+  <p class="tagline">Proven DojangScore · GIWA Sepolia 91342 · contract changelog &amp; roadmap</p>
+
+  <!-- ─── CURRENT ─────────────────────────────────────────────────────── -->
+  <div class="section-label" id="current">Current</div>
+
+  <div class="release-card">
+    <span class="tag current">v2.1 · Current</span>
+    <h2>DojangScore V2 + Self-Serve API Keys</h2>
+    <div class="date">2026-08-27</div>
+    <ul>
+      <li><strong>DojangScoreV2</strong> — Provenance-ceiling engine. Score capped by strongest proof class: ATTESTER (1000), CONSENTED (799), BEHAVIORAL (499), STATE (299).</li>
+      <li><strong>Self-serve trial keys</strong> — Instant via <code>POST /api/keys/trial</code>. 1,000 calls / 60 req·min burst / nudge at 900.</li>
+      <li><strong>Two-level cache</strong> — L1 in-memory (45 s) + L2 Upstash Redis. Cold p50 511 ms, cached p50 241 ms.</li>
+      <li><strong>RPC failover</strong> — 2 500 ms timeout + retry across 2 RPC nodes; 503 on full outage.</li>
+      <li><strong>Env hardening</strong> — <code>env()</code> sanitizer strips quotes / whitespace from all env vars.</li>
+    </ul>
+    <div class="contracts">
+      <span class="chip">DojangScoreV2</span>
+      <span class="chip">WonVault</span>
+      <span class="chip">GIWASwapFactory</span>
+      <span class="chip">GIWASwapPool</span>
+      <span class="chip">TKRW</span>
+      <span class="chip">TUSD</span>
+    </div>
+  </div>
+
+  <div class="release-card">
+    <span class="tag shipped">v2.0 · Shipped</span>
+    <h2>DojangScore V2 — Architecture</h2>
+    <div class="date">2026-08-26</div>
+    <ul>
+      <li>Introduced <code>scoreBreakdown()</code> replacing V1 attestation sum.</li>
+      <li>Single RPC call per address read — <code>tierName()</code> removed, static <code>TIER_NAMES[]</code>.</li>
+      <li>Architecture page updated with 6-contract inventory and provenance ceiling spec.</li>
+    </ul>
+  </div>
+
+  <div class="release-card">
+    <span class="tag shipped">v1.0 · Shipped</span>
+    <h2>DojangScore V1 — Initial Release</h2>
+    <div class="date">2026-08-01</div>
+    <ul>
+      <li>Basic attestation-sum scoring. Manual PROVEN_KEYS pilot auth.</li>
+      <li>Score / tier / batch endpoints. In-memory L1 cache.</li>
+    </ul>
+  </div>
+
+  <!-- ─── ROADMAP ─────────────────────────────────────────────────────── -->
+  <div class="section-label" id="roadmap">Roadmap</div>
+
+  <div class="release-card">
+    <span class="tag roadmap">v3.0 · Planned</span>
+    <h2>Mainnet Launch + Paid Tiers</h2>
+    <div class="date">Target: Q4 2026</div>
+    <ul>
+      <li>Production deployment on GIWA Mainnet.</li>
+      <li>Builder (50 k calls/mo) and Scale (custom) paid tiers.</li>
+      <li>OAuth / ENS / Passport consented-proof integrations live.</li>
+      <li>Webhook push for score changes &gt; 50 points.</li>
+      <li>SLA 99.9 % uptime with multi-region RPC failover.</li>
+    </ul>
+  </div>
+
+  <div class="release-card">
+    <span class="tag roadmap">v2.2 · Near-term</span>
+    <h2>ATTESTER Integration</h2>
+    <div class="date">Target: Q3 2026</div>
+    <ul>
+      <li>Upbit / Dojang regulated-attester proofs → ceiling 1000 (Platinum).</li>
+      <li>On-chain attestation registry contract deployment.</li>
+    </ul>
+  </div>
+
+  <footer>
+    PROVEN · DojangScore API · GIWA Sepolia 91342 · <a href="index.html">app</a> · <a href="architecture.html">architecture</a> · <a href="mailto:proven.defi@gmail.com">proven.defi@gmail.com</a>
+  </footer>
+</div>
+</body>
+</html>

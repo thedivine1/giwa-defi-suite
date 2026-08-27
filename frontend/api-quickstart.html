@@ -136,6 +136,7 @@ td .req{color:var(--rose);font-size:.66rem}
   <span class="api">DojangScore API</span>
   <span class="ver">v1 · testnet</span>
   <span class="spacer"></span>
+  <a class="key" href="releases.html" style="margin-right:6px;background:transparent;color:var(--muted);border:1px solid var(--line2);border-radius:6px;padding:7px 14px;font-family:var(--mono);font-size:.72rem;font-weight:400">Releases</a>
   <a class="key" href="#getkey">Get a key</a>
 </div>
 
@@ -432,9 +433,22 @@ console.log(`Scored ${count - failed} addresses`);</pre>
   <p>Responses are cached for <b>45 seconds</b> per address; <code>cached:true</code> tells you a value came from cache. For most gating use-cases 45s staleness is irrelevant; for settlement, read on-chain.</p>
 </section>
 
+<!-- ============ PERFORMANCE ============ -->
+<section id="performance" class="rv">
+  <h2><span class="n">07</span>Performance <span style="font-family:var(--mono);font-size:.6em;color:var(--faint)">· measured on live deployment</span></h2>
+  <p style="color:var(--muted);font-family:var(--mono);font-size:.8rem;margin-bottom:12px">Measured 2026-08-27 · GIWA Sepolia (chainId 91342) · 10–15 sequential requests each</p>
+  <div class="tbl"><table>
+    <tr><th>Endpoint</th><th>p50</th><th>p95</th><th>max</th></tr>
+    <tr><td><code>/api/health</code></td><td>484 ms</td><td>761 ms</td><td>761 ms</td></tr>
+    <tr><td><code>/api/score/:addr</code> (cached)</td><td>241 ms</td><td>276 ms</td><td>276 ms</td></tr>
+    <tr><td><code>/api/score/:addr</code> (cold)</td><td>511 ms</td><td>1207 ms</td><td>1207 ms</td></tr>
+  </table></div>
+  <p style="color:var(--faint);font-family:var(--mono);font-size:.72rem;margin-top:10px">Cached reads return in under 300 ms. Cold reads include an RPC round-trip to GIWA Sepolia. Times measured from a single origin; your latency may vary by region.</p>
+</section>
+
 <!-- ============ PLAYGROUND ============ -->
 <section id="playground" class="rv">
-  <h2><span class="n">07</span>Playground <span style="font-family:var(--mono);font-size:.6em;color:var(--faint)">· reads the chain live, no key needed</span></h2>
+  <h2><span class="n">08</span>Playground <span style="font-family:var(--mono);font-size:.6em;color:var(--faint)">· reads the chain live, no key needed</span></h2>
   <p>This reads <b>DojangScoreV2</b> directly over public RPC — the same source the API caches — so you can verify any wallet right now.</p>
   <div class="pg">
     <div class="row">
