@@ -1367,13 +1367,13 @@
     <div class="ticker">
         <div class="track">
             <span><b>●</b> PROVEN · ARCHITECTURE</span><span>GIWA Sepolia · OP Stack ·
-                <i>91342</i></span><span>DojangScore V2 <i>0xDe9D…492a</i></span><span>WonVault
-                <i>0xEE4E…69F5</i></span><span>GIWASwap <i>0x8813…0059</i></span><span>reads DojangScroll
+                <i>91342</i></span><span>Our contracts: <b>6</b></span><span>DojangScore V2 <i>0xDe9D…492a</i></span><span>WonVault
+                <i>0xEE4E…69F5</i></span><span>GIWASwapFactory <i>0x7c78…a99F</i></span><span>GIWASwapPool <i>0x8813…0059</i></span><span>TKRW · TUSD stablecoins</span><span>reads DojangScroll
                 <i>0xd507…17B9</i> + EAS <i>0x4200…0021</i></span><span>attester <b>Upbit Korea</b></span><span>solidity
                 <i>0.8.28</i> · OZ <i>v5</i></span>
             <span><b>●</b> PROVEN · ARCHITECTURE</span><span>GIWA Sepolia · OP Stack ·
-                <i>91342</i></span><span>DojangScore V2 <i>0xDe9D…492a</i></span><span>WonVault
-                <i>0xEE4E…69F5</i></span><span>GIWASwap <i>0x8813…0059</i></span><span>reads DojangScroll
+                <i>91342</i></span><span>Our contracts: <b>6</b></span><span>DojangScore V2 <i>0xDe9D…492a</i></span><span>WonVault
+                <i>0xEE4E…69F5</i></span><span>GIWASwapFactory <i>0x7c78…a99F</i></span><span>GIWASwapPool <i>0x8813…0059</i></span><span>TKRW · TUSD stablecoins</span><span>reads DojangScroll
                 <i>0xd507…17B9</i> + EAS <i>0x4200…0021</i></span><span>attester <b>Upbit Korea</b></span><span>solidity
                 <i>0.8.28</i> · OZ <i>v5</i></span>
         </div>
@@ -1493,8 +1493,8 @@
                 </div>
                 <div class="stat">
                     <div class="k">Our contracts</div>
-                    <div class="v g">4</div>
-                    <div class="n">score · vault · factory · pool</div>
+                    <div class="v g">6</div>
+                    <div class="n">score · vault · factory · pool · TKRW · TUSD</div>
                 </div>
                 <div class="stat">
                     <div class="k">Attestations read</div>
@@ -1526,60 +1526,39 @@
             </div>
         </section>
 
-        <!-- §02 DOJANGSCORE -->
+        <!-- §02 DOJANGSCORE V2 -->
         <section class="sec rv">
             <div class="num">02</div>
             <div class="ey">Tier B · the trust engine</div>
-            <h2>Dojang<span class="j">Score</span></h2>
-            <p class="sub">A pure read layer: it composes four Dojang attestations into one number and four tiers. No
-                state of its own about users — only a cache of owner-set manual scores for bootstrapping.</p>
+            <h2>DojangScore V2 · <span class="j">Provenance-ceiling engine</span></h2>
+            <p class="sub">V2 introduces the <b>provenance ceiling</b>: a wallet's score can never exceed the strength of its strongest proof. A sybil farm can grind to Silver, but cannot buy Platinum.</p>
             <div class="grid2">
                 <div class="card">
-                    <div class="tag">Composite · exact</div>
-                    <h3>How the 0–1000 is built</h3>
+                    <div class="tag">Provenance classes · ranked</div>
+                    <h3>Four classes, four ceilings</h3>
                     <div class="formula"><span class="fn">score</span>(w) = <span class="fn">min</span>(<span
-                            class="op">1000</span>, manual[w] <span class="op">||</span> Σ active_weights)<br><span
-                            class="cm">// each attestation read is try/catch-wrapped —</span><br><span class="cm">// a
-                            missing / revoked proof degrades, never reverts</span></div>
-                    <div class="wbar">
-                        <div class="seg s1">400</div>
-                        <div class="seg s2">300</div>
-                        <div class="seg s3">200</div>
-                        <div class="seg s4">100</div>
-                    </div>
-                    <div class="wleg"><span><i style="background:var(--jade)"></i>Verified Address · 400</span><span><i
-                                style="background:var(--gold)"></i>Verified Balance · 300</span><span><i
-                                style="background:var(--slate)"></i>Account Age &gt;90d · 200</span><span><i
-                                style="background:#c79bd6"></i>Verified Code · 100</span></div>
+                            class="op">ceiling(provenance_class)</span>, Σ category_scores)<br><span
+                            class="cm">// ceiling is the hard cap set by the strongest proof class —</span><br><span class="cm">// no amount of lower-class signals can break through it</span></div>
+                    <ul class="feat" style="margin-top:12px">
+                        <li><b>ATTESTER</b> — regulated attester (Upbit/Dojang) → ceiling <b>1000</b> <span class="mono">Platinum</span></li>
+                        <li><b>CONSENTED</b> — self-submitted proofs (ENS, Passport, OAuth) → ceiling <b>799</b> <span class="mono">Gold</span></li>
+                        <li><b>BEHAVIORAL</b> — reporter-attested on-chain activity → ceiling <b>499</b> <span class="mono">Silver</span></li>
+                        <li><b>STATE</b> — trustless on-chain state (holds LP/vault shares) → ceiling <b>499</b> <span class="mono">Silver</span></li>
+                    </ul>
                 </div>
                 <div class="card">
                     <div class="tag">Tiers · downstream effect</div>
                     <h3>One number, many gates</h3>
                     <ul class="feat">
-                        <li><b>Unverified</b> &lt;200 · <b>Silver</b> 200–499 · <b>Gold</b> 500–799 · <b>Platinum</b>
-                            800–1000.</li>
+                        <li><b>Standard</b> &lt;200 · <b>Silver</b> 200–499 · <b>Gold</b> 500–799 · <b>Platinum</b> 800–1000.</li>
                         <li><code>tierOf()</code> / <code>tierName()</code> are the only calls consumers need.</li>
-                        <li>Account age is read from <b>EAS</b> <code>getAttestation(uid).time</code> — rewards wallets
-                            that aren't fresh/Sybil.</li>
-                        <li><b>Graceful reads</b>: every upstream call is wrapped, so a flaky attester degrades a score
-                            instead of bricking a query.</li>
+                        <li><code>scoreBreakdown()</code> returns per-category detail: <code>baseAttestation</code>, <code>trustlessState</code>, <code>reporterActivity</code>, <code>consentedProofs</code>.</li>
+                        <li><b>Graceful reads</b>: every upstream call is <code>try/catch</code>-wrapped — a missing or revoked proof degrades a score, never reverts a query.</li>
+                        <li><b>V1 required Upbit; V2 accepts any whitelisted attester</b> — the ceiling stays high, the door gets wider.</li>
                     </ul>
                 </div>
             </div>
-            <div class="card" style="margin-top:16px">
-                <div class="tag">Extensibility · v2 design</div>
-                <h3>Adding on-chain actions without redeploying the engine</h3>
-                <ul class="feat">
-                    <li><b>Pluggable signal registry:</b> a <code>recordSignal(id, wallet, value)</code> gated to a
-                        whitelist of <code>signalReporter</code> contracts (each protocol registers itself), each signal
-                        carrying a governance-set weight + decay half-life.</li>
-                    <li>Composite becomes <code>min(1000, baseAttestation + Σ decayed_signal_contributions)</code> — so
-                        a wallet that swaps 5× and provides LP accrues "activity trust" that <b>decays if it goes
-                            idle</b>, resisting one-time farming.</li>
-                    <li>Trust assumption added: reporters must be honest — mitigated by whitelist + per-signal caps +
-                        the attestation floor that already exists.</li>
-                </ul>
-            </div>
+            <div class="pull" style="margin-top:24px">A sybil farm can grind to Silver, but cannot buy Platinum.<span class="by">the provenance ceiling · DojangScore V2</span></div>
         </section>
 
         <!-- §03 WONVAULT -->
@@ -1704,6 +1683,13 @@
                         <td data-c="2">200–499</td>
                         <td data-c="3">500–799</td>
                         <td data-c="4">800–1000</td>
+                    </tr>
+                    <tr>
+                        <td><b>Provenance ceiling</b></td>
+                        <td data-c="1" style="color:var(--faint)">NONE</td>
+                        <td data-c="2" style="color:var(--slate)">BEHAVIORAL</td>
+                        <td data-c="3" style="color:var(--gold)">CONSENTED</td>
+                        <td data-c="4" style="color:var(--jade)">ATTESTER</td>
                     </tr>
                     <tr>
                         <td><b>WonVault</b> entry fee</td>
@@ -1850,6 +1836,64 @@
             <div class="pull">The dashboard is not decoration. It is the instrument that caught a real accounting
                 exploit before real money was at stake — and the same discipline now gates what we promise on
                 mainnet.<span class="by">the Proven engineering principle</span></div>
+        </section>
+
+        <!-- §08 API LAYER -->
+        <section class="sec rv">
+            <div class="num">08</div>
+            <div class="ey">The B2B product</div>
+            <h2>The <span class="j">API Layer</span></h2>
+            <p class="sub">One call returns a wallet's trust score, tier, and provenance. Use it to gate, weight, or price anything off-chain: launchpad allocations, airdrop multipliers, trading fees.</p>
+            <div class="grid2">
+                <div class="card">
+                    <div class="tag">REST endpoints</div>
+                    <h3>Four routes, full coverage</h3>
+                    <div class="formula"><span class="fn">GET</span>  /api/score/<span class="op">{address}</span><br><span class="fn">GET</span>  /api/tier/<span class="op">{address}</span><br><span class="fn">POST</span> /api/score/batch <span class="cm">// max 500 addresses</span><br><span class="fn">GET</span>  /api/health</div>
+                    <ul class="feat" style="margin-top:12px">
+                        <li>Auth via <code>x-proven-key</code> header — no wallet signing required.</li>
+                        <li><b>45-second cache</b> per address — fast reads, no chain hammering.</li>
+                        <li>Batch endpoint handles up to <b>500 addresses</b> per call for bulk screening.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="tag">Rate tiers · B2B</div>
+                    <h3>Start free, scale to custom</h3>
+                    <ul class="feat">
+                        <li><b>Pilot</b> — 1,000 calls / month, free. No credit card.</li>
+                        <li><b>Builder</b> — 50,000 calls / month. Production-ready.</li>
+                        <li><b>Scale</b> — custom limits, SLA, dedicated support.</li>
+                    </ul>
+                    <div class="note" style="margin-top:14px"><b>The API is the B2B product; the suite is the proof that it works.</b> Every on-chain contract is live evidence that the score is real and the tiers are enforced.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- §09 SUSTAINABILITY -->
+        <section class="sec rv">
+            <div class="num">09</div>
+            <div class="ey">Protocol funding · community</div>
+            <h2>Sustain<span class="j">ability</span></h2>
+            <p class="sub">The soulbound NFT funds protocol development and rewards early believers — without touching the trust score.</p>
+            <div class="grid2">
+                <div class="card">
+                    <div class="tag">Soulbound supporter NFT</div>
+                    <h3>5,555 cap · $5 USDC</h3>
+                    <ul class="feat">
+                        <li>Hard cap of <b>5,555 tokens</b> — soulbound, non-transferable.</li>
+                        <li>Mint price: <b>$5 USDC</b>. 100% of proceeds fund protocol development.</li>
+                        <li>Holders receive <b>fee discounts</b> across the suite and <b>governance voice</b> on parameter proposals.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <div class="tag">Trust purity guarantee</div>
+                    <h3>Benefits, not score</h3>
+                    <ul class="feat">
+                        <li>NFT ownership grants <b>benefits</b> (discounts, governance) — it does <b>not</b> influence the DojangScore.</li>
+                        <li>Trust stays pure: a whale with 100 NFTs gets the same score as an honest first-timer.</li>
+                        <li>The ceiling is provenance. The perks are loyalty. They never mix.</li>
+                    </ul>
+                </div>
+            </div>
         </section>
 
         <!-- FOOTER -->
