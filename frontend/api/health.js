@@ -2,8 +2,7 @@
 const { withFailover, authKey, kvConfigured, CHAIN_ID, CONTRACT_ADDRESS } = require('./utils');
 
 module.exports = async function handler(req, res) {
-    const record = await authKey(req);
-    if (!record) return res.status(401).json({ error: "Missing or invalid x-proven-key" });
+    res.setHeader("Cache-Control", "no-store");
 
     try {
         let ms = 0;
